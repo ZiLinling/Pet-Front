@@ -238,6 +238,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/tabBar/shop/shop",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -258,12 +267,12 @@
 				"selectedIconPath": "static/img/tabBar/home-on.png",
 				"text": "首页"
 			},
-			// {
-			// 	"pagePath": "pages/tabBar/category/category",
-			// 	"iconPath": "static/img/tabBar/category.png",
-			// 	"selectedIconPath": "static/img/tabBar/category-on.png",
-			// 	"text": "分类"
-			// },
+			{
+				"pagePath": "pages/tabBar/shop/shop",
+				"iconPath": "static/img/tabBar/category.png",
+				"selectedIconPath": "static/img/tabBar/category-on.png",
+				"text": "周边"
+			},
 			{
 				"pagePath": "pages/tabBar/cart/cart",
 				"iconPath": "static/img/tabBar/cart.png",
