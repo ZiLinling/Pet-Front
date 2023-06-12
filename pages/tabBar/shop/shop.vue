@@ -4,10 +4,21 @@
 		
 
 
-		<!-- 搜索框 -->
-		<view class="input-box">
-			<input placeholder="   搜宠物" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
-			<view class="icon search"></view>
+		<!-- 状态栏 -->
+		<view v-if="showHeader" class="status" :style="{ position: headerPosition,top:statusTop,opacity: afterHeaderOpacity}"></view>
+		<!-- 顶部导航栏 -->
+		<view v-if="showHeader" class="header" :style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
+			
+			<!-- 搜索框 -->
+			<view class="input-box">
+				<input
+					placeholder="搜宠物"
+					placeholder-style="color:#c0c0c0;"
+					@tap="toSearch()"
+				/>
+				<view class="icon search"></view>
+			</view>
+			
 		</view>
 
 
@@ -349,20 +360,45 @@
 		height: var(--status-bar-height); //覆盖样式
 		/*  #endif  */
 	}
+.header {
+	width: 92%;
+	padding: 0 4%;
+	height: 100upx;
+	display: flex;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	z-index: 10;
+	background-color: #fff;
 
+	/*  #ifdef  APP-PLUS  */
+	top: var(--status-bar-height);
+	/*  #endif  */
+
+	.addr {
+		width: 120upx;
+		height: 60upx;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		font-size: 28upx;
+		.icon {
+			height: 60upx;
+			margin-right: 5upx;
+			display: flex;
+			align-items: center;
+			font-size: 42upx;
+			color: #ffc50a;
+		}
+	}
 	.input-box {
-		
-		width: 90%;
-		margin-left: 5%;
+		width: 100%;
 		height: 60upx;
 		background-color: #f5f5f5;
 		border-radius: 30upx;
 		position: relative;
 		display: flex;
 		align-items: center;
-	
-		align-items: center;
-
 		.icon {
 			display: flex;
 			align-items: center;
@@ -374,18 +410,63 @@
 			font-size: 34upx;
 			color: #c0c0c0;
 		}
-
-		.input {
+		input {
 			padding-left: 28upx;
 			height: 28upx;
 			font-size: 28upx;
 		}
+	}
+	.icon-btn {
+		width: 120upx;
+		height: 60upx;
+		flex-shrink: 0;
+		display: flex;
+		.icon {
+			width: 60upx;
+			height: 60upx;
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			font-size: 42upx;
+		}
+	}
+}
+	// .input-box {
+		
+	// 	width: 90%;
+	// 	margin-left: 5%;
+	// 	height: 60upx;
+	// 	background-color: #f5f5f5;
+	// 	border-radius: 30upx;
+	// 	position: relative;
+	// 	display: flex;
+	// 	align-items: center;
+	
+	// 	align-items: center;
+
+	// 	.icon {
+	// 		display: flex;
+	// 		align-items: center;
+	// 		position: absolute;
+	// 		top: 0;
+	// 		right: 0;
+	// 		width: 60upx;
+	// 		height: 60upx;
+	// 		font-size: 34upx;
+	// 		color: #c0c0c0;
+	// 	}
+
+	// 	.input {
+	// 		padding-left: 28upx;
+	// 		height: 28upx;
+	// 		font-size: 28upx;
+	// 	}
 
 
 
 
 		
-	}
+	// }
 
 	.place {
 		background-color: #ffffff;
@@ -397,7 +478,7 @@
 
 	.swiper {
 		width: 100%;
-		margin-top: 50upx;
+		margin-top: 120upx;
 		display: flex;
 		justify-content: center;
 

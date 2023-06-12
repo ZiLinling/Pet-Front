@@ -33,7 +33,6 @@ axios.interceptors.response.use(
   });
 
 export function getRequest(url, params) {
-  let token = uni.getStorageSync('token')
   return axios({
     method: "get",
     url: base_url + url,
@@ -41,7 +40,6 @@ export function getRequest(url, params) {
   })
 }
 export function postRequest(url, params) {
-  let token = uni.getStorageSync('token')
   return axios({
     method: "post",
     url: base_url + url,
@@ -52,7 +50,6 @@ export function postRequest(url, params) {
   })
 }
 export function postJsonRequest(url, params) {
-  let token = uni.getStorageSync('token')
   return axios({
     method: "post",
     url: base_url + url,

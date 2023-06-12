@@ -24,23 +24,14 @@
 				<view class="username" @tap="toLogin">{{user.username}}</view>
 				<view class="signature" @tap="toSetting">{{user.signature}}</view>
 			</view>
-			<!-- 二维码按钮 -->
-			<view class="erweima" @tap="toMyQR">
-				<view class="icon qr"></view>
-			</view>
+		
 		</view>
-		<!-- VIP banner -->
-		<view class="VIP">
-			<view class="img">
-				<image src="/static/img/VIP.png"></image>
-			</view>
-			<view class="title">开通VIP会员</view>
-			<view class="tis">会员特权</view>
-		</view>
+	
 		<!-- 订单-余额 -->
 		<view class="order">
 			<!-- 订单类型 -->
 			<view class="list">
+				<view class="title">我的订单</view>
 				<view class="box" v-for="(row,index) in orderList" :key="index" @tap="toOrderList(index)">
 					<view class="img">
 						<view class="icon" :class="row.icon"></view>
@@ -48,31 +39,8 @@
 					<view class="text">{{row.text}}</view>
 				</view>
 			</view>
-			<!-- 余额 -->
-			<view class="balance-info">
-				<view class="left">
-					<view class="box">
-						<view class="num">{{user.integral}}</view>
-						<view class="text">积分</view>
-					</view>
-					<view class="box">
-						<view class="num">{{user.envelope}}</view>
-						<view class="text">佣金</view>
-					</view>
-					<view class="box">
-						<view class="num">{{user.balance}}</view>
-						<view class="text">余额</view>
-					</view>
-				</view>
-				<view class="right">
-					<view class="box" @tap="toDeposit">
-						<view class="img">
-							<view class="icon chongzhi"></view>
-						</view>
-						<view class="text">充值</view>
-					</view>
-				</view>
-			</view>
+		
+		
 		</view>
 		<!-- 工具栏 -->
 		<view class="toolbar">
@@ -120,14 +88,12 @@
 				// 工具栏列表
 				mytoolbarList:[
 					{url:'../../user/keep/keep',text:'我的收藏',img:'/static/img/user/point.png'},
-					{url:'../../user/coupon/coupon',text:'优惠券',img:'/static/img/user/quan.png'}, 
-					{url:'',text:'新客豪礼',img:'/static/img/user/renw.png'},
-					{url:'',text:'领红包',img:'/static/img/user/momey.png'},
+					
 					
 					{url:'../../user/address/address',text:'收货地址',img:'/static/img/user/addr.png'},
 					{url:'',text:'账户安全',img:'/static/img/user/security.png'},
 					{url:'',text:'银行卡',img:'/static/img/user/bank.png'},
-					{url:'',text:'抽奖',img:'/static/img/user/choujiang.png'},
+					
 					// {text:'客服',img:'/static/img/user/kefu.png'},
 					// {text:'签到',img:'/static/img/user/mingxi.png'}
 					
@@ -258,7 +224,7 @@
 		position: fixed;
 		top: 0;
 		z-index: 10;
-		background-color: #f06c7a;
+		background-color: white;
 		/*  #ifdef  APP-PLUS  */
 		top: var(--status-bar-height);
 		/*  #endif  */
@@ -268,7 +234,7 @@
 			flex-shrink: 0;
 			display: flex;
 			.icon{
-				color: #fff;
+				color: black;
 				width: 60upx;
 				height: 60upx;
 				display: flex;
@@ -279,7 +245,7 @@
 		}
 	}
 	.place{
-		background-color: #f06c7a;
+		background-color: white;
 		height: 100upx;
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
@@ -289,13 +255,14 @@
 		height: 300upx;
 	}
 	.user{
+		margin-left: 50upx;
 		width: 92%;
 		padding: 0 4%;
 		display: flex;
 		align-items: center;
 		// position: relative;
-		background-color: #f06c7a;
-		padding-bottom: 120upx;
+		background-color: white;
+		padding-bottom: 50upx;
 		.left{
 			width: 20vw;
 			height: 20vw;
@@ -313,30 +280,18 @@
 		.right{
 			width: 100%;
 			.username{
+				margin-left: 50upx;
 				font-size: 36upx;
-				color: #fff;
+				color: black;
 			}
 			.signature{
-				color: #eee;
+				margin-top:30upx;
+				margin-left: 50upx;
+				color: black;
 				font-size: 28upx;
 			}
 		}
-		.erweima{
-			flex-shrink: 0;
-			width: 10vw;
-			height: 10vw;
-			margin-left: 5vw;
-			border-radius: 100%;
-		
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			background: linear-gradient(to left, #fbbb37 0%,#fcf0d0 105%);
-			.icon{
-				color: #7b6335;
-				font-size: 42upx;
-			}
-		}
+	
 	}
 	.order{
 		width: 84%;
@@ -345,8 +300,18 @@
 		background-color: #fff;
 		box-shadow: 0upx 0upx 25upx rgba(0,0,0,0.1);
 		border-radius: 15upx;
+		.title{
+			
+			margin-top: -10upx;
+			font-size: 30upx;
+			height: 80upx;
+			display: flex;
+			align-items: center;
+			width: 100%;
+		}
 		.list{
 			display: flex;
+			flex-wrap: wrap;
 			border-bottom: solid 1upx #17e6a1;
 			padding-bottom: 10upx;
 			.box{
@@ -369,91 +334,9 @@
 				}
 			}
 		}
-		.balance-info{
-			display: flex;
-			padding: 10upx 0;
-			.left{
-				width: 75%;
-				display: flex;
-				.box{
-					width: 50%;
-					font-size: 28upx;
-					
-					.num{
-						width: 100%;
-						height: 50upx;
-						display: flex;
-						justify-content: center;
-						align-items: flex-end;
-						color: #f9a453;
-					}
-					.text{
-						width: 100%;
-						display: flex;
-						justify-content: center;
-						color: #3d3d3d;
-						font-size: 28upx;
-					}
-				}
-			}
-			.right{
-				border-left: solid 1upx #17e6a1;
-				width: 25%;
-				.box{
-					
-					.img{
-						width: 100%;
-						height: 50upx;
-						display: flex;
-						justify-content: center;
-						align-items: flex-end;
-						.icon{
-							font-size: 45upx;
-							color: #e78901;
-						}
-					}
-					.text{
-						width: 100%;
-						display: flex;
-						justify-content: center;
-						font-size: 28upx;
-						color: #3d3d3d;
-					}
-				}
-			}
-		}
+		
 	}
-	.VIP{
-		width: 84%;
-		margin: -65upx auto 20upx auto;
-		padding: 30upx 4%;
-		background: linear-gradient(to left, #dea96d 0%,#f6d59b 100%);
-		box-shadow: 0upx 0upx 25upx rgba(0,0,0,0.2);
-		border-radius: 15upx;
-		display: flex;
-		align-items: center;
-		.img{
-			flex-shrink: 0;
-			width: 60upx;
-			height: 60upx;
-			image{
-				width: 60upx;
-				height: 60upx;
-			}
-		}
-		.title{
-			width: 100%;
-			color: #796335;
-			font-size: 30upx;
-		}
-		.tis{
-			width: 100%;
-			display: flex;
-			justify-content: flex-end;
-			color: #fcf0d0;
-			font-size: 26upx;
-		}
-	}
+	
 	.toolbar{
 		width: 92%;
 		margin: 0 4% 0 4%;
