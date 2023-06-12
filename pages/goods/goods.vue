@@ -157,6 +157,13 @@
 				</view>
 				<view class="arrow"><view class="icon xiangyou"></view></view>
 			</view>
+			
+			<view class="row">
+					<view class="text">运费：</view>
+					<view>8-24</view>
+					<view style="display:flex;float:right;"> 库存：{{stock }}</view>
+			</view>
+			
 		</view>
 		<!-- 评价 -->
 		<view class="info-box comments" id="comments">
