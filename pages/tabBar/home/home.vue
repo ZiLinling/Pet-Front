@@ -146,10 +146,10 @@ export default {
 			city: '厦门',
 			currentSwiper: 0,
 			petCategory: [
-				{ id: 1, name: '附近', img: '/static/img/category/1.png' },
-				{ id: 2, name: '狗狗', img: '/static/img/category/1.png' },
-				{ id: 3, name: '猫猫', img: '/static/img/category/1.png' },
-				{ id: 4, name: '其他', img: '/static/img/category/1.png' }
+				{ id: 1, name: '附近', img: '/static/img/category/category_0.jpg' },
+				{ id: 2, name: '狗狗', img: '/static/img/category/category_1.jpg' },
+				{ id: 3, name: '猫猫', img: '/static/img/category/category_2.jpg' },
+				{ id: 4, name: '其他', img: '/static/img/category/category_2.jpg' }
 			],
 			// 轮播图片
 			swiperList: [
@@ -159,14 +159,14 @@ export default {
 			],
 			// 品种菜单
 			categoryList: [
-				{ id: 1, name: '布偶猫', img: '/static/img/category/1.png' },
-				{ id: 2, name: '英国短毛猫', img: '/static/img/category/2.png' },
-				{ id: 3, name: '美国短毛猫', img: '/static/img/category/3.png' },
-				{ id: 4, name: '缅因猫', img: '/static/img/category/4.png' },
-				{ id: 5, name: '泰迪', img: '/static/img/category/5.png' },
-				{ id: 6, name: '运动', img: '/static/img/category/6.png' },
-				{ id: 7, name: '书籍', img: '/static/img/category/7.png' },
-				{ id: 8, name: '文具', img: '/static/img/category/8.png' }
+				{ id: 1, name: '布偶猫', img: '/static/img/category/catcat.jpg' },
+				{ id: 2, name: '英国短毛猫', img: '/static/img/category/catcat1.jpg' },
+				{ id: 3, name: '美国短毛猫', img: '/static/img/category/catcat2.jpg' },
+				{ id: 4, name: '缅因猫', img: '/static/img/category/catcat3.jpg' },
+				{ id: 5, name: '泰迪', img: '/static/img/category/dog0.jpg' },
+				{ id: 6, name: '拉布拉多', img: '/static/img/category/dog1.jpg' },
+				{ id: 7, name: '贵宾犬', img: '/static/img/category/dog2.jpg' },
+				{ id: 8, name: '斑点狗', img: '/static/img/category/dog3.jpg' }
 			],
 			Promotion: [],
 			//猜你喜欢列表
@@ -618,9 +618,9 @@ page{position: relative;background-color: #fff;}
 			width: 100%;
 			display: flex;
 			justify-content: center;
-			image {
-				width: 9vw;
-				height: 9vw;
+			image {   //分类图片大小
+				width: 18vw;
+				height: 18vw;
 			}
 		}
 		.text {
