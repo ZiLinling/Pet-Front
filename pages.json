@@ -64,35 +64,35 @@
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "登录",
-				"navigationBarBackgroundColor":"#f06c7a",
-				"navigationBarTextStyle":"white",
 				"app-plus": {
-		            "bounce": "none" ,//关闭窗口回弹效果
-					"softinputNavBar":"none"
-		        }
-			}
-		},
-		{
-			"path": "pages/login/register",
-			"style": {
-				"navigationBarTitleText": "注册账号",
-				"navigationBarBackgroundColor":"#f06c7a",
-				"navigationBarTextStyle":"white",
-				"app-plus": {
-				    "bounce": "none" ,//关闭窗口回弹效果
-					"softinputNavBar":"none"
+					"bounce":"none"
 				}
 			}
 		},
 		{
-			"path": "pages/login/resetpasswd",
+			"path": "pages/login/reg",
 			"style": {
-				"navigationBarTitleText": "重置密码",
-				"navigationBarBackgroundColor":"#f06c7a",
-				"navigationBarTextStyle":"white",
+				"navigationBarTitleText": "注册",
 				"app-plus": {
-				    "bounce": "none" ,//关闭窗口回弹效果
-					"softinputNavBar":"none"
+					"bounce":"none"
+				}
+			}
+		},
+		{
+			"path": "pages/login/forget",
+			"style": {
+				"navigationBarTitleText": "忘记密码",
+				"app-plus": {
+					"bounce":"none"
+				}
+			}
+		},
+		{
+			"path": "pages/login/agreement",
+			"style": {
+				"navigationBarTitleText": "用户协议",
+				"app-plus": {
+					"bounce":"none"
 				}
 			}
 		}
