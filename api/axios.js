@@ -9,7 +9,7 @@ const base_url = "http://localhost:8090/Pet"
 axios.interceptors.request.use(
   config => {
     if (uni.getStorageSync('token')) {
-      config.header.token = uni.getStorageSync('token');
+      config.headers.token = uni.getStorageSync('token');
     }
     return config;
   },

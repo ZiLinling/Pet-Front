@@ -3,6 +3,7 @@
 		<view class="tabr" :style="{top:headerTop}">
 			<view :class="{on:typeClass=='goods'}" @tap="switchType('goods')">商品({{goodsList.length}})</view>
 			<view :class="{on:typeClass=='shop'}"  @tap="switchType('shop')">店铺({{shopList.length}})</view>
+			<view :class="{on:typeClass=='pet'}"  @tap="switchType('pet')">宠物({{shopList.length}})</view>
 			<view class="border" :class="typeClass"></view>
 		</view>
 		<view class="place" ></view>

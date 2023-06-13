@@ -95,34 +95,7 @@
 				<view class="btn"><view class="button" @tap="hideService">完成</view></view>
 			</view>
 		</view>
-		<!-- 规格-模态层弹窗 -->
-		<view class="popup spec" :class="specClass" @touchmove.stop.prevent="discard" @tap="hideSpec">
-			<!-- 遮罩层 -->
-			<view class="mask"></view>
-			<view class="layer" @tap.stop="discard">
-				<view class="content">
-					<view class="title">选择规格：</view>
-					<view class="sp">
-						<view v-for="(item,index) in goodsData.spec" :class="[index==selectSpec?'on':'']" @tap="setSelectSpec(index)" :key="index">{{item}}</view>
-					</view>
-					<view class="length" v-if="selectSpec!=null">
-						<view class="text">数量</view>
-						<view class="number">
-							<view class="sub" @tap.stop="sub">
-								<view class="icon jian"></view>
-							</view>
-							<view class="input" @tap.stop="discard">
-								<input type="number" v-model="goodsData.number" />
-							</view>
-							<view class="add"  @tap.stop="add">
-								<view class="icon jia"></view>
-							</view>
-						</view>
-					</view>
-				</view>
-				<view class="btn"><view class="button" @tap="hideSpec">完成</view></view>
-			</view>
-		</view>
+		
 		<!-- 商品主图轮播 -->
 		<view class="swiper-box">
 			<swiper circular="true" autoplay="true" @change="swiperChange">
@@ -146,22 +119,10 @@
 				<view class="content"><view class="serviceitem" v-for="(item,index) in goodsData.service" :key="index">{{item.name}}</view></view>
 				<view class="arrow"><view class="icon xiangyou"></view></view>
 			</view>
-			<view class="row" @tap="showSpec(false)">
-				<view class="text">选择</view>
-				<view class="content">
-					<view>选择规格：</view>
-					<view class="sp">
-						<view v-for="(item,index) in goodsData.spec" :key="index" :class="[index==selectSpec?'on':'']">{{item}}</view>
-					</view>
-					
-				</view>
-				<view class="arrow"><view class="icon xiangyou"></view></view>
-			</view>
 			
 			<view class="row">
-					<view class="text">运费：</view>
-					<view>8-24</view>
-					<view style="display:flex;float:right;"> 库存：{{stock }}</view>
+					<view class="text">运费：8-24 <view class="arrow" > 库存：11</view></view>
+					
 			</view>
 			
 		</view>

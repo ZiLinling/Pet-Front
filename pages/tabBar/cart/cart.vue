@@ -86,6 +86,9 @@
 </template>
 
 <script>
+	import {
+		getCart
+	} from '../../../api/cart';
 	export default {
 		data() {
 			return {
@@ -152,14 +155,7 @@
 				theIndex: null,
 				oldIndex: null,
 				isStop: false,
-				storeList: [{
-						id: 0,
-						name: '猫猫小店',
-					},
-					{
-						id: 1,
-						name: '狗狗小店',
-					}
+				storeList: [
 				],
 			}
 		},
@@ -185,11 +181,38 @@
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 		},
+		mounted() {
+		this.getCart();	
+		console.log("token"+uni.getStorageSync('token'))
+		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
 			// 直接所有需要的参数查询回来，然后我给他分开push到两个数组里面就好了吧
 
-
+			getCart(){
+				
+				//要记得规划userid
+				 console.log("拉去成功")
+				getCart({userId:1}).then((response) => {
+					console.log(response.data)
+					for(let i=0;i<response.data.length;i++){
+						let id=response.data.storeId;
+						let name=response.data.name;
+						this.storeList.push({id:id,name:name});
+					}
+					console.log(this.storeList)
+					storeList
+					// uni.switchTab({
+					// 	url: "/pages/tabBar/home/home"
+					// })
+				}).catch((error) => {
+					console.log(error)
+					// uni.showToast({
+					// 	title: error.message,
+					// 	icon:  "none"
+					// })
+				})
+			},
 
 			//加入商品 参数 goods:商品数据
 			joinGoods(goods) {
