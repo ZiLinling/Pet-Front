@@ -21,7 +21,6 @@ axios.interceptors.response.use(
   response => {
     if (uni.getStorageSync('token') && response.data.statusCode == 600) {
       uni.removeStorageSync('token')
-      uni.removeStorageSync('userId')
       return response;
     }
     if (response.data.statusCode != 200)

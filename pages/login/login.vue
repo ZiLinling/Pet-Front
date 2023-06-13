@@ -32,7 +32,7 @@
 <script>
 	import {
 		login
-	} from '../../api/login';
+	} from '../../api/user';
 	export default {
 		data() {
 			return {
@@ -46,9 +46,12 @@
 					account: this.account,
 					password: this.password
 				}).then((response) => {
-					console.log(response.data)
+					uni.setStorageSync("token",response.data.data)
 					uni.switchTab({
-						url: "/pages/tabBar/home/home"
+						url: "/pages/tabBar/user/user",
+						success() {
+							uni.$emit("checkLogin")
+						}
 					})
 				}).catch((error) => {
 					console.log(error)

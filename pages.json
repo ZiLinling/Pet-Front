@@ -33,18 +33,23 @@
 			"style": {
 				"enablePullDownRefresh": true,
 				"navigationBarTextStyle": "black",
-				"navigationStyle": "custom"
+				"navigationBarTitleText": "购物车",
+				"app-plus": {
+					"titleNView": {
+						"splitLine": {
+							"color": "#EEEEEE"
+						}
+					}
+				}
 			}
 		},
 		{
 			"path": "pages/tabBar/user/user",
 			"style": {
-				"enablePullDownRefresh": true,
-				"backgroundTextStyle": "light",
-				"navigationBarBackgroundColor": "#f06c7a",
+				"navigationBarTextStyle": "black",
 				"backgroundColorTop": "#f06c7a",
-				"navigationBarTextStyle": "white",
 				"navigationStyle": "custom"
+
 			}
 		},
 		{
@@ -243,7 +248,7 @@
 	"tabBar": {
 		"color": "#333333",
 		"selectedColor": "#f06c7a",
-		"borderStyle": "black",
+		"borderStyle": "#EEEEEE",
 		"backgroundColor": "#ffffff",
 		"list": [{
 				"pagePath": "pages/tabBar/home/home",
