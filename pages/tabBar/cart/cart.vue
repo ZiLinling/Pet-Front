@@ -2,57 +2,58 @@
 	<view>
 
 		<view v-if="showHeader" class="header">
-			<p class="title" >购物车</p>
-
+			<p class="title">购物车</p>
 		</view>
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place">
 			<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
 			<p>{{address}}</p>
-			<button type="warning" class="controller">管理</button>
+			<button class="controller">管理</button>
 		</view>
 		<!-- 商品列表 -->
 		<view class="goods-list">
 			<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
 			<!-- store是商店，cnt是遍历的数字 -->
-			<view v-for="(store,cnt) in storeList" :key="cnt" class="store">
-				<view class="">
+			<view v-for="store in storeList" :key="store.id" class="store">
+				<view>
 					<image src="/static/img/store.png" class="store-logo"></image>
 					{{store.name}}
+
 				</view>
-				<view class="row" v-for="(row,index) in goodsList" :key="index" v-show="row.storeId==store.id?true:false">
+
+				<view class="row" v-for="goods in store.goodsVOList" :key="goods.id">
 					<!-- 删除按钮 -->
-					<view class="menu" @tap.stop="deleteGoods(row.id)">
+
+					<view class="menu" @tap.stop="deleteGoods(goods.id)">
 						<view class="icon shanchu"></view>
 					</view>
 					<!-- 商品 -->
-					<view class="carrier" :class="[theIndex==index?'open':oldIndex==index?'close':'']"
-						@touchstart="touchStart(index,$event)" @touchmove="touchMove(index,$event)"
-						@touchend="touchEnd(index,$event)">
+					<view class="carrier" :class="[theIndex==goods.id?'open':oldIndex==goods.id?'close':'']"
+						@touchstart="touchStart(goods.id,$event)" @touchmove="touchMove(goods.id,$event)"
+						@touchend="touchEnd(goods.id,$event)">
 						<!-- checkbox -->
-						<view class="checkbox-box" @tap="selected(index)">
+						<view class="checkbox-box" @tap="selected(goods.id)">
 							<view class="checkbox">
-								<view :class="[row.selected?'on':'']"></view>
+								<view :class="[goods.selected?'on':'']"></view>
 							</view>
 						</view>
 						<!-- 商品信息 -->
-						<view class="goods-info" @tap="toGoods(row)" >
+						<view class="goods-info" @tap="toGoods(goods)">
 							<view class="img">
-								<image :src="row.img"></image>
+								<image :src="goods.img"></image>
 							</view>
 							<view class="info">
-								<view class="title">{{row.name}}</view>
-								<view class="spec">{{row.spec}}</view>
+								<view class="title">{{goods.name}}</view>
 								<view class="price-number">
-									<view class="price">￥{{row.price}}</view>
+									<view class="price">￥{{goods.price}}</view>
 									<view class="number">
-										<view class="sub" @tap.stop="sub(index)">
+										<view class="sub" @tap.stop="sub(goods.id)">
 											<view class="icon jian"></view>
 										</view>
 										<view class="input" @tap.stop="discard">
-											<input type="number" v-model="row.number" @input="sum($event,index)" />
+											<input type="number" v-model="goods.num" @input="sum($event,goods.id)" />
 										</view>
-										<view class="add" @tap.stop="add(index)">
+										<view class="add" @tap.stop="add(goods.id)">
 											<view class="icon jia"></view>
 										</view>
 									</view>
@@ -86,6 +87,9 @@
 </template>
 
 <script>
+	import {
+		getCart
+	} from '../../../api/cart';
 	export default {
 		data() {
 			return {
@@ -97,70 +101,23 @@
 				showHeader: true,
 				selectedList: [],
 				isAllselected: false,
-				goodsList: [{
-						id: 1,
-						img: '/static/img/goods/p1.jpg',
-						name: '商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题',
-						spec: '规格:S码',
-						price: 1,
-						number: 1,
-						selected: false,
-						storeId: 0
-					},
-					{
-						id: 2,
-						img: '/static/img/goods/p2.jpg',
-						name: '商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题',
-						spec: '规格:S码',
-						price: 2,
-						number: 1,
-						selected: false,
-						storeId: 0
-					},
-					{
-						id: 3,
-						img: '/static/img/goods/p3.jpg',
-						name: '商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题',
-						spec: '规格:S码',
-						price: 3,
-						number: 1,
-						selected: false,
-						storeId: 0
-					},
-					{
-						id: 4,
-						img: '/static/img/goods/p4.jpg',
-						name: '商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题',
-						spec: '规格:S码',
-						price: 4,
-						number: 1,
-						selected: false,
-						storeId: 1
-					},
-					{
-						id: 5,
-						img: '/static/img/goods/p5.jpg',
-						name: '商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题',
-						spec: '规格:S码',
-						price: 5,
-						number: 1,
-						selected: false,
-						storeId: 1
-					}
+				goodsList: [
+					// {
+					// 	id: 1,
+					// 	img: '/static/img/goods/p1.jpg',
+					// 	name: "猫咪玩具",
+					// 	price: 30,
+					// 	number: 1,
+					// 	selected: false,
+					// 	storeId: 0
+					// },
+
 				],
 				//控制滑动效果
 				theIndex: null,
 				oldIndex: null,
 				isStop: false,
-				storeList: [{
-						id: 0,
-						name: '猫猫小店',
-					},
-					{
-						id: 1,
-						name: '狗狗小店',
-					}
-				],
+				storeList: [],
 			}
 		},
 		onPageScroll(e) {
@@ -185,11 +142,44 @@
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 		},
+		mounted() {
+			this.getCart();
+			console.log("token" + uni.getStorageSync('token'))
+		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
 			// 直接所有需要的参数查询回来，然后我给他分开push到两个数组里面就好了吧
 
+			getCart() {
 
+				//要记得规划userid
+				console.log("拉去成功")
+				getCart({
+				}).then((response) => {
+					console.log(response.data.data)
+					for (let i = 0; i < response.data.data.length; i++) {
+
+						this.storeList.push(response.data.data[i]);
+						console.log(response.data.data[i])
+						for (let j = 0; j < response.data.data[i].goodsVOList.length; j++) {
+							this.goodsList.push(response.data.data[i].goodsVOList[j]);
+						}
+					}
+					console.log("storeList")
+					console.log(this.storeList)
+					console.log("goodsList")
+					console.log(this.goodsList)
+					// uni.switchTab({
+					// 	url: "/pages/tabBar/home/home"
+					// })
+				}).catch((error) => {
+					console.log(error)
+					// uni.showToast({
+					// 	title: error.message,
+					// 	icon:  "none"
+					// })
+				})
+			},
 
 			//加入商品 参数 goods:商品数据
 			joinGoods(goods) {
@@ -204,7 +194,7 @@
 				for (let i = 0; i < len; i++) {
 					let row = this.goodsList[i];
 					if (row.id == goods.id) { //找到商品一样的商品
-						this.goodsList[i].number++; //数量自增
+						this.goodsList[i].num++; //数量自增
 						isFind = true; //找到一样的商品
 						break; //跳出循环
 					}
@@ -303,13 +293,25 @@
 			},
 			//删除商品
 			deleteGoods(id) {
-				let len = this.goodsList.length;
-				for (let i = 0; i < len; i++) {
-					if (id == this.goodsList[i].id) {
-						this.goodsList.splice(i, 1);
-						break;
-					}
-				}
+				deleteById({
+					goodsId:id
+				}).then((response) => {
+
+				}).catch((error) => {
+					console.log(error)
+					// uni.showToast({
+					// 	title: error.message,
+					// 	icon:  "none"
+					// })
+				})
+
+				// let len = this.goodsList.length;
+				// for (let i = 0; i < len; i++) {
+				// 	if (id == this.goodsList[i].id) {
+				// 		this.goodsList.splice(i, 1);
+				// 		break;
+				// 	}
+				// }
 				this.selectedList.splice(this.selectedList.indexOf(id), 1);
 				this.sum();
 				this.oldIndex = null;
@@ -327,6 +329,7 @@
 			},
 			// 选中商品
 			selected(index) {
+				console.log(index)
 				this.goodsList[index].selected = this.goodsList[index].selected ? false : true;
 				let i = this.selectedList.indexOf(this.goodsList[index].id);
 				i > -1 ? this.selectedList.splice(i, 1) : this.selectedList.push(this.goodsList[index].id);
@@ -347,15 +350,15 @@
 			},
 			// 减少数量
 			sub(index) {
-				if (this.goodsList[index].number <= 1) {
+				if (this.goodsList[index].num <= 1) {
 					return;
 				}
-				this.goodsList[index].number--;
+				this.goodsList[index].num--;
 				this.sum();
 			},
 			// 增加数量
 			add(index) {
-				this.goodsList[index].number++;
+				this.goodsList[index].num++;
 				this.sum();
 			},
 			// 合计
@@ -367,7 +370,7 @@
 						if (e && i == index) {
 							this.sumPrice = this.sumPrice + (e.detail.value * this.goodsList[i].price);
 						} else {
-							this.sumPrice = this.sumPrice + (this.goodsList[i].number * this.goodsList[i].price);
+							this.sumPrice = this.sumPrice + (this.goodsList[i].num * this.goodsList[i].price);
 						}
 					}
 				}
@@ -451,25 +454,25 @@
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
-		
+
 		p {
 			position: absolute;
 			margin-top: 30upx;
 			display: inline-block;
 		}
-		
+
 		.address-icon {
-		
+
 			margin-top: 20upx;
 			display: inline-block;
-		
+
 		}
 	}
 
 	.goods-list {
 		width: 100%;
 		padding: 20upx 0 120upx 0;
-		
+
 		.tis {
 			width: 100%;
 			height: 60upx;
@@ -496,7 +499,7 @@
 			.menu {
 				.icon {
 					color: #fff;
-					 font-size: 30upx;
+					font-size: 30upx;
 				}
 
 				position: absolute;
@@ -733,7 +736,7 @@
 	}
 
 
-	.store{
+	.store {
 		width: 90%;
 		margin-left: 5%;
 		background-color: #f8f8e4;
@@ -741,9 +744,10 @@
 		margin-bottom: 30upx;
 		border-radius: 20upx;
 	}
-	.store-logo{
+
+	.store-logo {
 		width: 40upx;
 		height: 40upx;
-		margin:10upx 0 0 10upx;
+		margin: 15upx 0 0 15upx;
 	}
 </style>

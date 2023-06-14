@@ -53,17 +53,12 @@
 
 <script>
 	import {
-		postJsonRequest,
-		postRequest
-	} from '../../api/axios';
-	import {
 		register
-	} from '../../api/login';
+	} from '../../api/user';
 	var _this, js;
 	export default {
 		onLoad() {
 			_this = this;
-
 		},
 		onUnload() {
 			clearInterval(js)
@@ -172,12 +167,14 @@
 				}).then((response) => {
 					console.log(response.data)
 					uni.setStorageSync('token', response.data.data.token)
-					uni.setStorageSync('userId', response.data.data.userid)
 					uni.showToast({
 						title: response.message,
 					})
 					uni.switchTab({
-						url: "/pages/tabBar/home/home"
+						url: "/pages/tabBar/user/user",
+						success() {
+							uni.$emit("checkLogin")
+						}
 					})
 				}).catch((error) => {
 					uni.showToast({

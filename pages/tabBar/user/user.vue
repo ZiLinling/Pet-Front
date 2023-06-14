@@ -2,10 +2,6 @@
 	<view>
 		<view v-if="showHeader" class="status" :style="{position:headerPosition,top:statusTop}"></view>
 		<view v-if="showHeader" class="header" :style="{position:headerPosition,top:headerTop}">
-			<view class="addr"></view>
-			<view class="input-box">
-				
-			</view>
 			<view class="icon-btn">
 				<view class="icon tongzhi" @tap="toMsg"></view>
 				<view class="icon setting" @tap="toSetting"></view>
@@ -14,19 +10,30 @@
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place"></view>
 		<!-- 用户信息 -->
-		<view class="user">
+		<view class="user" @tap="toLogin" v-if="user==null">
 			<!-- 头像 -->
 			<view class="left">
-				<image :src="user.face" @tap="toSetting"></image>
+				<image :src="img"></image>
+			</view>
+			<view class="right">
+				<view class="username">尚未登录</view>
+				<view class="account">点击此处跳转登录页面</view>
+			</view>
+
+		</view>
+		<view class="user" v-if="user">
+			<!-- 头像 -->
+			<view class="left">
+				<image :src="user.img"></image>
 			</view>
 			<!-- 昵称,个性签名 -->
 			<view class="right">
-				<view class="username" @tap="toLogin">{{user.username}}</view>
-				<view class="signature" @tap="toSetting">{{user.signature}}</view>
+				<view class="username">{{user.name}}</view>
+				<view class="account">账号:{{user.account}}</view>
 			</view>
-		
+
 		</view>
-	
+
 		<!-- 订单-余额 -->
 		<view class="order">
 			<!-- 订单类型 -->
@@ -39,8 +46,8 @@
 					<view class="text">{{row.text}}</view>
 				</view>
 			</view>
-		
-		
+
+
 		</view>
 		<!-- 工具栏 -->
 		<view class="toolbar">
@@ -59,148 +66,149 @@
 	</view>
 </template>
 <script>
+	import {
+		getUser
+	} from '../../../api/user';
 
 	export default {
 		data() {
 			return {
-				isfirst:true,
-				headerPosition:"fixed",
-				headerTop:null,
-				statusTop:null,
-				showHeader:true,
+				isfirst: true,
+				headerPosition: "fixed",
+				headerTop: null,
+				statusTop: null,
+				showHeader: true,
+				img: '/static/img/face.jpg',
 				//个人信息,
-				user:{
-					username:'游客1002',
-					face:'/static/img/face.jpg',
-					signature:'点击昵称跳转登录/注册页',
-					integral:0,
-					balance:0,
-					envelope:0
-				},
+				user: null,
 				// 订单类型
-				orderList:[
-					{text:'待付款',icon:"fukuan"},
-					{text:'待发货',icon:"fahuo"},
-					{text:'待收货',icon:"shouhuo"},
-					{text:'待评价',icon:"pingjia"},
-					{text:'退换货',icon:"tuihuo"}
+				orderList: [{
+						text: '待付款',
+						icon: "fukuan"
+					},
+					{
+						text: '待发货',
+						icon: "fahuo"
+					},
+					{
+						text: '待收货',
+						icon: "shouhuo"
+					},
+					{
+						text: '待评价',
+						icon: "pingjia"
+					},
+					{
+						text: '退换货',
+						icon: "tuihuo"
+					}
 				],
 				// 工具栏列表
-				mytoolbarList:[
-					{url:'../../user/keep/keep',text:'我的收藏',img:'/static/img/user/point.png'},
-					
-					
-					{url:'../../user/address/address',text:'收货地址',img:'/static/img/user/addr.png'},
-					{url:'',text:'账户安全',img:'/static/img/user/security.png'},
-					{url:'',text:'银行卡',img:'/static/img/user/bank.png'},
-					
+				mytoolbarList: [{
+						url: '../../user/keep/keep',
+						text: '我的收藏',
+						img: '/static/img/user/point.png'
+					},
+
+
+					{
+						url: '../../user/address/address',
+						text: '收货地址',
+						img: '/static/img/user/addr.png'
+					},
+					{
+						url: '',
+						text: '账户安全',
+						img: '/static/img/user/security.png'
+					},
+					{
+						url: '',
+						text: '银行卡',
+						img: '/static/img/user/bank.png'
+					},
+
 					// {text:'客服',img:'/static/img/user/kefu.png'},
 					// {text:'签到',img:'/static/img/user/mingxi.png'}
-					
+
 				]
 			}
-		},
-		//下拉刷新，需要自己在page.json文件中配置开启页面下拉刷新 "enablePullDownRefresh": true
-		onPullDownRefresh() {
-		    setTimeout(function () {
-		        uni.stopPullDownRefresh();
-		    }, 1000);
-		},
-		onPageScroll(e){
-			//兼容iOS端下拉时顶部漂移
-			this.headerPosition = e.scrollTop>=0?"fixed":"absolute";
-			this.headerTop = e.scrollTop>=0?null:0;
-			this.statusTop = e.scrollTop>=0?null:-this.statusHeight+'px';
 		},
 		onLoad() {
 			this.statusHeight = 0;
 			// #ifdef APP-PLUS
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
-			// #endif
-		},
-		onReady(){
-			//此处，演示,每次页面初次渲染都把登录状态重置
-			uni.setStorage({
-				key: 'UserInfo',
-				data: false,
-				success: function () {
-				},
-				fail:function(e){
-				}
-			});
-		},
-		onShow(){
-			uni.getStorage({
-				key: 'UserInfo',
-				success: (res)=>{
-					if(!res.data){
-						if(this.isfirst){
-							//this.toLogin();
-						}
-						return ;
-					}
-					this.user = res.data;
-				},
-				fail:(e)=>{
-					//this.toLogin(); 
-				}
+			// #endif	
+			uni.$on('checkLogin', () => {
+				this.getLogin()
 			});
 		},
 		methods: {
 			//消息列表
-			toMsg(){
+			toMsg() {
 				uni.navigateTo({
-					url:'../../msg/msg'
+					url: '../../msg/msg'
 				})
 			},
-			toOrderList(index){
-				uni.setStorageSync('tbIndex',index);
-				uni.navigateTo({url:'../../user/order_list/order_list?tbIndex='+index}) 
-			},
-			toSetting(){
+			toOrderList(index) {
+				uni.setStorageSync('tbIndex', index);
 				uni.navigateTo({
-					url:'../../user/setting/setting'
+					url: '../../user/order_list/order_list?tbIndex=' + index
 				})
 			},
-			toMyQR(){
+			toSetting() {
 				uni.navigateTo({
-					url:'../../user/myQR/myQR'
+					url: '../../user/setting/setting'
 				})
 			},
-			toLogin(){
-				uni.showToast({title: '请登录',icon:"none"});
+			toMyQR() {
 				uni.navigateTo({
-					url:'../../login/login'
+					url: '../../user/myQR/myQR'
+				})
+			},
+			toLogin() {
+				uni.showToast({
+					title: '请登录',
+					icon: "none"
+				});
+				uni.navigateTo({
+					url: '../../login/login'
 				})
 				this.isfirst = false;
 			},
-			isLogin(){
-				//实际应用中,用户登录状态应该用token等方法去维持登录状态.
-				const value = uni.getStorageSync('UserInfo');
-				if (value) {
-					return true;
-				}
-				return false
-			},
-			toDeposit(){
+			toDeposit() {
 				uni.navigateTo({
-					url:'../../user/deposit/deposit'
+					url: '../../user/deposit/deposit'
 				})
 			},
-			toPage(url){
-				if(!url){
-					uni.showToast({title: '模板未包含此页面',icon:"none"});return;
+			toPage(url) {
+				if (!url) {
+					uni.showToast({
+						title: '模板未包含此页面',
+						icon: "none"
+					});
+					return;
 				}
 				uni.navigateTo({
-					url:url
+					url: url
+				})
+			},
+			getLogin() {
+				getUser().then((response) => {
+					this.user = response.data.data
+				}).catch((error) => {
+					this.user = null
 				})
 			}
-		}
-	} 
+		},
+	}
 </script>
 <style lang="scss">
-	page{position: relative;background-color: #fff;}
+	page {
+		position: relative;
+		background-color: #fff;
+	}
+
 	.status {
 		width: 100%;
 		height: 0;
@@ -209,12 +217,12 @@
 		background-color: #f06c7a;
 		top: 0;
 		/*  #ifdef  APP-PLUS  */
-		height: var(--status-bar-height);//覆盖样式
+		height: var(--status-bar-height); //覆盖样式
 		/*  #endif  */
-		
+
 	}
-	
-	.header{
+
+	.header {
 		width: 92%;
 		padding: 0 4%;
 		height: 100upx;
@@ -227,13 +235,15 @@
 		background-color: white;
 		/*  #ifdef  APP-PLUS  */
 		top: var(--status-bar-height);
+
 		/*  #endif  */
-		.icon-btn{
+		.icon-btn {
 			width: 120upx;
 			height: 60upx;
 			flex-shrink: 0;
 			display: flex;
-			.icon{
+
+			.icon {
 				color: black;
 				width: 60upx;
 				height: 60upx;
@@ -244,64 +254,73 @@
 			}
 		}
 	}
-	.place{
+
+	.place {
 		background-color: white;
 		height: 100upx;
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
 	}
-	.place-bottom{
+
+	.place-bottom {
 		height: 300upx;
 	}
-	.user{
-		margin-left: 50upx;
+
+	.user {
+		margin: 30upx 90upx;
 		width: 92%;
-		padding: 0 4%;
 		display: flex;
 		align-items: center;
 		// position: relative;
 		background-color: white;
 		padding-bottom: 50upx;
-		.left{
+
+		.left {
 			width: 20vw;
 			height: 20vw;
 			flex-shrink: 0;
 			margin-right: 20upx;
 			border: solid 1upx #fff;
 			border-radius: 100%;
-			image{
+
+			image {
 				width: 20vw;
 				height: 20vw;
 				border-radius: 100%;
 			}
-			
+
 		}
-		.right{
+
+		.right {
 			width: 100%;
-			.username{
+
+			.username {
 				margin-left: 50upx;
 				font-size: 36upx;
 				color: black;
 			}
-			.signature{
-				margin-top:30upx;
+
+			.account {
+				margin-top: 30upx;
 				margin-left: 50upx;
 				color: black;
 				font-size: 28upx;
 			}
 		}
-	
+
 	}
-	.order{
+
+	.order {
 		width: 84%;
 		margin: 30upx 4% 30upx 4%;
 		padding: 30upx 4% 20upx 4%;
 		background-color: #fff;
-		box-shadow: 0upx 0upx 25upx rgba(0,0,0,0.1);
+		box-shadow: 0upx 0upx 25upx rgba(0, 0, 0, 0.1);
 		border-radius: 15upx;
-		.title{
-			
+
+		.title {
+
 			margin-top: -10upx;
 			font-size: 30upx;
 			height: 80upx;
@@ -309,23 +328,28 @@
 			align-items: center;
 			width: 100%;
 		}
-		.list{
+
+		.list {
 			display: flex;
 			flex-wrap: wrap;
 			border-bottom: solid 1upx #17e6a1;
 			padding-bottom: 10upx;
-			.box{
+
+			.box {
 				width: 20%;
-				.img{
+
+				.img {
 					width: 100%;
 					display: flex;
 					justify-content: center;
-					.icon{
+
+					.icon {
 						font-size: 50upx;
 						color: #464646;
 					}
 				}
-				.text{
+
+				.text {
 					width: 100%;
 					display: flex;
 					justify-content: center;
@@ -334,17 +358,18 @@
 				}
 			}
 		}
-		
+
 	}
-	
-	.toolbar{
+
+	.toolbar {
 		width: 92%;
 		margin: 0 4% 0 4%;
 		padding: 0 0 20upx 0;
 		background-color: #fff;
-		box-shadow: 0upx 0upx 25upx rgba(0,0,0,0.1);
+		box-shadow: 0upx 0upx 25upx rgba(0, 0, 0, 0.1);
 		border-radius: 15upx;
-		.title{
+
+		.title {
 			padding-top: 10upx;
 			margin: 0 0 10upx 3%;
 			font-size: 30upx;
@@ -352,24 +377,28 @@
 			display: flex;
 			align-items: center;
 		}
-		.list{
+
+		.list {
 			display: flex;
 			flex-wrap: wrap;
-			.box{
+
+			.box {
 				width: 25%;
 				margin-bottom: 30upx;
-				.img{
+
+				.img {
 					width: 23vw;
 					height: 10.5vw;
 					display: flex;
 					justify-content: center;
-					
-					image{
+
+					image {
 						width: 9vw;
 						height: 9vw;
 					}
 				}
-				.text{
+
+				.text {
 					width: 100%;
 					display: flex;
 					justify-content: center;

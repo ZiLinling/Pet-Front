@@ -35,20 +35,19 @@
 	export default {
 		created() {
 			let this_ = this;
-			if(this.specie=='0')//查询宠物种类数量(相同物种下的不同种类)
+			if (this.specie == '0') //查询宠物种类数量(相同物种下的不同种类)
 			{
 				getCount(this_.breedId).then((response) => {
 					this_.count1 = response.data.data
 				})
-			}
-			else  //查询宠物物种数量(猫、狗、其他分类)
+			} else //查询宠物物种数量(猫、狗、其他分类)
 			{
-				getCountBySpecie(this.specie).then(res=>{
+				getCountBySpecie(this.specie).then(res => {
 					this_.count1 = res.data.data;
 				})
 			}
 			console.log(this.specie)
-			page(1, 6, this.breedName,this.specie).then((response) => {
+			page(1, 6, this.breedName, this.specie).then((response) => {
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
 					this.goodsList.push(p[i])
@@ -64,11 +63,11 @@
 				loadingText: "正在加载...",
 				headerTop: "0px",
 				headerPosition: "fixed",
-				breedName: '',//种类名称
-				breedId: 0,//种类id
-				count1: 0,//数量
-				specie:0,//种类物种分类
-				pageNum: 2,//当前页号
+				breedName: '', //种类名称
+				breedId: 0, //种类id
+				count1: 0, //数量
+				specie: 0, //种类物种分类
+				pageNum: 2, //当前页号
 				orderbyList: [{
 						text: "宠物",
 						selected: true,
@@ -113,14 +112,16 @@
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
-			uni.showToast({title: '触发上拉加载'});
+			uni.showToast({
+				title: '触发上拉加载'
+			});
 			let len = this.goodsList.length;
 			if (len >= this.count1) {
 				this.loadingText = '没有更多了';
 				return false;
 			}
-			
-			page(this.pageNum, 4, this.breedName,this.specie).then((response) => {
+
+			page(this.pageNum, 4, this.breedName, this.specie).then((response) => {
 				this.pageNum++;
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
@@ -130,9 +131,9 @@
 		},
 		methods: {
 			//商品跳转
-			toGoods(e) {
+			toGoods(goods) {
 				uni.showToast({
-					title: '商品' + e.goods_id,
+					title: '商品' + goods.goods_id,
 					icon: "none"
 				});
 				uni.navigateTo({
