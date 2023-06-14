@@ -27,7 +27,7 @@
 					<view class="fav">
 
 
-						<uni-icons type="star-filled" size="25" color="red" @tap="cancelFav(product)"></uni-icons>
+						<uni-icons type="star-filled" size="25" color="red" @tap.native.stop="cancelFav(product)"></uni-icons>
 					</view>
 					<view class="info">
 						<view class="petName" v-if="favNow==1">{{product.name}}</view>
@@ -226,7 +226,7 @@
 			},
 
 			cancelFav(e) { //取消收藏
-
+				console.log(111)
 			}
 		}
 	};

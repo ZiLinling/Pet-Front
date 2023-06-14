@@ -166,7 +166,7 @@
 					email: this.email,
 				}).then((response) => {
 					console.log(response.data)
-					uni.setStorageSync('token', response.data.data.token)
+					uni.setStorageSync('token', response.data.data)
 					uni.showToast({
 						title: response.message,
 					})

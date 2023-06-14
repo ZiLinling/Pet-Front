@@ -3,17 +3,7 @@
 		<!-- 状态栏 -->
 		<view class="status" :style="{position:headerPosition}"></view>
         <view class="header" :style="{position:headerPosition}">
-			<view class="addr"><view class="icon location"></view>{{city}}</view>
-			<view class="input-box">
-				<input placeholder="默认关键字" placeholder-style="color:#c0c0c0;" @tap="toSearch()"/>
-				<view class="icon search"></view>
-			</view>
-			<view class="icon-btn">
-				<view class="icon tongzhi" @tap="toMsg"></view>
-			</view>
 		</view>
-		<!-- 占位 -->
-		<view class="place"></view>
 		<view class="category-list">
 			<!-- 左侧分类导航 -->
 			<scroll-view  scroll-y="true" class="left" >
@@ -237,9 +227,9 @@
 		.left,.right{
 			position: absolute;
 			
-			top: 100upx;
+			top: 0upx;
 			/*  #ifdef  APP-PLUS  */
-			top: calc(100upx + var(--status-bar-height));
+			top: calc(0upx + var(--status-bar-height));
 			/*  #endif  */
 			bottom: 0upx;
 		}
