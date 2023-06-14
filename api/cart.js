@@ -6,3 +6,11 @@ const {
 export function getCart(user) {
 	return getRequest('/cart/getcart', user)
 }
+
+export function save(user) {
+	return postRequest('/cart/save', user)
+}
+
+// export function delete(user) {
+// 	return postRequest('/cart/delete', user)
+// }
