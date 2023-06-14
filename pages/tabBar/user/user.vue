@@ -80,11 +80,7 @@
 				showHeader: true,
 				img: '/static/img/face.jpg',
 				//个人信息,
-				user: {
-					name: '尚未登录',
-					img: '/static/img/face.jpg',
-					account: '点击跳转登录',
-				},
+				user: null,
 				// 订单类型
 				orderList: [{
 						text: '待付款',
