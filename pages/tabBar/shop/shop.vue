@@ -732,6 +732,10 @@
 					padding: 10upx 4% 10upx 4%;
 
 					.store {
+						
+							line-height: 5px;
+							height: 30upx;
+						
 						font-size: 10upx;
 						margin-left: 5px;
 					}

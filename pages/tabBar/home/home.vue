@@ -599,6 +599,9 @@ page{position: relative;background-color: #fff;}
 				border-radius: 20upx 20upx 0 0;
 			}
 			.name {
+			
+				
+				
 				width: 92%;
 				padding: 10upx 4%;
 				display: -webkit-box;
@@ -621,6 +624,8 @@ page{position: relative;background-color: #fff;}
 					font-weight: 600;
 				}
 				.slogan {
+					line-height: 5px;
+					height: 30upx;
 					color: #807c87;
 					font-size: 24upx;
 				}
