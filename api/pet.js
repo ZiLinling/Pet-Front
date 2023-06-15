@@ -3,6 +3,6 @@ const {
 } = require("./axios");
 
 
-export function getPet(Id) {
-	return getRequest('/pet/getById', {Id})
+export function getPet(id) {
+	return getRequest('/pet/getById', id)
 }

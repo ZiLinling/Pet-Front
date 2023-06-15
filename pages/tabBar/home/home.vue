@@ -268,8 +268,9 @@ export default {
 		},
 		//商品跳转
 		toGoods(e) {
+		
 			uni.navigateTo({
-				url: '../../goods/goods?cid='+e.id+'&type='+this.type
+				url: '../../goods/pet?cid='+e.id+'&breed='+e.breedName
 			});
 		},
 		//轮播图指示器
