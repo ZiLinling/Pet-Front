@@ -109,7 +109,11 @@
 			<view class="layer" @tap.stop="discard">
 				<view class="content">
 					<view class="title">
-						图片 价格
+						图片
+						<view style="float: right;">
+							价格：{{goodsData.price}}
+						</view>
+
 					</view>
 					<view class="length">
 						<view class="text">数量</view>
@@ -118,7 +122,7 @@
 								<view class="icon jian"></view>
 							</view>
 							<view class="input" @tap.stop="discard">
-								<input type="number" v-model="goodsData.number" />
+								<input type="number" v-model="goodsData.num" />
 							</view>
 							<view class="add" @tap.stop="add">
 								<view class="icon jia"></view>
@@ -161,7 +165,9 @@
 			</view>
 
 			<view class="row">
-				<view class="text">运费：8-24 <view class="arrow"> 库存：{{goodsData.stock}}</view>
+				<view class="text">运费：8-24
+					<view class="arrow" v-if="type">性别：{{goodsData.gender}}</view>
+					<view class="arrow" v-else>库存：{{goodsData.stock}}</view>
 				</view>
 
 			</view>
@@ -195,7 +201,7 @@
 			<view class="title">———— 商品详情 ————</view>
 			<view class="">
 				<!-- 商品详情在这，看后面怎么用？ -->
-			<!-- 	{{goodsData.description}} -->
+				<!-- 	{{goodsData.description}} -->
 			</view>
 			<view class="content"><rich-text :nodes="descriptionStr"></rich-text></view>
 		</view>
@@ -209,10 +215,15 @@
 	import {
 		getGoods
 	} from '../../api/goods';
+	import {
+		getPet
+	} from '../../api/pet';
 
 	export default {
 		data() {
 			return {
+				type:null,
+				id: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -249,13 +260,6 @@
 				shareClass: '', //分享弹窗css类，控制开关动画
 				// 商品信息
 				goodsData: {
-					id: 1,
-					name: "",
-					price: "127.00",
-					number: 1,
-					stock:1,
-					category:'',
-					description:'',
 					service: [{
 							name: "正品保证",
 							description: "此商品官方保证为正品"
@@ -288,9 +292,9 @@
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
-			console.log(option.cid); //打印出上个页面传递的参数。
-			this.getgoods(option.cid);
-			
+			this.id = option.cid;
+			this.getpet()
+			// this.judge(option.type);
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -314,24 +318,30 @@
 			});
 		},
 		mounted() {
-
+			
 		},
 		methods: {
-			
-			getgoods(goodsId){
-				//先设置好id为1把数据弄好
-				goodsId=1;
+			// judge(type){
+			// 	if(type){
+			// 		this.getpet();
+			// 	}
+			// 	else{
+			// 		this.getgoods();
+			// 	}
+			// },
+			getgoods() {
 				getGoods({
-					id: goodsId
+					id: this.id
 				}).then((response) => {
-					console.log(response.data.data)
-					this.goodsData.id=response.data.data.id;
-					this.goodsData.name=response.data.data.name;
-					this.goodsData.description=response.data.data.description;
-					this.goodsData.stock=response.data.data.stock;
-					this.goodsData.category=response.data.data.category;
-					this.goodsData.price=response.data.data.price;
-					console.log(goodsData)
+					console.log("商品")
+					// console.log(response.data.data)
+					this.goodsData.id = response.data.data.id;
+					this.goodsData.name = response.data.data.name;
+					this.goodsData.description = response.data.data.description;
+					this.goodsData.stock = response.data.data.stock;
+					this.goodsData.category = response.data.data.category;
+					this.goodsData.price = response.data.data.price;
+					consol.log(this.goodsData)
 				}).catch((error) => {
 					console.log(error)
 					// uni.showToast({
@@ -339,6 +349,26 @@
 					// 	icon:  "none"
 					// })
 				})
+			},
+			getpet() {
+				getPet(this.id).then((response) => {
+					console.log("宠物")
+					console.log(response.data.data)
+					this.goodsData.id = response.data.data.id;
+					this.goodsData.name = response.data.data.name;
+					this.goodsData.description = response.data.data.description;
+					this.goodsData.gender = response.data.data.gender;
+					this.goodsData.category = response.data.data.category;
+					this.goodsData.price = response.data.data.price;
+					consol.log(this.goodsData)
+				}).catch((error) => {
+					console.log(error)
+					// uni.showToast({
+					// 	title: error.message,
+					// 	icon:  "none"
+					// })
+				})
+
 			},
 			//轮播图指示器
 			swiperChange(event) {
@@ -371,18 +401,8 @@
 				this.isKeep = this.isKeep ? false : true;
 			},
 			// 加入购物车
-			joinCart(id) {
-				id = parseInt(Math.random() * 10);
+			joinCart() {
 				if (this.selectSpec == null) {
-					save({
-						goodsId: id,
-					}).then((response) => {
-						console.log(response)
-					}).catch((error) => {
-						console.log(error)
-
-					})
-
 					return this.showSpec(() => {
 						uni.showToast({
 							title: "已加入购物车"
@@ -411,14 +431,7 @@
 			//跳转确认订单页面
 			toConfirmation() {
 				let tmpList = [];
-				let goods = {
-					id: this.goodsData.id,
-					img: '../../static/img/goods/p1.jpg',
-					name: this.goodsData.name,
-					spec: '规格:' + this.goodsData.spec[this.selectSpec],
-					price: this.goodsData.price,
-					number: this.goodsData.number
-				};
+				let goods = this.goodsData;
 				tmpList.push(goods);
 				uni.setStorage({
 					key: 'buylist',
@@ -431,7 +444,7 @@
 				})
 			},
 			//跳转评论列表
-			showComments(goodsid) {
+			showComments(id) {
 
 			},
 			//选择规格
@@ -440,14 +453,14 @@
 			},
 			//减少数量
 			sub() {
-				if (this.goodsData.number <= 1) {
+				if (this.goodsData.num <= 1) {
 					return;
 				}
-				this.goodsData.number--;
+				this.goodsData.num--;
 			},
 			//增加数量
 			add() {
-				this.goodsData.number++;
+				this.goodsData.num++;
 			},
 			//跳转锚点
 			toAnchor(index) {
@@ -512,9 +525,19 @@
 			},
 			//关闭规格弹窗
 			hideSpec() {
+				save({
+					id: this.goodsData.id,
+				}).then((response) => {
+					console.log(response)
+					console.log(this.goodsData.id)
+				}).catch((error) => {
+					console.log(error)
+
+				})
+
 				this.specClass = 'hide';
 				//回调
-
+				console.log("close")
 				this.selectSpec && this.specCallback && this.specCallback();
 				this.specCallback = false;
 				setTimeout(() => {

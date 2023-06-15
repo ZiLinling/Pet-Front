@@ -132,13 +132,7 @@
 		methods: {
 			//商品跳转
 			toGoods(goods) {
-				uni.showToast({
-					title: '商品' + goods.goods_id,
-					icon: "none"
-				});
-				uni.navigateTo({
-					url: '../goods'
-				});
+				
 			},
 			//排序类型
 			select(index) {
