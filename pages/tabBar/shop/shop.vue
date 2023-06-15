@@ -37,17 +37,17 @@
 				</view>
 			</view>
 		</view>
-		<!-- 宠物分类 -->
+		<!-- 商品分类 -->
 		<view class="category-list">
-			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
-				<view class="img">
+			<view  class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
+				<view  class="img">
 					<image :src="row.img"></image>
 				</view>
 				<view class="text">{{ row.name }}</view>
 			</view>
 		</view>
 
-		<!-- 商品列表 -->
+		<!-- 周边商品列表 -->
 		<view class="goods-list">
 		
 			<view class="product-list">
@@ -83,6 +83,7 @@ import { getGoodsList } from '../../../api/goods';
 		},
 		data() {
 			return {
+				bgColor: '#ffffff',
 				showHeader: true,
 				count1:0,
 				pageNum:2,
@@ -201,6 +202,10 @@ import { getGoodsList } from '../../../api/goods';
 			
 		},
 		methods: {
+			changeColor() {
+			    this.bgColor = '#ff0000'
+				console.log(11111111111111111111111111111)
+			},
 			//搜索跳转
 			toSearch() {
 			},
