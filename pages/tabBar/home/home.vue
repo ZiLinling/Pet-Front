@@ -90,7 +90,7 @@
 					:key="index"
 					@tap="toGoods(product)"
 				>
-					<image mode="widthFix" :src="product.img"></image>
+					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -261,9 +261,8 @@ export default {
 		},
 		//商品跳转
 		toGoods(e) {
-			uni.showToast({ title: '商品' + e.goods_id, icon: 'none' });
 			uni.navigateTo({
-				url: '../../goods/goods'
+				url: '../../goods/goods?cid='+e.id
 			});
 		},
 		//轮播图指示器
@@ -599,9 +598,6 @@ page{position: relative;background-color: #fff;}
 				border-radius: 20upx 20upx 0 0;
 			}
 			.name {
-			
-				
-				
 				width: 92%;
 				padding: 10upx 4%;
 				display: -webkit-box;
