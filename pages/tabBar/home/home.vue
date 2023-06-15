@@ -90,7 +90,7 @@
 					:key="index"
 					@tap="toGoods(product)"
 				>
-					<image mode="widthFix" :src="product.img"></image>
+					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -605,9 +605,6 @@ page{position: relative;background-color: #fff;}
 				border-radius: 20upx 20upx 0 0;
 			}
 			.name {
-			
-				
-				
 				width: 92%;
 				padding: 10upx 4%;
 				display: -webkit-box;
