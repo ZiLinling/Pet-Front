@@ -69,7 +69,7 @@
 				specie: 0, //种类物种分类
 				pageNum: 2, //当前页号
 				orderbyList: [{
-						text: "宠物",
+						text: "综合",
 						selected: true,
 						orderbyicon: false,
 						orderby: 0
@@ -132,13 +132,7 @@
 		methods: {
 			//商品跳转
 			toGoods(goods) {
-				uni.showToast({
-					title: '商品' + goods.goods_id,
-					icon: "none"
-				});
-				uni.navigateTo({
-					url: '../goods'
-				});
+				
 			},
 			//排序类型
 			select(index) {
@@ -158,10 +152,15 @@
 						this.orderbyList[i].selected = false;
 					}
 				}
-				uni.showToast({
-					title: tmpTis,
-					icon: "none"
-				});
+				console.log(this.orderbyList[index].orderby)
+				if(this.orderbyList[index].orderby==0)
+				{
+					this.goodsList.sort((a, b) => a.price - b.price);
+				}
+				else
+				{
+					this.goodsList.sort((a, b) => b.price - a.price);
+				}
 			}
 		}
 

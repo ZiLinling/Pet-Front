@@ -25,6 +25,7 @@
 					<!-- 删除按钮 -->
 
 					<view class="menu" @tap.stop="deleteGoods(goods.id)">
+						
 						<view class="icon shanchu"></view>
 					</view>
 					<!-- 商品 -->
@@ -88,7 +89,8 @@
 
 <script>
 	import {
-		getCart
+		getCart,
+		deleteById
 	} from '../../../api/cart';
 	export default {
 		data() {
@@ -141,10 +143,11 @@
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-		},
-		mounted() {
 			this.getCart();
 			console.log("token" + uni.getStorageSync('token'))
+		},
+		mounted() {
+			
 		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
@@ -154,8 +157,7 @@
 
 				//要记得规划userid
 				console.log("拉去成功")
-				getCart({
-				}).then((response) => {
+				getCart({}).then((response) => {
 					console.log(response.data.data)
 					for (let i = 0; i < response.data.data.length; i++) {
 
@@ -293,29 +295,22 @@
 			},
 			//删除商品
 			deleteGoods(id) {
+				// console.log(id)
+				let goodsId=this.goodsList[id].goodsId
+				// console.log("goodsId+++++++++++++++"+goodsId)
 				deleteById({
-					goodsId:id
+					goodsId: goodsId
 				}).then((response) => {
-
+					console.log(response)
+					this.selectedList.splice(this.selectedList.indexOf(id), 1);
+					this.sum();
+					this.oldIndex = null;
+					this.theIndex = null;
+					this.getCart;
 				}).catch((error) => {
 					console.log(error)
-					// uni.showToast({
-					// 	title: error.message,
-					// 	icon:  "none"
-					// })
 				})
-
-				// let len = this.goodsList.length;
-				// for (let i = 0; i < len; i++) {
-				// 	if (id == this.goodsList[i].id) {
-				// 		this.goodsList.splice(i, 1);
-				// 		break;
-				// 	}
-				// }
-				this.selectedList.splice(this.selectedList.indexOf(id), 1);
-				this.sum();
-				this.oldIndex = null;
-				this.theIndex = null;
+				
 			},
 			// 删除商品s
 			deleteList() {

@@ -90,7 +90,7 @@
 					:key="index"
 					@tap="toGoods(product)"
 				>
-					<image mode="widthFix" :src="product.img"></image>
+					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -106,7 +106,7 @@
 <script>
 var ttt = 0;
 //高德SDK
-// import amap from '@/common/SDK/amap-wx.js';
+import amap from '@/common/SDK/amap-wx.js';
 import { getCount, page } from '../../../api/home';
 export default {
 	created(){
@@ -120,6 +120,7 @@ export default {
 				this.productList.push(p[i])	
 			}
 		})
+		
 	},
 	data() {
 		return {
@@ -131,7 +132,8 @@ export default {
 			nVueTitle:null,
 			pagenum:2,
 			count1:0,
-			city: '厦门',
+			type:0,//0为宠物，1为商品
+			city: '北京',
 			currentSwiper: 0,
 			petCategory: [
 				{ id:0,specie: 0, name: '附近', img: '/static/img/category/category_0.jpg' },
@@ -208,19 +210,24 @@ export default {
 		this.showHeader = false;
 		this.statusHeight = plus.navigator.getStatusbarHeight();
 		// #endif
-		// this.amapPlugin = new amap.AMapWX({
-		// 	//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
-		// 	key: '7c235a9ac4e25e482614c6b8eac6fd8e'
-		// });
+		this.amapPlugin = new amap.AMapWX({
+			//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
+			key: '821553eebd87b7396dd5e7aa6b3350e5'
+		});
 		//定位地址
-		// this.amapPlugin.getRegeo({
-		// 	success: data => {
-		// 		this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
-		// 		// #ifdef APP-PLUS
-		// 		this.nVueTitle.postMessage({type: 'location',city:this.city});
-		// 		// #endif
-		// 	}
-		// });
+		this.amapPlugin.getRegeo({
+			success: data => {
+				console.log(data)
+				 this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
+				// #ifdef APP-PLUS
+				this.nVueTitle.postMessage({type: 'location',city:this.city});
+				// #endif
+			},
+			fail: function(err){ //就是这个
+			    console.log('err',err)  
+			}  
+		});
+		
 	},
 	methods: {
 		//消息列表
@@ -261,9 +268,9 @@ export default {
 		},
 		//商品跳转
 		toGoods(e) {
-			uni.showToast({ title: '商品' + e.goods_id, icon: 'none' });
+		
 			uni.navigateTo({
-				url: '../../goods/goods'
+				url: '../../goods/pet?cid='+e.id+'&breed='+e.breedName
 			});
 		},
 		//轮播图指示器
@@ -599,9 +606,6 @@ page{position: relative;background-color: #fff;}
 				border-radius: 20upx 20upx 0 0;
 			}
 			.name {
-			
-				
-				
 				width: 92%;
 				padding: 10upx 4%;
 				display: -webkit-box;

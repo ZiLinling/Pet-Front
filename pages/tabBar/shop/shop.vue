@@ -1,26 +1,17 @@
 <template>
 	<view>
-
-
-
-
 		<!-- 状态栏 -->
 		<view v-if="showHeader" class="status"
 			:style="{ position: headerPosition,top:statusTop,opacity: afterHeaderOpacity}"></view>
 		<!-- 顶部导航栏 -->
 		<view v-if="showHeader" class="header"
 			:style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
-
 			<!-- 搜索框 -->
 			<view class="input-box">
-				<input placeholder="搜宠物" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
+				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
 				<view class="icon search"></view>
 			</view>
-
 		</view>
-
-
-
 		<!-- 轮播图 -->
 		<view class="swiper">
 			<view class="swiper-box">
@@ -35,9 +26,9 @@
 				</view>
 			</view>
 		</view>
-		<!-- 宠物分类 -->
+		<!-- 商品分类 -->
 		<view class="category-list">
-			<view class="category" v-for="(row, index) in petCategory" :key="index" @tap="toCategory(row)">
+			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
 				<view class="img">
 					<image :src="row.img"></image>
 				</view>
@@ -45,19 +36,18 @@
 			</view>
 		</view>
 
-		<!-- 商品列表 -->
+		<!-- 周边商品列表 -->
 		<view class="goods-list">
 
 			<view class="product-list">
-				<view class="product" v-for="product in productList" :key="product.goods_id" @tap="toGoods(product)">
-					<image mode="widthFix" :src="product.img"></image>
-					<view class="name">{{ product.name }}</view>
-
-					<view class="info">
-						<view class="store">{{product.storeId}}</view>
-						<view class="price">{{ product.price }}</view>
+					<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+						<image mode="widthFix" :src="goods.img"></image>
+						<view class="name">{{ goods.name }}</view>
+						<view class="info">
+							<view class="store">{{goods.storeId}}</view>
+							<view class="price">{{ goods.price }}</view>
+						</view>
 					</view>
-				</view>
 			</view>
 			<view class="loading-text">{{ loadingText }}</view>
 		</view>
@@ -68,34 +58,53 @@
 	var ttt = 0;
 	//高德SDK
 	import amap from '@/common/SDK/amap-wx.js';
+	import {
+		getGoodsList
+	} from '../../../api/goods';
 	export default {
+		created() {
+			let this_ = this;
+			getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+				this.count1 = res.data.etc.total
+				for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+					this_.goodsList.push(res.data.data.records[i])
+				}
+			})
+		},
 		data() {
 			return {
+				bgColor: '#ffffff',
 				showHeader: true,
+				count1: 0,
+				pageNum: 2,
+				pageSize: 6,
+				category: 0,
+				key: "",
+				status: 1,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
 				headerTop: null,
 				statusTop: null,
 				nVueTitle: null,
 				currentSwiper: 0,
-				petCategory: [{
+				goodsCategory: [{
 						id: 1,
-						name: '附近',
+						name: '全部',
 						img: '/static/img/category/1.png'
 					},
 					{
 						id: 2,
-						name: '狗狗',
+						name: '玩具',
 						img: '/static/img/category/1.png'
 					},
 					{
 						id: 3,
-						name: '猫猫',
+						name: '保健品',
 						img: '/static/img/category/1.png'
 					},
 					{
 						id: 4,
-						name: '其他',
+						name: '主粮',
 						img: '/static/img/category/1.png'
 					}
 				],
@@ -116,122 +125,10 @@
 						img: '/static/img/3.jpg'
 					},
 				],
-				// 品种菜单
-				categoryList: [{
-						id: 1,
-						name: '布偶猫',
-						img: '/static/img/category/1.png'
-					},
-					{
-						id: 2,
-						name: '英国短毛猫',
-						img: '/static/img/category/2.png'
-					},
-					{
-						id: 3,
-						name: '美国短毛猫',
-						img: '/static/img/category/3.png'
-					},
-					{
-						id: 4,
-						name: '缅因猫',
-						img: '/static/img/category/4.png'
-					},
-					{
-						id: 5,
-						name: '泰迪',
-						img: '/static/img/category/5.png'
-					},
-					{
-						id: 6,
-						name: '运动',
-						img: '/static/img/category/6.png'
-					},
-					{
-						id: 7,
-						name: '书籍',
-						img: '/static/img/category/7.png'
-					},
-					{
-						id: 8,
-						name: '文具',
-						img: '/static/img/category/8.png'
-					}
-				],
+
 				Promotion: [],
 				//猜你喜欢列表
-				productList: [{
-						goods_id: 0,
-						img: '/static/img/goods/p1.jpg',
-						name: '商品名称',
-						price: '￥100',
-						storeId: '猫猫小店'
-
-					},
-					{
-						goods_id: 1,
-						img: '/static/img/goods/p2.jpg',
-						name: '商品名称',
-						price: '￥100',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 2,
-						img: '/static/img/goods/p3.jpg',
-						name: '商品名称',
-						price: '￥100',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 3,
-						img: '/static/img/goods/p4.jpg',
-						name: '商品名称',
-						price: '￥120',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 4,
-						img: '/static/img/goods/p5.jpg',
-						name: '商品名称',
-						price: '￥120',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 5,
-						img: '/static/img/goods/p6.jpg',
-						name: '商品名称',
-						price: '￥120',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 6,
-						img: '/static/img/goods/p7.jpg',
-						name: '商品名称',
-						price: '￥130',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 7,
-						img: '/static/img/goods/p8.jpg',
-						name: '商品名称',
-						price: '￥130',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 8,
-						img: '/static/img/goods/p9.jpg',
-						name: '商品名称',
-						price: '￥168',
-						storeId: '猫猫小店'
-					},
-					{
-						goods_id: 9,
-						img: '/static/img/goods/p10.jpg',
-						name: '商品名称',
-						price: '￥168',
-						storeId: '猫猫小店'
-					}
-				],
+				goodsList: [],
 				loadingText: '正在加载...'
 			};
 		},
@@ -249,31 +146,33 @@
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
+			let this_ = this
 			uni.showToast({
 				title: '触发上拉加载'
 			});
-			let len = this.productList.length;
-			if (len >= 40) {
-				this.loadingText = '到底了';
+			let len = this.goodsList.length;
+			if (len >= this.count1) {
+				this.loadingText = '没有商品了';
 				return false;
 			}
-			// 演示,随机加入商品,生成环境请替换为ajax请求
-			let end_goods_id = this.productList[len - 1].goods_id;
-			for (let i = 1; i <= 10; i++) {
-				let goods_id = end_goods_id + i;
-				let p = {
-					goods_id: goods_id,
-					img: '/static/img/goods/p' + (goods_id % 10 == 0 ? 10 : goods_id % 10) + '.jpg',
-					name: '商品名称',
-					price: '￥168',
-					storeId: '猫猫小店',
-					slogan: '1235人付款'
-				};
-				this.productList.push(p);
+			if (this_.category == 0) {
+				getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+					this_.count1 = res.data.etc.total
+					for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+						this_.goodsList.push(res.data.data.records[i])
+					}
+				})
+			} else {
+				getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
+					this_.count1 = res.data.etc.total
+					for (let i = 0; i < res.data.data.records.length; i++) { //放入选择商品
+						this_.goodsList.push(res.data.data.records[i])
+					}
+				})
 			}
+			this_.pageNum++;
 		},
 		onLoad() {
-
 			// #ifdef APP-PLUS
 			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
 			this.nVueTitle.onMessage(res => {
@@ -285,15 +184,8 @@
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-
-
 		},
 		methods: {
-
-
-
-
-
 			//搜索跳转
 			toSearch() {
 
@@ -309,22 +201,34 @@
 				});
 			},
 			//分类跳转
-			toCategory(e) {
-				//uni.showToast({title: e.name,icon:"none"});
-				uni.setStorageSync('catName', e.name);
-				uni.navigateTo({
-					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name
-				});
+			toGoodsCategory(e) {
+				let this_ = this
+				this.category = e.id - 1 //展示类别
+				console.log(this.category)
+				this.pageNum = 1
+				this.goodsList = []
+				if (this_.category == 0) {
+					getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+						this_.count1 = res.data.etc.total;
+						for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+							this_.goodsList.push(res.data.data.records[i])
+						}
+					})
+				} else {
+					getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
+						this_.count1 = res.data.etc.total;
+						for (let i = 0; i < res.data.data.records.length; i++) { //放入选择商品
+							this_.goodsList.push(res.data.data.records[i])
+						}
+					})
+				}
+				this.pageNum++;
 			},
 
 			//商品跳转
 			toGoods(e) {
-				uni.showToast({
-					title: '商品' + e.goods_id,
-					icon: 'none'
-				});
 				uni.navigateTo({
-					url: '../../goods/goods'
+					url: '../../goods/goods?cid=' + e.id
 				});
 			},
 			//轮播图指示器

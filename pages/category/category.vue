@@ -23,7 +23,7 @@
 					</view>
 					<view class="list">
 						<view class="box" v-for="(box,i) in category.list" :key="i" @tap="toCategory(box)">
-							<image :src="'/static/img/category/list/'+box.img"></image>
+							<image :src="'/static/img/pet/'+box.img"></image>
 							<view class="text">{{box.name}}</view>
 						</view>
 					</view>
@@ -35,51 +35,28 @@
 <script>
 	//高德SDK
 	import amap from '@/common/SDK/amap-wx.js';
+import { getBreed } from '../../api/category_pet';
 	export default {
+		created() {
+			let this_ = this;
+			for(let i = 1;i<=3;i++)
+			{
+				getBreed(i).then(res=>{
+					this.categoryList[i-1].list = res.data.data;
+				})
+			}
+		},
 		data() {
 			return {
 				showCategoryIndex:0,
 				headerPosition:"fixed",
 				city:"北京",
+				specie:1,
 				//分类列表
 				categoryList:[
-					{id:1,title:'家用电器',banner:'/static/img/category/banner.jpg',list:[
-						{name:'冰箱',	img:'1.jpg'},
-						{name:'电视',	img:'2.jpg'},
-						{name:'空调',	img:'3.jpg'},
-						{name:'洗衣机',	img:'4.jpg'},
-						{name:'风扇',	img:'5.jpg'},
-						{name:'燃气灶',	img:'6.jpg'},
-						{name:'热水器',	img:'7.jpg'},
-						{name:'电吹风',	img:'8.jpg'},
-						{name:'电饭煲',	img:'9.jpg'}
-					]},
-					{id:2,title:'办公用品',banner:'/static/img/category/banner.jpg',list:[
-						{name:'打印机',	img:'1.jpg'},
-						{name:'路由器',	img:'2.jpg'},
-						{name:'扫描仪',	img:'3.jpg'},
-						{name:'投影仪',	img:'4.jpg'},
-						{name:'墨盒',	img:'5.jpg'},
-						{name:'纸类',	img:'6.jpg'}
-					]},
-					{id:3,title:'日常用品',banner:'/static/img/category/banner.jpg',list:[
-						{name:'茶具',	img:'1.jpg'},
-						{name:'花瓶',	img:'2.jpg'},
-						{name:'纸巾',	img:'3.jpg'},
-						{name:'毛巾',	img:'4.jpg'},
-						{name:'牙膏',	img:'5.jpg'},
-						{name:'保鲜膜',	img:'6.jpg'},
-						{name:'保鲜袋',	img:'7.jpg'}
-					]},
-					{id:4,title:'蔬菜水果',banner:'/static/img/category/banner.jpg',list:[
-						{name:'苹果',	img:'1.jpg'},
-						{name:'芒果',	img:'2.jpg'},
-						{name:'椰子',	img:'3.jpg'},
-						{name:'橙子',	img:'4.jpg'},
-						{name:'奇异果',	img:'5.jpg'},
-						{name:'玉米',	img:'6.jpg'},
-						{name:'百香果',	img:'7.jpg'}
-					]},
+					{id:1,title:'猫猫',banner:'/static/img/category/banner.jpg',list:[]},
+					{id:2,title:'狗狗',banner:'/static/img/category/banner.jpg',list:[]},
+					{id:3,title:'其他',banner:'/static/img/category/banner.jpg',list:[]},
 				]
 			}
 		},
@@ -92,16 +69,6 @@
 			}
 		},
 		onLoad() {
-			// this.amapPlugin = new amap.AMapWX({  
-			// 	//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
-			// 	key: '7c235a9ac4e25e482614c6b8eac6fd8e'  
-			// });
-			// //定位地址
-			// this.amapPlugin.getRegeo({  
-			// 	success: (data) => {
-			// 		this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g,'');//把"市"去掉
-			// 	}  
-			// }); 
 		},
 		methods: {
 			//消息列表
@@ -113,11 +80,12 @@
 			//分类切换显示
 			showCategory(index){
 				this.showCategoryIndex = index;
+				this.specie = index;
 			},
 			toCategory(e){
 				uni.setStorageSync('catName',e.name);
 				uni.navigateTo({
-					url: '/pages/goods/goods-list/goods-list?cid='+e.id+'&name='+e.name
+					url: '/pages/goods/goods-list/goods-list?cid='+e.id+'&name='+e.name+'&specie='+'0'
 				});
 			},
 			//搜索跳转

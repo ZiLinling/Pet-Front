@@ -45,7 +45,6 @@
 				</view>
 			</view>
 			<view class="btn">
-				<view class="joinCart" @tap="joinCart">加入购物车</view>
 				<view class="buy" @tap="buy">立即购买</view>
 			</view>
 		</view>
@@ -102,35 +101,6 @@
 				</view>
 			</view>
 		</view>
-		<!-- 规格-模态层弹窗 -->
-		<view class="popup spec" :class="specClass" @touchmove.stop.prevent="discard" @tap="hideSpec">
-			<!-- 遮罩层 -->
-			<view class="mask"></view>
-			<view class="layer" @tap.stop="discard">
-				<view class="content">
-					<view class="title">
-						图片 价格
-					</view>
-					<view class="length">
-						<view class="text">数量</view>
-						<view class="num">
-							<view class="sub" @tap.stop="sub">
-								<view class="icon jian"></view>
-							</view>
-							<view class="input" @tap.stop="discard">
-								<input type="num" v-model="goodsData.num" />
-							</view>
-							<view class="add" @tap.stop="add">
-								<view class="icon jia"></view>
-							</view>
-						</view>
-					</view>
-				</view>
-				<view class="btn">
-					<view class="button" @tap="hideSpec">完成</view>
-				</view>
-			</view>
-		</view>
 		<!-- 商品主图轮播 -->
 		<view class="swiper-box">
 			<swiper circular="true" autoplay="true" @change="swiperChange">
@@ -161,7 +131,7 @@
 			</view>
 
 			<view class="row">
-				<view class="text">运费：8-24 <view class="arrow"> 库存：{{goodsData.stock}}</view>
+				<view class="text">运费：8-24 <view class="arrow"> 性别：{{goodsData.gender}}</view>
 				</view>
 
 			</view>
@@ -207,12 +177,13 @@
 		save
 	} from '../../api/cart';
 	import {
-		getGoods
-	} from '../../api/goods';
+		getPet
+	} from '../../api/pet';
 
 	export default {
 		data() {
 			return {
+				breed:'',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -249,35 +220,26 @@
 				shareClass: '', //分享弹窗css类，控制开关动画
 				// 商品信息
 				goodsData: {
-					id: 1,
-					name: "",
-					price: "127.00",
-					num: 1,
-					stock:1,
-					category:'',
-					description:'',
-					
-					
 				},
 				comment: {
-						num: 102,
-						userface: '../../static/img/face.jpg',
-						username: '大黑哥',
-						content: '很不错，之前买了很多次了，很好看，能放很久，和图片色差不大，值得购买！'
+					num: 102,
+					userface: '../../static/img/face.jpg',
+					username: '大黑哥',
+					content: '很不错，之前买了很多次了，很好看，能放很久，和图片色差不大，值得购买！'
+				},
+				service: [{
+						name: "正品保证",
+						description: "此商品官方保证为正品"
 					},
-					service: [{
-							name: "正品保证",
-							description: "此商品官方保证为正品"
-						},
-						{
-							name: "极速退款",
-							description: "此商品享受退货极速退款服务"
-						},
-						{
-							name: "7天退换",
-							description: "此商品享受7天无理由退换服务"
-						}
-					],
+					{
+						name: "极速退款",
+						description: "此商品享受退货极速退款服务"
+					},
+					{
+						name: "7天退换",
+						description: "此商品享受7天无理由退换服务"
+					}
+				],
 				selectSpec: null, //选中规格
 				isKeep: false, //收藏
 				//商品描述html
@@ -291,8 +253,9 @@
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
 			console.log(option.cid); //打印出上个页面传递的参数。
-			this.getgoods(option.cid);
-			
+			this.getpet(option.cid);
+			this.breed=option.breedName;
+			console.log("breed:  "+this.breed);
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -320,18 +283,13 @@
 		},
 		methods: {
 			
-			getgoods(goodsId){
+			getpet(id){
 				//先设置好id为1把数据弄好
-				getGoods({
-					id: goodsId
+				getPet({
+					id: id
 				}).then((response) => {
 					console.log(response.data.data)
-					this.goodsData.id=response.data.data.id;
-					this.goodsData.name=response.data.data.name;
-					this.goodsData.description=response.data.data.description;
-					this.goodsData.stock=response.data.data.stock;
-					this.goodsData.category=response.data.data.category;
-					this.goodsData.price=response.data.data.price;
+					this.goodsData=response.data.data;
 					console.log(goodsData)
 				}).catch((error) => {
 					console.log(error)
@@ -370,29 +328,6 @@
 			//收藏
 			keep() {
 				this.isKeep = this.isKeep ? false : true;
-			},
-			// 加入购物车
-			joinCart(id) {
-				id = parseInt(Math.random() * 10);
-				if (this.selectSpec == null) {
-					save({
-						goodsId: id,
-					}).then((response) => {
-						console.log(response)
-					}).catch((error) => {
-						console.log(error)
-
-					})
-
-					return this.showSpec(() => {
-						uni.showToast({
-							title: "已加入购物车"
-						});
-					});
-				}
-				uni.showToast({
-					title: "已加入购物车"
-				});
 			},
 			//立即购买
 			buy() {
