@@ -10,7 +10,7 @@
 				<view class="middle"></view>
 				<view class="icon-btn">
 					<view class="icon tongzhi" @tap="toMsg"></view>
-					<view class="icon cart" @tap="joinCart"></view>
+					<view class="icon cart" @tap="join"></view>
 				</view>
 			</view>
 			<!-- 头部-滚动渐变显示 -->
@@ -24,7 +24,7 @@
 				</view>
 				<view class="icon-btn">
 					<view class="icon tongzhi" @tap="toMsg"></view>
-					<view class="icon cart" @tap="joinCart"></view>
+					<view class="icon cart" @tap="join"></view>
 				</view>
 			</view>
 		</view>
@@ -45,7 +45,7 @@
 				</view>
 			</view>
 			<view class="btn">
-				<view class="joinCart" @tap="joinCart">加入购物车</view>
+				<view class="joinCart" @tap="join">加入购物车</view>
 				<view class="buy" @tap="buy">立即购买</view>
 			</view>
 		</view>
@@ -103,13 +103,20 @@
 			</view>
 		</view>
 		<!-- 规格-模态层弹窗 -->
-		<view class="popup spec" :class="specClass" @touchmove.stop.prevent="discard" @tap="hideSpec">
+		<view class="popup spec" :class="specClass" @touchmove.stop.prevent="discard" @tap="hideSpec(0)">
 			<!-- 遮罩层 -->
 			<view class="mask"></view>
 			<view class="layer" @tap.stop="discard">
 				<view class="content">
 					<view class="title">
-						图片 价格
+						<view style="float: right; font-size: 24px; color: red; font-weight: 800;">
+							价格: <view class="" style="float: right; font-size: 26px;">
+								￥{{goodsData.price}}
+							</view>
+						</view>
+						<view style="margin-top:30upx; margin-left: 20upx;">
+							<img src="../../static/img/goods/p1.jpg" alt="" style="border-radius: 50upx;">
+						</view>
 					</view>
 					<view class="length">
 						<view class="text">数量</view>
@@ -118,7 +125,7 @@
 								<view class="icon jian"></view>
 							</view>
 							<view class="input" @tap.stop="discard">
-								<input type="num" v-model="goodsData.num" />
+								<input type="num" v-model="num" />
 							</view>
 							<view class="add" @tap.stop="add">
 								<view class="icon jia"></view>
@@ -127,7 +134,7 @@
 					</view>
 				</view>
 				<view class="btn">
-					<view class="button" @tap="hideSpec">完成</view>
+					<view class="button" @tap="hideSpec()">完成</view>
 				</view>
 			</view>
 		</view>
@@ -195,7 +202,7 @@
 			<view class="title">———— 商品详情 ————</view>
 			<view class="">
 				<!-- 商品详情在这，看后面怎么用？ -->
-			<!-- 	{{goodsData.description}} -->
+				<!-- 	{{goodsData.description}} -->
 			</view>
 			<view class="content"><rich-text :nodes="descriptionStr"></rich-text></view>
 		</view>
@@ -213,6 +220,7 @@
 	export default {
 		data() {
 			return {
+				num: null,
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -241,6 +249,7 @@
 					}
 				],
 				//轮播图下标
+				choose: null,
 				currentSwiper: 0,
 				anchorlist: [], //导航条锚点
 				selectAnchor: 0, //选中锚点
@@ -253,32 +262,31 @@
 					name: "",
 					price: "127.00",
 					num: 1,
-					stock:1,
-					category:'',
-					description:'',
-					
-					
+					stock: 1,
+					category: '',
+					description: '',
+
+
 				},
 				comment: {
-						num: 102,
-						userface: '../../static/img/face.jpg',
-						username: '大黑哥',
-						content: '很不错，之前买了很多次了，很好看，能放很久，和图片色差不大，值得购买！'
+					num: 102,
+					userface: '../../static/img/face.jpg',
+					username: '大黑哥',
+					content: '很不错，之前买了很多次了，很好看，能放很久，和图片色差不大，值得购买！'
+				},
+				service: [{
+						name: "正品保证",
+						description: "此商品官方保证为正品"
 					},
-					service: [{
-							name: "正品保证",
-							description: "此商品官方保证为正品"
-						},
-						{
-							name: "极速退款",
-							description: "此商品享受退货极速退款服务"
-						},
-						{
-							name: "7天退换",
-							description: "此商品享受7天无理由退换服务"
-						}
-					],
-				selectSpec: null, //选中规格
+					{
+						name: "极速退款",
+						description: "此商品享受退货极速退款服务"
+					},
+					{
+						name: "7天退换",
+						description: "此商品享受7天无理由退换服务"
+					}
+				],
 				isKeep: false, //收藏
 				//商品描述html
 				descriptionStr: '<div style="text-align:center;"><img width="100%" src="https://ae01.alicdn.com/kf/HTB1t0fUl_Zmx1VjSZFGq6yx2XXa5.jpg"/><img width="100%" src="https://ae01.alicdn.com/kf/HTB1LzkjThTpK1RjSZFKq6y2wXXaT.jpg"/><img width="100%" src="https://ae01.alicdn.com/kf/HTB18dkiTbvpK1RjSZPiq6zmwXXa8.jpg"/></div>'
@@ -292,7 +300,7 @@
 			//option为object类型，会序列化上个页面传递的参数
 			console.log(option.cid); //打印出上个页面传递的参数。
 			this.getgoods(option.cid);
-			
+
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -319,26 +327,17 @@
 
 		},
 		methods: {
-			
-			getgoods(goodsId){
+			getgoods(goodsId) {
 				//先设置好id为1把数据弄好
 				getGoods({
 					id: goodsId
 				}).then((response) => {
-					console.log(response.data.data)
-					this.goodsData.id=response.data.data.id;
-					this.goodsData.name=response.data.data.name;
-					this.goodsData.description=response.data.data.description;
-					this.goodsData.stock=response.data.data.stock;
-					this.goodsData.category=response.data.data.category;
-					this.goodsData.price=response.data.data.price;
-					console.log(goodsData)
+					console.log(response.data)
+					this.goodsData = response.data.data;
+					this.num = 1;
+					console.log(this.num)
 				}).catch((error) => {
 					console.log(error)
-					// uni.showToast({
-					// 	title: error.message,
-					// 	icon:  "none"
-					// })
 				})
 			},
 			//轮播图指示器
@@ -372,35 +371,35 @@
 				this.isKeep = this.isKeep ? false : true;
 			},
 			// 加入购物车
-			joinCart(id) {
-				id = parseInt(Math.random() * 10);
-				if (this.selectSpec == null) {
-					save({
-						goodsId: id,
-					}).then((response) => {
-						console.log(response)
-					}).catch((error) => {
-						console.log(error)
+			joinCart() {
 
-					})
-
-					return this.showSpec(() => {
-						uni.showToast({
-							title: "已加入购物车"
-						});
+				save({
+					goodsId: this.goodsData.id,
+				}).then((response) => {
+					console.log(response)
+				}).catch((error) => {
+					console.log(error)
+				})
+			},
+			join() {
+				this.choose = 0;
+				return this.showSpec(() => {
+					uni.showToast({
+						title: "已加入购物车"
 					});
-				}
+				});
+
 				uni.showToast({
 					title: "已加入购物车"
 				});
 			},
 			//立即购买
 			buy() {
-				if (this.selectSpec == null) {
-					return this.showSpec(() => {
-						this.toConfirmation();
-					});
-				}
+				this.choose = 1;
+				return this.showSpec(() => {
+					this.toConfirmation();
+				});
+
 				this.toConfirmation();
 			},
 			//商品评论
@@ -411,44 +410,49 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				let tmpList = [];
-				let goods = {
-					id: this.goodsData.id,
-					img: '../../static/img/goods/p1.jpg',
-					name: this.goodsData.name,
-					spec: '规格:' + this.goodsData.spec[this.selectSpec],
-					price: this.goodsData.price,
-					num: this.goodsData.num
-				};
-				tmpList.push(goods);
+				// let tmpList = [];
+				// let goods = {
+				// 	id: this.goodsData.id,
+				// 	img: '../../static/img/goods/p1.jpg',
+				// 	name: this.goodsData.name,
+				// 	spec: '规格:' + this.goodsData.spec[this.selectSpec],
+				// 	price: this.goodsData.price,
+				// 	num: this.num
+				// };
+				// tmpList.push(goods);
+				console.log('进入跳转')
 				uni.setStorage({
 					key: 'buylist',
-					data: tmpList,
-					success: () => {
+					data: this.goodsData,
+					success: function() {
 						uni.navigateTo({
-							url: '../order/confirmation'
+							url: '/pages/order/confirmation'
 						})
 					}
+					// success: () => {
+					// 	console.log('跳转成功')
+					// 	uni.navigateTo({
+					// 		url: '/pages/order/confirmation'
+					// 	})
+					// }
 				})
 			},
 			//跳转评论列表
 			showComments(goodsid) {
 
 			},
-			//选择规格
-			setSelectSpec(index) {
-				this.selectSpec = index;
-			},
 			//减少数量
 			sub() {
-				if (this.goodsData.num <= 1) {
+				console.log('---')
+				if (this.num <= 1) {
 					return;
 				}
-				this.goodsData.num--;
+				this.num--;
 			},
 			//增加数量
 			add() {
-				this.goodsData.num++;
+				console.log('+++')
+				this.num++;
 			},
 			//跳转锚点
 			toAnchor(index) {
@@ -498,6 +502,7 @@
 			//关闭服务弹窗
 			hideService() {
 				this.serviceClass = 'hide';
+
 				setTimeout(() => {
 					this.serviceClass = 'none';
 				}, 200);
@@ -506,18 +511,18 @@
 			showSpec(fun) {
 				console.log('show');
 				this.specClass = 'show';
-				this.specCallback = fun;
-			},
-			specCallback() {
-				return;
 			},
 			//关闭规格弹窗
 			hideSpec() {
 				this.specClass = 'hide';
 				//回调
-
-				this.selectSpec && this.specCallback && this.specCallback();
-				this.specCallback = false;
+				//跳转到订单页面
+				console.log(this.choose)
+				if (this.choose == 0) {
+					this.joinCart();
+				} else {
+					this.toConfirmation();
+				}
 				setTimeout(() => {
 					this.specClass = 'none';
 				}, 200);
@@ -1240,5 +1245,9 @@
 				font-size: 34upx;
 			}
 		}
+	}
+	.img{
+		border-radius: 10upx;
+		width: 300upx;
 	}
 </style>

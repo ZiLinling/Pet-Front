@@ -290,7 +290,6 @@
 				}).then((response) => {
 					console.log(response.data.data)
 					this.goodsData=response.data.data;
-					console.log(goodsData)
 				}).catch((error) => {
 					console.log(error)
 					// uni.showToast({
@@ -331,12 +330,7 @@
 			},
 			//立即购买
 			buy() {
-				if (this.selectSpec == null) {
-					return this.showSpec(() => {
-						this.toConfirmation();
-					});
-				}
-				this.toConfirmation();
+				console.log(111)
 			},
 			//商品评论
 			toRatings() {
@@ -360,9 +354,7 @@
 					key: 'buylist',
 					data: tmpList,
 					success: () => {
-						uni.navigateTo({
-							url: '../order/confirmation'
-						})
+						
 					}
 				})
 			},
