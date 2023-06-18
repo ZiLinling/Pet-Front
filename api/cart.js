@@ -7,10 +7,10 @@ export function getCart(user) {
 	return getRequest('/cart/getcart', user)
 }
 
-export function save(user) {
-	return postRequest('/cart/save', user)
+export function save(goodsId) {
+	return postRequest('/cart/save', goodsId)
 }
 
-export function deleteById(user) {
-	return postRequest('/cart/delete', user)
+export function deleteById(goodsId) {
+	return postRequest('/cart/delete', goodsId)
 }

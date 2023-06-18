@@ -1,14 +1,10 @@
 <template>
 	<view>
 
-		<view v-if="showHeader" class="header">
-			<p class="title">购物车</p>
-		</view>
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place">
 			<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
 			<p>{{address}}</p>
-			<button class="controller">管理</button>
 		</view>
 		<!-- 商品列表 -->
 		<view class="goods-list">
@@ -25,7 +21,7 @@
 					<!-- 删除按钮 -->
 
 					<view class="menu" @tap.stop="deleteGoods(goods.id)">
-						
+
 						<view class="icon shanchu"></view>
 					</view>
 					<!-- 商品 -->
@@ -143,34 +139,34 @@
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-			this.getCart();
+
 			console.log("token" + uni.getStorageSync('token'))
 		},
 		mounted() {
-			
+			this.getCart();
+		},
+		onReady() {
+			console.log('组件激活')
+			this.getCart();
 		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
 			// 直接所有需要的参数查询回来，然后我给他分开push到两个数组里面就好了吧
 
 			getCart() {
-
-				//要记得规划userid
-				console.log("拉去成功")
+				if (!uni.getStorageSync('token')) {
+					return;
+				}
 				getCart({}).then((response) => {
-					console.log(response.data.data)
+					this.storeList = [];
+					this.goodsList = [];
 					for (let i = 0; i < response.data.data.length; i++) {
-
 						this.storeList.push(response.data.data[i]);
-						console.log(response.data.data[i])
 						for (let j = 0; j < response.data.data[i].goodsVOList.length; j++) {
 							this.goodsList.push(response.data.data[i].goodsVOList[j]);
 						}
+						
 					}
-					console.log("storeList")
-					console.log(this.storeList)
-					console.log("goodsList")
-					console.log(this.goodsList)
 					// uni.switchTab({
 					// 	url: "/pages/tabBar/home/home"
 					// })
@@ -264,7 +260,7 @@
 					icon: "none"
 				});
 				uni.navigateTo({
-					url: '../../goods/goods'
+					url: '../../goods/goods?cid='+e.goodsId
 				});
 			},
 			//跳转确认订单页面
@@ -296,7 +292,7 @@
 			//删除商品
 			deleteGoods(id) {
 				// console.log(id)
-				let goodsId=this.goodsList[id].goodsId
+				let goodsId = this.goodsList[id].goodsId
 				// console.log("goodsId+++++++++++++++"+goodsId)
 				deleteById({
 					goodsId: goodsId
@@ -310,7 +306,7 @@
 				}).catch((error) => {
 					console.log(error)
 				})
-				
+
 			},
 			// 删除商品s
 			deleteList() {

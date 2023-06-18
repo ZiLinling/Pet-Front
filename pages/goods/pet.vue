@@ -284,9 +284,14 @@
 				getPet({
 					id: id
 				}).then((response) => {
+<<<<<<< HEAD
 					this_.goodsData=response.data.data;
 					this.storeImg = response.data.data.etc.store.img
 					this.store = this.goodsData.etc.store
+=======
+					console.log(response.data.data)
+					this.goodsData=response.data.data;
+>>>>>>> efcbf7c7bcab455cda38ef3093e0d1f9a354b2b4
 				}).catch((error) => {
 					//console.log(error)
 				})
@@ -323,12 +328,7 @@
 			},
 			//立即购买
 			buy() {
-				if (this.selectSpec == null) {
-					return this.showSpec(() => {
-						this.toConfirmation();
-					});
-				}
-				this.toConfirmation();
+				console.log(111)
 			},
 			//商品评论
 			toRatings() {
@@ -352,9 +352,7 @@
 					key: 'buylist',
 					data: tmpList,
 					success: () => {
-						uni.navigateTo({
-							url: '../order/confirmation'
-						})
+						
 					}
 				})
 			},
