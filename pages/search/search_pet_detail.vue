@@ -15,41 +15,59 @@
 					placeholder-style="color:#c0c0c0;"
 					v-model="searchValue"
 				/>
-				<view class="icon search" @tap="toSearch"></view>
+				<view class="icon search" @tap="toSearch()"></view>
 			</view>	
 		</view>
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place"></view>
-		
-		
-		<!-- 热门宠物 -->
-		<view class="popular-pet">
-			<uni-section class="mb-10" title="热门宠物">
-				<template v-slot:right>
-					<view style="font-size: 5px;" @click="toSearchAll()">查看全部 <uni-icons type="forward" size="10" @click="toSearchAll()"></uni-icons></view>
-				</template>
-			</uni-section>
-		</view>
-		<!-- 分类列表 -->
-		<view class="category-list">
-			<view
-				class="category"
-				v-for="(row, index) in categoryList"
-				:key="index"
-				@tap="toCategory(row)"
-			>
-				<view class="img"><image :src="row.img"></image></view>
-				<view class="text">{{ row.name }}</view>
+		<!-- 商品列表 -->
+		<view class="goods-list">
+			<view class="title">
+				<image src="/static/img/hua.png"></image>
+				猜你想搜
+				<image src="/static/img/hua.png"></image>
 			</view>
+			<view class="product-list">
+				<view
+					class="product"
+					v-for="(product,index) in productList"
+					:key="index"
+					@tap="toGoods(product)"
+				>
+					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
+					<view class="name">{{ product.breedName }}</view>
+					<view class="info">
+						<view class="slogan">{{product.name}}</view>
+						<view class="price">{{ product.price }}$</view>
+					</view>
+				</view>
+			</view>
+			<view class="loading-text">{{ loadingText }}</view>
 		</view>
 	</view>
 </template>
 
 <script>
+import { getPetByName } from '../../api/pet';
 var ttt = 0;
 //高德SDK
-import amap from '@/common/SDK/amap-wx.js';
 export default {
+	created(){
+		getPetByName(this.pageNum,this.pageSize,this.searchName).then((response)=>{
+			this.count1 = response.data.etc.total
+			let p = response.data.data.records
+			if(p.length==0)
+			{
+				this.loadingText = '暂无商品'
+			}
+			for(let i = 0;i<p.length;i++)
+			{
+				this.productList.push(p[i])	
+			}
+			this.pageNum++
+		})
+		
+	},
 	data() {
 		return {
 			showHeader:true,
@@ -58,51 +76,64 @@ export default {
 			headerTop:null,
 			statusTop:null,
 			nVueTitle:null,
-			city: '厦门',
-			currentSwiper: 0,
+			pageNum:1,
+			pageSize:6,
 			searchValue:'',
-			// 品种菜单
-			categoryList: [
-				{ id: 3, specie: 0, name: '波斯猫', img: '/static/img/category/catcat.jpg' },
-				{ id: 5, specie: 0, name: '肥猫', img: '/static/img/category/catcat1.jpg' },
-				{ id: 8, specie: 0, name: '狮子猫', img: '/static/img/category/catcat2.jpg' },
-				{ id: 10, specie: 0, name: '爪哇猫', img: '/static/img/category/catcat3.jpg' },
-				{ id: 19, specie: 0, name: '泰迪狗', img: '/static/img/category/dog0.jpg' },
-				{ id: 11, specie: 0, name: '拉布拉多', img: '/static/img/category/dog1.jpg' },
-				{ id: 14, specie: 0, name: '贵宾犬', img: '/static/img/category/dog2.jpg' },
-				{ id: 15, specie: 0, name: '斑点狗', img: '/static/img/category/dog3.jpg' }
-			],
+			searchName:'',
+			count1:0,
+			Promotion: [],
+			//猜你喜欢列表
+			productList:[],
+			loadingText: '正在加载...'
 		};
 	},
-	
+	//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
+	onReachBottom() {
+		uni.showToast({ title: '触发上拉加载' });
+		let len = this.productList.length;
+		
+		if (len >= this.count1) {
+			this.loadingText = '没有更多了';
+			return false;
+		}
+		getPetByName(this.pageNum,this.pageSize,this.searchName).then((response)=>{ //“ ”代表BreedName为空，查询所有宠物
+			let p = response.data.data.records
+			for(let i = 0;i<p.length;i++)
+			{
+				this.productList.push(p[i])	
+			}
+		})
+		this.pagenum++;
+
+	},
+	onLoad(e) {
+		this.searchName = e.name
+	},
 	methods: {
-		//返回上级页面
 		goBack() {
-		        uni.navigateBack({
-		          delta: 1
-		        })
+			uni.navigateBack({
+			  delta: 1
+			})
 		},
-		//查看全部分类
-		toSearchAll() {
-			uni.showToast({ title: '查看全部' });
+		//消息列表
+		toMsg(){
 			uni.navigateTo({
-				url: '/pages/category/category'
-			});
+				url:'../../msg/msg'
+			})
 		},
 		//搜索跳转
 		toSearch() {
+			uni.showToast({ title: '建议跳转到新页面做搜索功能' });
 			uni.navigateTo({
-				url: '../search/search_pet_detail?name='+this.searchValue
+				url: '/pages/search/search_pet_detail?name='+this.searchValue
 			});
 		},
-		//分类跳转
-		toCategory(e) {
-			//uni.showToast({title: e.name,icon:"none"});
-			uni.setStorageSync('catName',e.name);
+		//商品跳转
+		toGoods(e) {
+		
 			uni.navigateTo({
-				url: '../goods/goods-list/goods-list?cid='+e.id+'&name='+e.name+'&specie='+e.specie
+				url: '/pages/goods/pet?cid='+e.id+'&breed='+e.breedName
 			});
-			
 		},
 	}
 };
@@ -284,9 +315,9 @@ page{position: relative;background-color: #fff;}
 			width: 100%;
 			display: flex;
 			justify-content: center;
-			image {
-				width: 9vw;
-				height: 9vw;
+			image {   //分类图片大小
+				width: 18vw;
+				height: 18vw;
 			}
 		}
 		.text {
@@ -455,6 +486,8 @@ page{position: relative;background-color: #fff;}
 					font-weight: 600;
 				}
 				.slogan {
+					line-height: 5px;
+					height: 30upx;
 					color: #807c87;
 					font-size: 24upx;
 				}

@@ -227,10 +227,33 @@
 			}
 
 		}, {
+			"path": "pages/search/search_pet_detail",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+			}
+
+		}, {
 			"path": "pages/goods/pet",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/store/store",
+			"style": {
+				"navigationBarTitleText": "商店详情",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/search/search_goods_detail",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 
 		}

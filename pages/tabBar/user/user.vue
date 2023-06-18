@@ -122,8 +122,6 @@
 						img: '/static/img/user/bank.png'
 					},
 
-					// {text:'客服',img:'/static/img/user/kefu.png'},
-					// {text:'签到',img:'/static/img/user/mingxi.png'}
 
 				]
 			}
@@ -137,6 +135,10 @@
 				this.getLogin()
 			});
 		},
+		onReady(){
+			this.getLogin()
+		},
+	
 		methods: {
 			//消息列表
 			toMsg() {

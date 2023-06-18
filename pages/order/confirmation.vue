@@ -29,9 +29,9 @@
 					</view>
 					<view class="info">
 						<view class="title">{{row.name}}</view>
-						<view class="spec">选择{{row.spec}} 数量:{{row.number}}</view>
+						<view class="spec">数量:{{row.num}}</view>
 						<view class="price-number">
-							<view class="price">￥{{row.price*row.number}}</view>
+							<view class="price">￥{{row.price*row.num}}</view>
 							<view class="number">
 								
 							</view>
@@ -118,12 +118,13 @@
 			uni.getStorage({
 				key:'buylist',
 				success: (ret) => {
+					console.log(ret.data)
 					this.buylist = ret.data;
 					this.goodsPrice=0;
 					//合计
 					let len = this.buylist.length;
 					for(let i=0;i<len;i++){
-						this.goodsPrice = this.goodsPrice + (this.buylist[i].number*this.buylist[i].price);
+						this.goodsPrice = this.goodsPrice + (this.buylist[i].num*this.buylist[i].price);
 					}
 					this.deduction = this.int/100;
 					this.sumPrice = this.goodsPrice-this.deduction+this.freight;
@@ -168,8 +169,12 @@
 				let len = this.buylist.length;
 				for(let i=0;i<len;i++){
 					paymentOrder.push(this.buylist[i]);
-					goodsid.push(this.buylist[i].id);
+					goodsid.push(this.buylist[i].goodsId);
 				}
+				console.log("paymentOrder")
+				console.log(paymentOrder);																																																																																																																							
+				console.log("goodsid")
+				console.log(goodsid);
 				if(paymentOrder.length==0){
 					uni.showToast({title:'订单信息有误，请重新购买',icon:'none'});
 					return ;

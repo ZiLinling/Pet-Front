@@ -8,8 +8,8 @@
 			:style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
 			<!-- 搜索框 -->
 			<view class="input-box">
-				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
-				<view class="icon search"></view>
+				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" v-model="searchValue" />
+				<view class="icon search" @tap="toSearch()"></view>
 			</view>
 		</view>
 		<!-- 占位 -->
@@ -46,7 +46,7 @@
 					<image mode="widthFix" :src="getUrl(goods.img)"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
-						<view class="store">{{goods.storeId}}</view>
+						<view class="store">{{goods.etc.storeName}}</view>
 						<view class="price">{{ goods.price }}</view>
 					</view>
 				</view>
@@ -75,6 +75,7 @@
 					this_.goodsList.push(res.data.data.records[i])
 				}
 			})
+			this.pageNum++;
 		},
 		data() {
 			return {
@@ -82,9 +83,10 @@
 				bgColor: '#ffffff',
 				showHeader: true,
 				count1: 0,
-				pageNum: 2,
+				pageNum: 1,
 				pageSize: 6,
 				category: 0,
+				searchValue: '',
 				key: "",
 				status: 1,
 				afterHeaderOpacity: 1, //不透明度
@@ -195,9 +197,8 @@
 			},
 			//搜索跳转
 			toSearch() {
-
 				uni.navigateTo({
-					url: '/pages/search/search_pet'
+					url: '/pages/search/search_goods_detail?name=' + this.searchValue
 				});
 			},
 			//轮播图跳转
@@ -220,6 +221,7 @@
 						for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
 							this_.goodsList.push(res.data.data.records[i])
 						}
+						console.log(this_.goodsList)
 					})
 				} else {
 					getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {

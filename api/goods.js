@@ -9,6 +9,7 @@ const {
 export function getGoods(Id) {
 	return getRequest('/goods/getById', Id)
 }
+
 export function getGoodsList(pageNum, pageSize, key, category, status) {
 	return getRequest('/goods/getList', {
 		pageNum,
@@ -16,5 +17,13 @@ export function getGoodsList(pageNum, pageSize, key, category, status) {
 		key,
 		category,
 		status
+	})
+}
+
+export function searchGoodsList(pageNum, pageSize, name) {
+	return getRequest('/goods/searchList', {
+		pageNum,
+		pageSize,
+		name
 	})
 }
