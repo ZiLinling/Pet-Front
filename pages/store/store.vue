@@ -13,8 +13,8 @@
 		<view class="goods-list">
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image  mode="aspectFill" :src="'/static/img/pet/'+goods.img"></image>
-					<view class="name">{{goods.breedName}}</view>
+					<image mode="aspectFill" :src="'/static/img/pet/'+goods.img"></image>
+					<view class="name" v-if="type==0">{{goods.breedName}}</view>
 					<view class="info">
 						<view class="slogan">{{goods.name}}</view>
 						<view class="price">{{goods.price}}$</view>
@@ -27,27 +27,14 @@
 </template>
 
 <script>
-	import {
-		getCount,
-		getCountBySpecie,
-		page
-	} from '../../../api/home';
+import { pageByStoreId } from '../../api/store';
 	export default {
 		created() {
 			let this_ = this;
-			if (this.specie == '0') //查询宠物种类数量(相同物种下的不同种类)
-			{
-				getCount(this_.breedId).then((response) => {
-					this_.count1 = response.data.data
-				})
-			} else //查询宠物物种数量(猫、狗、其他分类)
-			{
-				getCountBySpecie(this.specie).then(res => {
-					this_.count1 = res.data.data;
-				})
-			}
 			console.log(this.specie)
-			page(1, 6, this.breedName, this.specie).then((response) => {
+			pageByStoreId(1, 6, this.storeId, 0).then((response) => {
+				this.count1 = response.data.etc.total
+				this.pageNum++
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
 					this.goodsList.push(p[i])
@@ -63,39 +50,31 @@
 				loadingText: "正在加载...",
 				headerTop: "0px",
 				headerPosition: "fixed",
-				breedName: '', //种类名称
-				breedId: 0, //种类id
+				storeId:0,
+				type:0,
 				count1: 0, //数量
-				specie: 0, //种类物种分类
-				pageNum: 2, //当前页号
+				pageNum: 1, //当前页号
+				pageSize:6,
 				orderbyList: [{
-						text: "综合",
+						text: "宠物",
 						selected: true,
-						orderbyicon: false,
-						orderby: 0
-					},
-					{
-						text: "价格",
-						selected: false,
 						orderbyicon: ['sheng', 'jiang'],
 						orderby: 0
 					},
 					{
-						text: "好评",
+						text: "商品",
 						selected: false,
-						orderbyicon: false,
+						orderbyicon: ['sheng', 'jiang'],
 						orderby: 0
-					}
+					},
 				],
 				orderby: "sheng"
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
-			this.breedName = option.name;
-			this.breedId = option.cid;
-			this.specie = option.specie;
+			this.storeId = option.cid
 			uni.setNavigationBarTitle({
-				title: option.name
+				title: option.storeName
 			});
 
 			//兼容H5下排序栏位置
@@ -120,9 +99,9 @@
 				this.loadingText = '没有更多了';
 				return false;
 			}
-
-			page(this.pageNum, 4, this.breedName, this.specie).then((response) => {
+			pageByStoreId(this.pageNum, this.pageSize, this.storeId, this.type).then((response) => {
 				this.pageNum++;
+				this.count1 = response.data.etc.total
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
 					this.goodsList.push(p[i])
@@ -131,13 +110,25 @@
 		},
 		methods: {
 			//商品跳转
-			toGoods(e) {
-				uni.navigateTo({
-					url: '../../goods/pet?cid='+e.id+'&breed='+e.breedName
-				});
+			toGoods(goods) {
+				
 			},
 			//排序类型
 			select(index) {
+				if(this.type!=index)
+				{
+					this.type = index
+					this.goodsList = []
+					this.pageNum = 1
+					pageByStoreId(this.pageNum, this.pageSize, this.storeId, index).then((response) => {
+						this.pageNum++;
+						this.count1 = response.data.etc.total
+						let p = response.data.data.records
+						for (let i = 0; i < p.length; i++) {
+							this.goodsList.push(p[i])
+						}
+					})
+				}
 				let tmpTis = this.orderbyList[index].text + "排序 "
 				if (this.orderbyList[index].orderbyicon) {
 					let type = this.orderbyList[index].orderby == 0 ? '升序' : '降序';
@@ -177,12 +168,12 @@
 	.header {
 		width: 92%;
 		padding: 0 4%;
-		height: 79upx;
+		height: 88upx;
 		display: flex;
 		justify-content: space-around;
 		align-items: flex-end;
 		position: fixed;
-		top: 0;
+		top: 0px;
 		z-index: 10;
 		background-color: #fff;
 		border-bottom: solid 1upx #eee;
@@ -196,7 +187,6 @@
 			font-size: 28upx;
 			margin-bottom: -2upx;
 			color: #aaa;
-
 			&.on {
 				color: #555;
 				border-bottom: 4upx solid #f06c7a;
@@ -232,7 +222,7 @@
 			display: flex;
 			justify-content: space-between;
 			flex-wrap: wrap;
-
+			
 			.product {
 				width: 48%;
 				border-radius: 20upx;

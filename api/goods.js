@@ -9,3 +9,7 @@ export function getGoods(Id) {
 export function getGoodsList(pageNum,pageSize,key,category,status) {
 	return getRequest('/goods/getList', {pageNum,pageSize,key,category,status})
 }
+
+export function searchGoodsList(pageNum,pageSize,name) {
+	return getRequest('/goods/searchList', {pageNum,pageSize,name})
+}

@@ -133,7 +133,7 @@ export default {
 			pagenum:2,
 			count1:0,
 			type:0,//0为宠物，1为商品
-			city: '北京',
+			city: '厦门',
 			currentSwiper: 0,
 			petCategory: [
 				{ id:0,specie: 0, name: '附近', img: '/static/img/category/category_0.jpg' },

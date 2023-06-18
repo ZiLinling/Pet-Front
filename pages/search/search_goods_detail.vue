@@ -4,45 +4,30 @@
 		<view v-if="showHeader" class="status" :style="{ position: headerPosition,top:statusTop,opacity: afterHeaderOpacity}"></view>
 		<!-- 顶部导航栏 -->
 		<view v-if="showHeader" class="header" :style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
-			
+			<view class="addr">
+				<uni-icons type="back" size="20" @click="goBack()"></uni-icons>
+				
+			</view>
 			<!-- 搜索框 -->
 			<view class="input-box">
 				<input
-					placeholder="搜周边商品"
+					placeholder="搜商品"
 					placeholder-style="color:#c0c0c0;"
 					v-model="searchValue"
 				/>
-				<view class="icon search" @tap="toSearch()"></view>
-			</view>
-			
+				<view class="icon search" @tap="toSearch"></view>
+			</view>	
 		</view>
-		<!-- 轮播图 -->
-		<view class="swiper">
-			<view class="swiper-box">
-				<swiper circular="true" autoplay="true" @change="swiperChange">
-					<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-						<image :src="swiper.img" @tap="toSwiper(swiper)"></image>
-					</swiper-item>
-				</swiper>
-				<view class="indicator">
-					<view class="dots" v-for="(swiper, index) in swiperList"
-						:class="[currentSwiper >= index ? 'on' : '']" :key="index"></view>
-				</view>
-			</view>
-		</view>
-		<!-- 商品分类 -->
-		<view class="category-list">
-			<view  class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
-				<view  class="img">
-					<image :src="row.img"></image>
-				</view>
-				<view class="text">{{ row.name }}</view>
-			</view>
-		</view>
-
+		<!-- 占位 -->
+		<view v-if="showHeader" class="place"></view>
+		
 		<!-- 周边商品列表 -->
 		<view class="goods-list">
-		
+			<view class="title">
+				<image src="/static/img/hua.png"></image>
+				猜你想搜
+				<image src="/static/img/hua.png"></image>
+			</view>
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
 					<image mode="widthFix" :src="goods.img"></image>
@@ -60,15 +45,17 @@
 </template>
 
 <script>
-	var ttt = 0;
-	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
-import { getGoodsList } from '../../../api/goods';
+import { searchGoodsList } from '../../api/goods';
 	export default {
 		created() {
+			
 			let this_ = this;
-				getGoodsList(this.pageNum,this.pageSize,this.key,this.key,this.status).then(res=>{
+				searchGoodsList(this.pageNum,this.pageSize,this.searchName).then(res=>{
 					this.count1 = res.data.etc.total
+					if(res.data.data.records.length==0)
+					{
+						this.loadingText = "暂无商品"
+					}
 					for(let i = 0;i<res.data.data.records.length;i++){         //放入全部商品
 						this_.goodsList.push(res.data.data.records[i])
 					}
@@ -79,77 +66,25 @@ import { getGoodsList } from '../../../api/goods';
 			return {
 				bgColor: '#ffffff',
 				showHeader: true,
+				searchValue:'',
+				searchName:'',
 				count1:0,
 				pageNum:1,
 				pageSize:6,
 				category:0,
-				searchValue:'',
 				key:"",
 				status:1,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
 				headerTop: null,
 				statusTop: null,
-				nVueTitle: null,
-				currentSwiper: 0,
-				goodsCategory: [{
-						id: 1,
-						name: '全部',
-						img: '/static/img/category/1.png'
-					},
-					{
-						id: 2,
-						name: '玩具',
-						img: '/static/img/category/1.png'
-					},
-					{
-						id: 3,
-						name: '保健品',
-						img: '/static/img/category/1.png'
-					},
-					{
-						id: 4,
-						name: '主粮',
-						img: '/static/img/category/1.png'
-					}
-				],
-				// 轮播图片
-				swiperList: [{
-						id: 1,
-						src: 'url1',
-						img: '/static/img/1.jpg'
-					},
-					{
-						id: 2,
-						src: 'url2',
-						img: '/static/img/2.jpg'
-					},
-					{
-						id: 3,
-						src: 'url3',
-						img: '/static/img/3.jpg'
-					},
-				],
-				
+				nVueTitle: null,		
 				Promotion: [],
 				//猜你喜欢列表
 				goodsList: [],
 				loadingText: '正在加载...'
 			};
 		},
-		onPageScroll(e) {
-			//兼容iOS端下拉时顶部漂移
-			this.headerPosition = e.scrollTop >= 0 ? "fixed" : "absolute";
-			this.headerTop = e.scrollTop >= 0 ? null : 0;
-			this.statusTop = e.scrollTop >= 0 ? null : -this.statusHeight + 'px';
-		},
-		//下拉刷新，需要自己在page.json文件中配置开启页面下拉刷新 "enablePullDownRefresh": true
-		onPullDownRefresh() {
-			setTimeout(function() {
-				uni.stopPullDownRefresh();
-			}, 1000);
-		},
-		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
 			let this_ = this
 			uni.showToast({
@@ -160,43 +95,23 @@ import { getGoodsList } from '../../../api/goods';
 				this.loadingText = '没有商品了';
 				return false;
 			}
-			if(this_.category==0)
-			{
-				getGoodsList(this.pageNum,this.pageSize,this.key,this.key,this.status).then(res=>{
-					this_.count1 = res.data.etc.total
-					for(let i = 0;i<res.data.data.records.length;i++){         //放入全部商品
-						this_.goodsList.push(res.data.data.records[i])
-					}
-				})
-			}
-			else
-			{
-				getGoodsList(this.pageNum,this.pageSize,this.key,this.category,this.status).then(res=>{
-					this_.count1 = res.data.etc.total
-					for(let i = 0;i<res.data.data.records.length;i++){         //放入选择商品
-						this_.goodsList.push(res.data.data.records[i])
-					}
-				})
-			}
+			searchGoodsList(this.pageNum,this.pageSize,this.searchName).then(res=>{
+				this_.count1 = res.data.etc.total
+				for(let i = 0;i<res.data.data.records.length;i++){         //放入选择商品
+					this_.goodsList.push(res.data.data.records[i])
+				}
+			})
 			this_.pageNum++;
 		},
-		onLoad() {
-
-			// #ifdef APP-PLUS
-			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
-			this.nVueTitle.onMessage(res => {
-				let type = res.data.type;
-				if (type == 'focus') {
-					this.toSearch();
-				}
-			});
-			this.showHeader = false;
-			this.statusHeight = plus.navigator.getStatusbarHeight();
-			// #endif
-		
-			
+		onLoad(e) {
+			this.searchName = e.name
 		},
 		methods: {
+			goBack() {
+				uni.navigateBack({
+				  delta: 1
+				})
+			},
 			//搜索跳转
 			toSearch() {
 				uni.navigateTo({
@@ -210,45 +125,12 @@ import { getGoodsList } from '../../../api/goods';
 					icon: 'none'
 				});
 			},
-			//分类跳转
-			toGoodsCategory(e) {
-				let this_ = this
-				this.category = e.id-1 //展示类别
-				console.log(this.category)
-				this.pageNum = 1
-				this.goodsList = []
-				if(this_.category == 0)
-				{
-					getGoodsList(this.pageNum,this.pageSize,this.key,this.key,this.status).then(res=>{
-						this_.count1 = res.data.etc.total;
-						for(let i = 0;i<res.data.data.records.length;i++){         //放入全部商品
-							this_.goodsList.push(res.data.data.records[i])
-						}
-						console.log(this_.goodsList)
-					})
-				}
-				else
-				{
-					getGoodsList(this.pageNum,this.pageSize,this.key,this.category,this.status).then(res=>{
-						this_.count1 = res.data.etc.total;
-						for(let i = 0;i<res.data.data.records.length;i++){         //放入选择商品
-							this_.goodsList.push(res.data.data.records[i])
-						}
-					})
-				}
-				this.pageNum++;
-			},
-			
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
-					url: '../../goods/goods?cid='+e.id
+					url: '/pages/goods/goods?cid='+e.id
 				});
 			},
-			//轮播图指示器
-			swiperChange(event) {
-				this.currentSwiper = event.detail.current;
-			}
 		}
 	};
 </script>
