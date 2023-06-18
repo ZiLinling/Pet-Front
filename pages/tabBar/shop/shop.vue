@@ -12,6 +12,8 @@
 				<view class="icon search"></view>
 			</view>
 		</view>
+		<!-- 占位 -->
+		<view v-if="showHeader" class="place"></view>
 		<!-- 轮播图 -->
 		<view class="swiper">
 			<view class="swiper-box">
@@ -30,7 +32,7 @@
 		<view class="category-list">
 			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
 				<view class="img">
-					<image :src="row.img"></image>
+					<image :src="getUrl(row.img)"></image>
 				</view>
 				<view class="text">{{ row.name }}</view>
 			</view>
@@ -40,14 +42,14 @@
 		<view class="goods-list">
 
 			<view class="product-list">
-					<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-						<image mode="widthFix" :src="goods.img"></image>
-						<view class="name">{{ goods.name }}</view>
-						<view class="info">
-							<view class="store">{{goods.storeId}}</view>
-							<view class="price">{{ goods.price }}</view>
-						</view>
+				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+					<image mode="widthFix" :src="getUrl(goods.img)"></image>
+					<view class="name">{{ goods.name }}</view>
+					<view class="info">
+						<view class="store">{{goods.storeId}}</view>
+						<view class="price">{{ goods.price }}</view>
 					</view>
+				</view>
 			</view>
 			<view class="loading-text">{{ loadingText }}</view>
 		</view>
@@ -61,6 +63,9 @@
 	import {
 		getGoodsList
 	} from '../../../api/goods';
+	import {
+		base_url
+	} from '@/api/axios'
 	export default {
 		created() {
 			let this_ = this;
@@ -73,6 +78,7 @@
 		},
 		data() {
 			return {
+				base_url: base_url,
 				bgColor: '#ffffff',
 				showHeader: true,
 				count1: 0,
@@ -90,22 +96,22 @@
 				goodsCategory: [{
 						id: 1,
 						name: '全部',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/61.png'
 					},
 					{
 						id: 2,
 						name: '玩具',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/62.png'
 					},
 					{
 						id: 3,
 						name: '保健品',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/64.png'
 					},
 					{
 						id: 4,
 						name: '主粮',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/63.png'
 					}
 				],
 				// 轮播图片
@@ -174,18 +180,19 @@
 		},
 		onLoad() {
 			// #ifdef APP-PLUS
-			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
-			this.nVueTitle.onMessage(res => {
-				let type = res.data.type;
-				if (type == 'focus') {
-					this.toSearch();
-				}
-			});
-			this.showHeader = false;
+			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 		},
 		methods: {
+			getUrl(url) {
+				console.log(url)
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			//搜索跳转
 			toSearch() {
 
@@ -341,13 +348,6 @@
 		}
 	}
 
-
-
-
-
-
-	// }
-
 	.place {
 		background-color: #ffffff;
 		height: 100upx;
@@ -358,7 +358,7 @@
 
 	.swiper {
 		width: 100%;
-		margin-top: 120upx;
+		margin-top: 10upx;
 		display: flex;
 		justify-content: center;
 

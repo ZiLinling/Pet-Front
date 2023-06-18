@@ -31,7 +31,6 @@
 				<view class="username">{{user.name}}</view>
 				<view class="account">账号:{{user.account}}</view>
 			</view>
-
 		</view>
 
 		<!-- 订单-余额 -->
@@ -46,8 +45,6 @@
 					<view class="text">{{row.text}}</view>
 				</view>
 			</view>
-
-
 		</view>
 		<!-- 工具栏 -->
 		<view class="toolbar">
@@ -61,8 +58,6 @@
 				</view>
 			</view>
 		</view>
-		<!-- 占位 -->
-		<view class="place-bottom"></view>
 	</view>
 </template>
 <script>
@@ -134,9 +129,8 @@
 			}
 		},
 		onLoad() {
-			this.statusHeight = 0;
 			// #ifdef APP-PLUS
-			this.showHeader = false;
+			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif	
 			uni.$on('checkLogin', () => {
@@ -213,8 +207,8 @@
 		width: 100%;
 		height: 0;
 		position: fixed;
+		background-color: #fff;
 		z-index: 10;
-		background-color: #f06c7a;
 		top: 0;
 		/*  #ifdef  APP-PLUS  */
 		height: var(--status-bar-height); //覆盖样式
@@ -261,10 +255,6 @@
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
-	}
-
-	.place-bottom {
-		height: 300upx;
 	}
 
 	.user {
