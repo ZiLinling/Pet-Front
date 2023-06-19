@@ -40,23 +40,30 @@
 		getListByUserId,
 		updateAddress,
 		deleteAddress,
-		addAddress
+		addAddress,
+		getAddressByDefault
 	} from '../../../api/address';
 	export default {
 
 		data() {
 			return {
 				isSelect: false,
-			
 				addressList: []
 			};
 		},
 		mounted() {
 
 		},
-		onShow() {
-
-
+		onReady() {
+			getDefaultAddress:{
+				getAddressByDefault({}).then((response) => {
+					console.log(response.data.data)
+				}).catch((error) => {
+					console.log(error)
+				})
+			}
+		},
+		activated() {
 			uni.getStorage({
 				key: 'delAddress',
 				success: (e) => {

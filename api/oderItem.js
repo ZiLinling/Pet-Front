@@ -2,6 +2,6 @@ const {
 	postJsonRequest,postRequest,getRequest
 } = require("./axios");
 
-export function orderItemGenerate(id) {
-	return getRequest('/orderItem/generate', id)
+export function generateOrderItem(id) {
+	return postJsonRequest('/orderItem/generate', id)
 }

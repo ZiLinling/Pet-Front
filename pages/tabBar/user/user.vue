@@ -141,10 +141,9 @@
 				this.getLogin()
 			});
 		},
-		onReady(){
+		activated() {
 			this.getLogin()
 		},
-	
 		methods: {
 			//消息列表
 			toMsg() {
