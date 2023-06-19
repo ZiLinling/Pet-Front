@@ -47,9 +47,10 @@
 			"path": "pages/tabBar/user/user",
 			"style": {
 				"navigationBarTextStyle": "black",
-				"backgroundColorTop": "#f06c7a",
-				"navigationStyle": "custom"
-
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none"
+				}
 			}
 		},
 		{
@@ -154,8 +155,8 @@
 			"path": "pages/user/keep/keep",
 			"style": {
 				"navigationBarTitleText": "我的收藏",
-				"navigationBarBackgroundColor": "#f06c7a",
-				"navigationBarTextStyle": "white",
+				// "navigationBarBackgroundColor": "#f06c7a",
+				"navigationBarTextStyle": "black",
 				"app-plus": {
 					"bounce": "none"
 				}
@@ -246,14 +247,12 @@
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom"
 			}
-
 		}, {
 			"path": "pages/user/setting/personal_detail/personal_detail",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-
 		}
 	],
 	"globalStyle": {

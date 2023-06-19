@@ -74,7 +74,8 @@
 			</view>
 			<view class="product-list">
 				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="getUrl(product.img)"></image>
+					<image mode="aspectFill" :src="getUrl(product.img)">
+					</image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -88,9 +89,6 @@
 </template>
 
 <script>
-	var ttt = 0;
-	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
 	import {
 		getCount,
 		page
@@ -109,7 +107,6 @@
 					this.productList.push(p[i])
 				}
 			})
-
 		},
 		data() {
 			return {
@@ -119,7 +116,6 @@
 				headerPosition: 'fixed',
 				headerTop: null,
 				statusTop: null,
-				nVueTitle: null,
 				pagenum: 2,
 				count1: 0,
 				type: 0, //0为宠物，1为商品
@@ -223,6 +219,18 @@
 				loadingText: '正在加载...'
 			};
 		},
+		onPageScroll(e) {
+			//兼容iOS端下拉时顶部漂移
+			this.headerPosition = e.scrollTop >= 0 ? "fixed" : "absolute";
+			this.headerTop = e.scrollTop >= 0 ? null : 0;
+			this.statusTop = e.scrollTop >= 0 ? null : -this.statusHeight + 'px';
+		},
+		//下拉刷新，需要自己在page.json文件中配置开启页面下拉刷新 "enablePullDownRefresh": true
+		onPullDownRefresh() {
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1000);
+		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
 			uni.showToast({
@@ -239,14 +247,11 @@
 				for (let i = 0; i < p.length; i++) {
 					this.productList.push(p[i])
 				}
-
 			})
 			this.pagenum++;
 
 		},
-		onLoad() {
-
-		},
+		onLoad() {},
 		methods: {
 			getUrl(url) {
 				if (url) {
