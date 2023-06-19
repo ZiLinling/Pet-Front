@@ -2,19 +2,12 @@
 	<view>
 		<view class="content">
 			<view class="list">
-				<view class="row">
-					<view class="title">头像</view>
+				<view class="row" @tap="toModify">
+					<view class="title">个人信息</view>
 					<view class="right">
 						<view class="tis">
 							<image src="/static/img/face.jpg" mode="widthFix"></image>
 						</view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">昵称</view>
-					<view class="right">
-						<view class="tis">大黑哥</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
@@ -70,6 +63,11 @@
 						uni.$emit('checkLogin');
 					}
 				});
+			},
+			toModify() {
+				uni.navigateTo({
+					url: '/pages/user/setting/setting_personal_detail/setting_personal_detail'
+				})
 			}
 		}
 	}

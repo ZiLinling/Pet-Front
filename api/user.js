@@ -1,5 +1,6 @@
 const {
-	postJsonRequest, getRequest
+	postJsonRequest,
+	getRequest
 } = require("./axios");
 
 export function register(user) {
@@ -10,8 +11,10 @@ export function login(user) {
 	return postJsonRequest('/user/login', user)
 }
 
-export function getUser(){
+export function getUser() {
 	return getRequest("/user/getUser")
 }
 
-
+export function updateUser(user) {
+	return postJsonRequest("/user/update", user)
+}
