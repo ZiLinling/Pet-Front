@@ -293,11 +293,9 @@
 		},
 		methods: {
 			toStore() {
-
 				uni.navigateTo({
 					url: '../store/store?cid=' + this.store.id + '&storeName=' + this.store.name
 				})
-				console.log('商店跳转')
 			},
 
 			getpet(id) {

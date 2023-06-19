@@ -17,19 +17,19 @@ axios.interceptors.request.use(
 		return Promise.reject(error);
 	});
 
-axios.interceptors.response.use(
-	response => {
-		if (uni.getStorageSync('token') && response.data.statusCode == 600) {
-			uni.removeStorageSync('token')
-			return response;
-		}
-		if (response.data.statusCode != 200)
-			return Promise.reject(response.data);
-		return response;
-	},
-	error => {
-		return Promise.reject(error);
-	});
+// axios.interceptors.response.use(
+//   response => {
+//     if (uni.getStorageSync('token') && response.data.statusCode == 600) {
+//       uni.removeStorageSync('token')
+//       return response;
+//     }
+//     if (response.data.statusCode != 200)
+//       return Promise.reject(response.data);
+//     return response;
+//   },
+//   error => {
+//     return Promise.reject(error);
+//   });
 
 export function getRequest(url, params) {
 	return axios({

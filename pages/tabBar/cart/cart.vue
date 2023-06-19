@@ -20,7 +20,7 @@
 				<view class="row" v-for="goods in store.goodsVOList" :key="goods.id">
 					<!-- 删除按钮 -->
 
-					<view class="menu" @tap.stop="deleteGoods(goods.id)">
+					<view class="menu" @tap.stop="deleteGood(goods.cartId)">
 
 						<view class="icon shanchu"></view>
 					</view>
@@ -29,7 +29,7 @@
 						@touchstart="touchStart(goods.id,$event)" @touchmove="touchMove(goods.id,$event)"
 						@touchend="touchEnd(goods.id,$event)">
 						<!-- checkbox -->
-						<view class="checkbox-box" @tap="selected(goods.id)">
+						<view class="checkbox-box" @tap="selected(goods.id,store.id)">
 							<view class="checkbox">
 								<view :class="[goods.selected?'on':'']"></view>
 							</view>
@@ -73,7 +73,7 @@
 				</view>
 				<view class="text">全选</view>
 			</view>
-			<view class="delBtn" @tap="deleteList" v-if="selectedList.length>0">删除</view>
+			<view class="delBtn" @tap="deleteGoods()" v-if="selectedList.length>0">删除</view>
 			<view class="settlement">
 				<view class="sum">合计:<view class="money">￥{{sumPrice}}</view>
 				</view>
@@ -86,7 +86,10 @@
 <script>
 	import {
 		getCart,
-		deleteById
+		deleteById,
+		updateNum,
+		updateSelected,
+		isAllSelected
 	} from '../../../api/cart';
 	export default {
 		data() {
@@ -97,7 +100,8 @@
 				headerTop: null,
 				statusTop: null,
 				showHeader: true,
-				selectedList: [],
+				selectedList:[],
+				selected_length:null,
 				isAllselected: false,
 				goodsList: [
 					// {
@@ -109,7 +113,6 @@
 					// 	selected: false,
 					// 	storeId: 0
 					// },
-
 				],
 				//控制滑动效果
 				theIndex: null,
@@ -140,14 +143,24 @@
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 
-			console.log("token" + uni.getStorageSync('token'))
+			uni.getAccountInfoSync('token');
 		},
-		mounted() {
-			this.getCart();
-		},
-		onReady() {
-			console.log('组件激活')
-			this.getCart();
+		activated() {
+			this.address = '福建省厦门市集美区',
+				this.headerPosition = "fixed",
+				this.headerTop = null,
+				this.statusTop = null,
+				this.showHeader = true,
+				this.isAllselected = false,
+				this.goodsList = [],
+				//控制滑动效果
+				this.theIndex = null,
+				this.oldIndex = null,
+				this.isStop = false,
+				this.getCart();
+
+
+
 		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
@@ -155,6 +168,8 @@
 
 			getCart() {
 				if (!uni.getStorageSync('token')) {
+					this.storeList = [];
+					this.goodsList = [];
 					return;
 				}
 				getCart({}).then((response) => {
@@ -165,11 +180,13 @@
 						for (let j = 0; j < response.data.data[i].goodsVOList.length; j++) {
 							this.goodsList.push(response.data.data[i].goodsVOList[j]);
 						}
-						
+
 					}
+					// this.sum();
 					// uni.switchTab({
 					// 	url: "/pages/tabBar/home/home"
 					// })
+					this.sum();
 				}).catch((error) => {
 					console.log(error)
 					// uni.showToast({
@@ -260,28 +277,39 @@
 					icon: "none"
 				});
 				uni.navigateTo({
-					url: '../../goods/goods?cid='+e.goodsId
+					url: '../../goods/goods?cid=' + e.goodsId
 				});
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				let tmpList = [];
-				let len = this.goodsList.length;
-				for (let i = 0; i < len; i++) {
-					if (this.goodsList[i].selected) {
-						tmpList.push(this.goodsList[i]);
-					}
-				}
-				if (tmpList.length < 1) {
+				let selected_goods = [];	
+				if(this.selectedList.length==0){
 					uni.showToast({
-						title: '请选择商品结算',
+						title: '尚未选中商品',
 						icon: 'none'
 					});
 					return;
 				}
+				//获得选中了的商品列表
+				for (let i = 0; i < this.selectedList.length; i++) {
+					selected_goods.push(this.goodsList[this.selectedList[i]]);
+				}
+				console.log(selected_goods)
+				//用reduce根据storeId分类给store
+				const store = Object.values(selected_goods.reduce((acc, obj) => {
+				  const key = obj.storeId;
+				  if (!acc[key]) {
+				    acc[key] = { storeId: key, goods: [] ,name:this.storeList[key].name};
+				  }
+				  acc[key].goods.push(obj);
+				  return acc;
+				}, {}));
+				console.log("store")
+				console.log(store)
+				//传值为store
 				uni.setStorage({
 					key: 'buylist',
-					data: tmpList,
+					data: store,
 					success: () => {
 						uni.navigateTo({
 							url: '../../order/confirmation'
@@ -290,42 +318,51 @@
 				})
 			},
 			//删除商品
-			deleteGoods(id) {
-				// console.log(id)
-				let goodsId = this.goodsList[id].goodsId
-				// console.log("goodsId+++++++++++++++"+goodsId)
+			deleteGoods() {
+				console.log("selectedList")
+				console.log(this.selectedList)
+				let ids = '';
+				for (let i = 0; i < this.selectedList.length; i++) {
+					ids += (this.goodsList[this.selectedList[i]].cartId) + ',';
+				}
+				this.deleteById(ids);
+			},
+			deleteGood(id) {
+				this.deleteById(id);
+			},
+			deleteById(ids) {
 				deleteById({
-					goodsId: goodsId
+					ids: ids
 				}).then((response) => {
-					console.log(response)
-					this.selectedList.splice(this.selectedList.indexOf(id), 1);
+					console.log("删除成功")
 					this.sum();
 					this.oldIndex = null;
 					this.theIndex = null;
-					this.getCart;
+					this.getCart();
 				}).catch((error) => {
 					console.log(error)
 				})
 
 			},
-			// 删除商品s
-			deleteList() {
-				let len = this.selectedList.length;
-				while (this.selectedList.length > 0) {
-					this.deleteGoods(this.selectedList[0]);
-				}
-				this.selectedList = [];
-				this.isAllselected = this.selectedList.length == this.goodsList.length && this.goodsList.length > 0;
-				this.sum();
-			},
 			// 选中商品
 			selected(index) {
-				console.log(index)
-				this.goodsList[index].selected = this.goodsList[index].selected ? false : true;
-				let i = this.selectedList.indexOf(this.goodsList[index].id);
-				i > -1 ? this.selectedList.splice(i, 1) : this.selectedList.push(this.goodsList[index].id);
-				this.isAllselected = this.selectedList.length == this.goodsList.length;
-				this.sum();
+				let selected=this.goodsList[index].selected;
+				if(selected==true){
+					selected=false
+				}else{
+					selected=true
+				}
+				updateSelected({
+					cartId:this.goodsList[index].cartId,
+					selected:selected
+				}).then((response)=>{
+					console.log(response)
+					this.goodsList[index].selected=selected
+					this.sum();
+				}).catch((error)=>{
+					console.log(error)
+				})
+				
 			},
 			//全选
 			allSelect() {
@@ -337,6 +374,14 @@
 				}
 				this.selectedList = this.isAllselected ? [] : arr;
 				this.isAllselected = this.isAllselected || this.goodsList.length == 0 ? false : true;
+				console.log("this.isAllselected   "+this.isAllselected)
+				isAllSelected({
+					isAllSelected:this.isAllselected
+				}).then((response)=>{
+					console.log(response)		
+				}).catch((error)=>{
+					console.log(error)
+				})
 				this.sum();
 			},
 			// 减少数量
@@ -345,24 +390,39 @@
 					return;
 				}
 				this.goodsList[index].num--;
+				updateNum({
+					cartId:this.goodsList[index].cartId,
+					num:this.goodsList[index].num
+				}).then((response)=>{
+					console.log(response)		
+				}).catch((error)=>{
+					console.log(error)
+				})
 				this.sum();
 			},
 			// 增加数量
 			add(index) {
 				this.goodsList[index].num++;
+				updateNum({
+					cartId:this.goodsList[index].cartId,
+					num:this.goodsList[index].num
+				}).then((response)=>{
+					console.log(response)		
+				}).catch((error)=>{
+					console.log(error)
+				})
 				this.sum();
 			},
 			// 合计
-			sum(e, index) {
+			sum() {
 				this.sumPrice = 0;
-				let len = this.goodsList.length;
-				for (let i = 0; i < len; i++) {
-					if (this.goodsList[i].selected) {
-						if (e && i == index) {
-							this.sumPrice = this.sumPrice + (e.detail.value * this.goodsList[i].price);
-						} else {
-							this.sumPrice = this.sumPrice + (this.goodsList[i].num * this.goodsList[i].price);
-						}
+				this.selectedList=[];
+				for (let i = 0; i <this.goodsList.length; i++) {
+					if(this.goodsList[i].selected==true){
+						this.selectedList.push(i)
+						this.sumPrice = this.sumPrice + (this.goodsList[i].num * this.goodsList[i].price);
+					}else{
+						this.selectedList.splice(i, 1);
 					}
 				}
 				this.sumPrice = this.sumPrice.toFixed(2);

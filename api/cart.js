@@ -14,3 +14,14 @@ export function save(goodsId) {
 export function deleteById(goodsId) {
 	return postRequest('/cart/delete', goodsId)
 }
+
+export function updateNum(num) {
+	return postRequest('/cart/updateNum',num)
+}
+
+export function updateSelected(selected) {
+	return postRequest('/cart/updateSelected', selected)
+}
+export function isAllSelected(selected) {
+	return postRequest('/cart/allSelected', selected)
+}

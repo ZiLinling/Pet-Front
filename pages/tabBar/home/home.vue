@@ -82,7 +82,8 @@
 			</view>
 			<view class="product-list">
 				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
+					<image mode="aspectFill" :src="getUrl(product.img)">
+					</image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -96,13 +97,15 @@
 </template>
 
 <script>
-	var ttt = 0;
 	import {
 		getCount,
 		page
 	} from '../../../api/home';
+	import {
+		base_url
+	} from '@/api/axios'
 	export default {
-		created() {
+		mounted() {
 			getCount(-1).then((response) => {
 				this.count1 = response.data.data
 			})
@@ -112,10 +115,10 @@
 					this.productList.push(p[i])
 				}
 			})
-
 		},
 		data() {
 			return {
+				base_url: base_url,
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
@@ -124,7 +127,7 @@
 				pagenum: 2,
 				count1: 0,
 				type: 0, //0为宠物，1为商品
-				city: '北京',
+				city: '厦门',
 				currentSwiper: 0,
 				petCategory: [{
 						id: 0,
@@ -252,8 +255,6 @@
 				for (let i = 0; i < p.length; i++) {
 					this.productList.push(p[i])
 				}
-				//console.log(p);
-
 			})
 			this.pagenum++;
 
@@ -266,6 +267,13 @@
 			// #endif
 		},
 		methods: {
+			getUrl(url) {
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			//消息列表
 			toMsg() {
 				uni.navigateTo({

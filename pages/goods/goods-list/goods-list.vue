@@ -13,7 +13,7 @@
 		<view class="goods-list">
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image  mode="aspectFill" :src="'/static/img/pet/'+goods.img"></image>
+					<image mode="aspectFill" :src="getUrl(goods.img)"></image>
 					<view class="name">{{goods.breedName}}</view>
 					<view class="info">
 						<view class="slogan">{{goods.name}}</view>
@@ -32,6 +32,9 @@
 		getCountBySpecie,
 		page
 	} from '../../../api/home';
+	import {
+		base_url
+	} from '@/api/axios'
 	export default {
 		created() {
 			let this_ = this;
@@ -46,7 +49,6 @@
 					this_.count1 = res.data.data;
 				})
 			}
-			console.log(this.specie)
 			page(1, 6, this.breedName, this.specie).then((response) => {
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
@@ -59,6 +61,7 @@
 		},
 		data() {
 			return {
+				base_url: base_url,
 				goodsList: [],
 				loadingText: "正在加载...",
 				headerTop: "0px",
@@ -130,10 +133,17 @@
 			})
 		},
 		methods: {
+			getUrl(url) {
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
-					url: '../../goods/pet?cid='+e.id+'&breed='+e.breedName
+					url: '../../goods/pet?cid=' + e.id + '&breed=' + e.breedName
 				});
 			},
 			//排序类型
@@ -154,13 +164,9 @@
 						this.orderbyList[i].selected = false;
 					}
 				}
-				console.log(this.orderbyList[index].orderby)
-				if(this.orderbyList[index].orderby==0)
-				{
+				if (this.orderbyList[index].orderby == 0) {
 					this.goodsList.sort((a, b) => a.price - b.price);
-				}
-				else
-				{
+				} else {
 					this.goodsList.sort((a, b) => b.price - a.price);
 				}
 			}

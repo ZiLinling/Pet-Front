@@ -53,7 +53,7 @@
 				loadingText: "正在加载...",
 				headerTop: "0px",
 				headerPosition: "fixed",
-				storeId: 1,
+				storeId: 0,
 				type: 0,
 				count1: 0, //数量
 				pageNum: 1, //当前页号

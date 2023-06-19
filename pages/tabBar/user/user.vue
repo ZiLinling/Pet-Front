@@ -3,8 +3,8 @@
 		<view v-if="showHeader" class="status" :style="{position:headerPosition,top:statusTop}"></view>
 		<view v-if="showHeader" class="header" :style="{position:headerPosition,top:headerTop}">
 			<view class="icon-btn">
-				<view class="icon tongzhi" @tap="toMsg"></view>
-				<view class="icon setting" @tap="toSetting"></view>
+				<view class="icon tongzhi" @tap="toMsg" v-if="user!=null"></view>
+				<view class="icon setting" @tap="toSetting" v-if="user!=null"></view>
 			</view>
 		</view>
 		<!-- 占位 -->
@@ -134,10 +134,9 @@
 				this.getLogin()
 			});
 		},
-		onReady() {
+		activated() {
 			this.getLogin()
 		},
-
 		methods: {
 			//消息列表
 			toMsg() {

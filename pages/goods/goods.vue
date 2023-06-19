@@ -372,9 +372,10 @@
 			},
 			// 加入购物车
 			joinCart() {
-
+				console.log(this.goodsData)
 				save({
 					goodsId: this.goodsData.id,
+					num: this.num
 				}).then((response) => {
 					console.log(response)
 				}).catch((error) => {
@@ -893,6 +894,7 @@
 		}
 	}
 
+
 	.description {
 		.title {
 			width: 100%;
@@ -912,6 +914,8 @@
 			text-align: center;
 			background-color: (248, 248, 248);
 		}
+
+		margin-bottom: 1000upx;
 	}
 
 	.footer {
