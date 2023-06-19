@@ -43,7 +43,7 @@
 
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image mode="widthFix" :src="getUrl(goods.img)"></image>
+					<image mode="aspectFill" :src="getUrl(goods.img)"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
 						<view class="store">{{goods.etc.storeName}}</view>
@@ -59,7 +59,7 @@
 <script>
 	var ttt = 0;
 	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
+	// import amap from '@/common/SDK/amap-wx.js';
 	import {
 		getGoodsList
 	} from '../../../api/goods';
@@ -188,7 +188,6 @@
 		},
 		methods: {
 			getUrl(url) {
-				console.log(url)
 				if (url) {
 					return this.base_url + url
 				} else {

@@ -40,11 +40,19 @@
 		</view>
 		<!-- 宠物分类 -->
 		<view class="category-list">
-			<view class="category" v-for="(row, index) in petCategory" :key="index" @tap="toCategory(row)">
-				<view class="img">
-					<image :src="row.img"></image>
+			<view class="category" v-for="(row, index) in petCategory" :key="index">
+				<view v-if="index" @tap="toCategory(row)">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
 				</view>
-				<view class="text">{{ row.name }}</view>
+				<view v-else @tap="toMap()">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
+				</view>
 			</view>
 		</view>
 		<!-- 热门宠物 -->
@@ -88,10 +96,7 @@
 </template>
 
 <script>
-	<< << << < HEAD
 	var ttt = 0;
-	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
 	import {
 		getCount,
 		page
@@ -259,27 +264,6 @@
 			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-			this.amapPlugin = new amap.AMapWX({
-				//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
-				key: '821553eebd87b7396dd5e7aa6b3350e5'
-			});
-			//定位地址
-			this.amapPlugin.getRegeo({
-				success: data => {
-					console.log(data)
-					this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
-					// #ifdef APP-PLUS
-					this.nVueTitle.postMessage({
-						type: 'location',
-						city: this.city
-					});
-					// #endif
-				},
-				fail: function(err) { //就是这个
-					console.log('err', err)
-				}
-			});
-
 		},
 		methods: {
 			//消息列表
@@ -304,6 +288,11 @@
 				});
 				uni.navigateTo({
 					url: '/pages/search/search_pet'
+				});
+			},
+			toMap() {
+				uni.navigateTo({
+					url: '/pages/map/map'
 				});
 			},
 			//轮播图跳转
@@ -331,7 +320,6 @@
 			},
 			//商品跳转
 			toGoods(e) {
-
 				uni.navigateTo({
 					url: '../../goods/pet?cid=' + e.id + '&breed=' + e.breedName
 				});

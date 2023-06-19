@@ -64,7 +64,6 @@
 	import {
 		getUser
 	} from '../../../api/user';
-
 	export default {
 		data() {
 			return {
@@ -100,7 +99,7 @@
 				],
 				// 工具栏列表
 				mytoolbarList: [{
-						url: '../../user/keep/keep',
+						url: '/pages/user/keep/keep?type=1',
 						text: '我的收藏',
 						img: '/static/img/user/point.png'
 					},
@@ -135,10 +134,10 @@
 				this.getLogin()
 			});
 		},
-		onReady(){
+		onReady() {
 			this.getLogin()
 		},
-	
+
 		methods: {
 			//消息列表
 			toMsg() {

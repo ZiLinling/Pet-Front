@@ -147,7 +147,7 @@
 			</view>
 			<image :src="storeImg" @tap="toStore"></image>
 		</view>
-		
+
 		<!-- 详情 -->
 		<view class="description">
 			<view class="title">———— 商品详情 ————</view>
@@ -167,12 +167,18 @@
 	import {
 		getPet
 	} from '../../api/pet';
-
+	import {
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '../../api/favor';
 	export default {
 		data() {
 			return {
-				storeImg:'',
-				breed:'',
+				id: '',
+				favorId: '',
+				storeImg: '',
+				breed: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -207,8 +213,8 @@
 				serviceClass: '', //服务弹窗css类，控制开关动画
 				specClass: '', //规格弹窗css类，控制开关动画
 				shareClass: '', //分享弹窗css类，控制开关动画
-				breedName:'',
-				store:[],
+				breedName: '',
+				store: [],
 				// 商品信息
 				goodsData: [],
 				comment: {
@@ -237,6 +243,20 @@
 			};
 		},
 		onLoad(option) {
+			this.id = option.cid
+
+			console.log(option.cid)
+			checkFavor(option.cid, 1).then((response) => {
+				console.log(777)
+				console.log(response.data.data)
+				this.favorId = response.data.data.id
+				this.isKeep = true
+
+			}).catch((error) => {
+				this.isKeep = false
+				this.favorId = ''
+
+			})
 			uni.setNavigationBarTitle({
 				title: option.breed
 			});
@@ -272,26 +292,24 @@
 
 		},
 		methods: {
-			toStore(){
+			toStore() {
+
 				uni.navigateTo({
-					url: '../store/store?cid='+this.store.id+'&storeName='+this.store.name
+					url: '../store/store?cid=' + this.store.id + '&storeName=' + this.store.name
 				})
 				console.log('商店跳转')
 			},
-			
-			getpet(id){
+
+			getpet(id) {
 				let this_ = this;
 				getPet({
 					id: id
 				}).then((response) => {
-<<<<<<< HEAD
-					this_.goodsData=response.data.data;
+					this_.goodsData = response.data.data;
 					this.storeImg = response.data.data.etc.store.img
 					this.store = this.goodsData.etc.store
-=======
 					console.log(response.data.data)
-					this.goodsData=response.data.data;
->>>>>>> efcbf7c7bcab455cda38ef3093e0d1f9a354b2b4
+					this.goodsData = response.data.data;
 				}).catch((error) => {
 					//console.log(error)
 				})
@@ -324,7 +342,21 @@
 			},
 			//收藏
 			keep() {
-				this.isKeep = this.isKeep ? false : true;
+				console.log(this.isKeep)
+				console.log(this.id)
+				console.log(this.favorId)
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+
+						console.log('quxiaochenggong')
+						this.isKeep = false
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 1).then((response) => {
+						console.log('jiaruchenggong')
+						this.isKeep = true
+					})
+				}
 			},
 			//立即购买
 			buy() {
@@ -352,7 +384,7 @@
 					key: 'buylist',
 					data: tmpList,
 					success: () => {
-						
+
 					}
 				})
 			},
@@ -498,15 +530,17 @@
 			transform: translateY(0);
 		}
 	}
-	.goods-description{
+
+	.goods-description {
 		display: flex;
 		flex-direction: row;
 		width: 100%;
 		height: 80rpx;
-		align-items: center;//垂直居中
+		align-items: center; //垂直居中
 		text-align: center;
-		background-color: (248,248,248);
+		background-color: (248, 248, 248);
 	}
+
 	.icon {
 		font-size: 26upx;
 	}
