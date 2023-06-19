@@ -8,10 +8,12 @@
 			:style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
 			<!-- 搜索框 -->
 			<view class="input-box">
-				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
-				<view class="icon search"></view>
+				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" v-model="searchValue" />
+				<view class="icon search" @tap="toSearch()"></view>
 			</view>
 		</view>
+		<!-- 占位 -->
+		<view v-if="showHeader" class="place"></view>
 		<!-- 轮播图 -->
 		<view class="swiper">
 			<view class="swiper-box">
@@ -30,7 +32,7 @@
 		<view class="category-list">
 			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
 				<view class="img">
-					<image :src="row.img"></image>
+					<image :src="getUrl(row.img)"></image>
 				</view>
 				<view class="text">{{ row.name }}</view>
 			</view>
@@ -40,14 +42,14 @@
 		<view class="goods-list">
 
 			<view class="product-list">
-					<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-						<image mode="widthFix" :src="goods.img"></image>
-						<view class="name">{{ goods.name }}</view>
-						<view class="info">
-							<view class="store">{{goods.storeId}}</view>
-							<view class="price">{{ goods.price }}</view>
-						</view>
+				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+					<image mode="widthFix" :src="getUrl(goods.img)"></image>
+					<view class="name">{{ goods.name }}</view>
+					<view class="info">
+						<view class="store">{{goods.etc.storeName}}</view>
+						<view class="price">{{ goods.price }}</view>
 					</view>
+				</view>
 			</view>
 			<view class="loading-text">{{ loadingText }}</view>
 		</view>
@@ -61,6 +63,9 @@
 	import {
 		getGoodsList
 	} from '../../../api/goods';
+	import {
+		base_url
+	} from '@/api/axios'
 	export default {
 		created() {
 			let this_ = this;
@@ -70,15 +75,18 @@
 					this_.goodsList.push(res.data.data.records[i])
 				}
 			})
+			this.pageNum++;
 		},
 		data() {
 			return {
+				base_url: base_url,
 				bgColor: '#ffffff',
 				showHeader: true,
 				count1: 0,
-				pageNum: 2,
+				pageNum: 1,
 				pageSize: 6,
 				category: 0,
+				searchValue: '',
 				key: "",
 				status: 1,
 				afterHeaderOpacity: 1, //不透明度
@@ -90,22 +98,22 @@
 				goodsCategory: [{
 						id: 1,
 						name: '全部',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/61.png'
 					},
 					{
 						id: 2,
 						name: '玩具',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/62.png'
 					},
 					{
 						id: 3,
 						name: '保健品',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/64.png'
 					},
 					{
 						id: 4,
 						name: '主粮',
-						img: '/static/img/category/1.png'
+						img: '/resource/goods/63.png'
 					}
 				],
 				// 轮播图片
@@ -174,23 +182,23 @@
 		},
 		onLoad() {
 			// #ifdef APP-PLUS
-			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
-			this.nVueTitle.onMessage(res => {
-				let type = res.data.type;
-				if (type == 'focus') {
-					this.toSearch();
-				}
-			});
-			this.showHeader = false;
+			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 		},
 		methods: {
+			getUrl(url) {
+				console.log(url)
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			//搜索跳转
 			toSearch() {
-
 				uni.navigateTo({
-					url: '/pages/search/search_pet'
+					url: '/pages/search/search_goods_detail?name=' + this.searchValue
 				});
 			},
 			//轮播图跳转
@@ -213,6 +221,7 @@
 						for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
 							this_.goodsList.push(res.data.data.records[i])
 						}
+						console.log(this_.goodsList)
 					})
 				} else {
 					getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
@@ -341,13 +350,6 @@
 		}
 	}
 
-
-
-
-
-
-	// }
-
 	.place {
 		background-color: #ffffff;
 		height: 100upx;
@@ -358,7 +360,7 @@
 
 	.swiper {
 		width: 100%;
-		margin-top: 120upx;
+		margin-top: 10upx;
 		display: flex;
 		justify-content: center;
 

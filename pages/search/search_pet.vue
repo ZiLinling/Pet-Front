@@ -13,9 +13,9 @@
 				<input
 					placeholder="搜宠物"
 					placeholder-style="color:#c0c0c0;"
-					@tap="toSearch()"
+					v-model="searchValue"
 				/>
-				<view class="icon search"></view>
+				<view class="icon search" @tap="toSearch"></view>
 			</view>	
 		</view>
 		<!-- 占位 -->
@@ -60,17 +60,17 @@ export default {
 			nVueTitle:null,
 			city: '厦门',
 			currentSwiper: 0,
-			
+			searchValue:'',
 			// 品种菜单
 			categoryList: [
-				{ id: 1, name: '布偶猫', img: '/static/img/category/1.png' },
-				{ id: 2, name: '英国短毛猫', img: '/static/img/category/2.png' },
-				{ id: 3, name: '美国短毛猫', img: '/static/img/category/3.png' },
-				{ id: 4, name: '缅因猫', img: '/static/img/category/4.png' },
-				{ id: 5, name: '泰迪', img: '/static/img/category/5.png' },
-				{ id: 6, name: '运动', img: '/static/img/category/6.png' },
-				{ id: 7, name: '书籍', img: '/static/img/category/7.png' },
-				{ id: 8, name: '文具', img: '/static/img/category/8.png' }
+				{ id: 3, specie: 0, name: '波斯猫', img: '/static/img/category/catcat.jpg' },
+				{ id: 5, specie: 0, name: '肥猫', img: '/static/img/category/catcat1.jpg' },
+				{ id: 8, specie: 0, name: '狮子猫', img: '/static/img/category/catcat2.jpg' },
+				{ id: 10, specie: 0, name: '爪哇猫', img: '/static/img/category/catcat3.jpg' },
+				{ id: 19, specie: 0, name: '泰迪狗', img: '/static/img/category/dog0.jpg' },
+				{ id: 11, specie: 0, name: '拉布拉多', img: '/static/img/category/dog1.jpg' },
+				{ id: 14, specie: 0, name: '贵宾犬', img: '/static/img/category/dog2.jpg' },
+				{ id: 15, specie: 0, name: '斑点狗', img: '/static/img/category/dog3.jpg' }
 			],
 		};
 	},
@@ -91,15 +91,16 @@ export default {
 		},
 		//搜索跳转
 		toSearch() {
-			uni.showToast({ title: '输入您要搜索的内容' });
-			
+			uni.navigateTo({
+				url: '../search/search_pet_detail?name='+this.searchValue
+			});
 		},
 		//分类跳转
 		toCategory(e) {
 			//uni.showToast({title: e.name,icon:"none"});
 			uni.setStorageSync('catName',e.name);
 			uni.navigateTo({
-				url: '../goods/goods-list/goods-list?cid='+e.id+'&name='+e.name
+				url: '../goods/goods-list/goods-list?cid='+e.id+'&name='+e.name+'&specie='+e.specie
 			});
 			
 		},

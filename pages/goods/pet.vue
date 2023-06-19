@@ -114,7 +114,7 @@
 		<view class="info-box goods-info">
 			<view class="price">￥{{goodsData.price}}</view>
 			<view class="title">
-				{{goodsData.name}}
+				昵称: {{goodsData.name}}
 			</view>
 		</view>
 		<!-- 服务-规则选择 -->
@@ -129,43 +129,31 @@
 					<view class="icon xiangyou"></view>
 				</view>
 			</view>
-
 			<view class="row">
 				<view class="text">运费：8-24 <view class="arrow"> 性别：{{goodsData.gender}}</view>
 				</view>
-
 			</view>
-
 		</view>
 		<!-- 评价 -->
 		<view class="info-box comments" id="comments">
 			<view class="row">
-				<view class="text">商品评价({{comment.num}})</view>
-				<view class="arrow" @tap="toRatings">
-					<view class="show" @tap="showComments(goodsData.id)">
-						查看全部
+				<view class="text">{{store.name}}</view>
+				<view class="arrow">
+					<view class="show" @tap="toStore">
+						查看商店
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
 			</view>
-			<view class="comment" @tap="toRatings">
-				<view class="user-info">
-					<view class="face">
-						<image :src="comment.userface"></image>
-					</view>
-					<view class="username">{{comment.username}}</view>
-				</view>
-				<view class="content">
-					{{comment.content}}
-				</view>
-			</view>
+			<image :src="storeImg" @tap="toStore"></image>
 		</view>
+		
 		<!-- 详情 -->
 		<view class="description">
 			<view class="title">———— 商品详情 ————</view>
-			<view class="">
+			<view class="goods-description">
 				<!-- 商品详情在这，看后面怎么用？ -->
-			<!-- 	{{goodsData.description}} -->
+				{{goodsData.description}}
 			</view>
 			<view class="content"><rich-text :nodes="descriptionStr"></rich-text></view>
 		</view>
@@ -183,6 +171,7 @@
 	export default {
 		data() {
 			return {
+				storeImg:'',
 				breed:'',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
@@ -218,9 +207,10 @@
 				serviceClass: '', //服务弹窗css类，控制开关动画
 				specClass: '', //规格弹窗css类，控制开关动画
 				shareClass: '', //分享弹窗css类，控制开关动画
+				breedName:'',
+				store:[],
 				// 商品信息
-				goodsData: {
-				},
+				goodsData: [],
 				comment: {
 					num: 102,
 					userface: '../../static/img/face.jpg',
@@ -247,15 +237,15 @@
 			};
 		},
 		onLoad(option) {
+			uni.setNavigationBarTitle({
+				title: option.breed
+			});
 			// #ifdef MP
 			//小程序隐藏返回按钮
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
-			console.log(option.cid); //打印出上个页面传递的参数。
 			this.getpet(option.cid);
-			this.breed=option.breedName;
-			console.log("breed:  "+this.breed);
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -282,20 +272,28 @@
 
 		},
 		methods: {
+			toStore(){
+				uni.navigateTo({
+					url: '../store/store?cid='+this.store.id+'&storeName='+this.store.name
+				})
+				console.log('商店跳转')
+			},
 			
 			getpet(id){
-				//先设置好id为1把数据弄好
+				let this_ = this;
 				getPet({
 					id: id
 				}).then((response) => {
+<<<<<<< HEAD
+					this_.goodsData=response.data.data;
+					this.storeImg = response.data.data.etc.store.img
+					this.store = this.goodsData.etc.store
+=======
 					console.log(response.data.data)
 					this.goodsData=response.data.data;
+>>>>>>> efcbf7c7bcab455cda38ef3093e0d1f9a354b2b4
 				}).catch((error) => {
-					console.log(error)
-					// uni.showToast({
-					// 	title: error.message,
-					// 	icon:  "none"
-					// })
+					//console.log(error)
 				})
 			},
 			//轮播图指示器
@@ -500,7 +498,15 @@
 			transform: translateY(0);
 		}
 	}
-
+	.goods-description{
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		height: 80rpx;
+		align-items: center;//垂直居中
+		text-align: center;
+		background-color: (248,248,248);
+	}
 	.icon {
 		font-size: 26upx;
 	}
@@ -691,10 +697,12 @@
 			font-size: 46upx;
 			font-weight: 600;
 			color: #f47925;
+			text-align: left;
 		}
 
 		.title {
 			font-size: 30upx;
+			text-align: right;
 		}
 	}
 

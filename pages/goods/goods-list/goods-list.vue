@@ -13,7 +13,7 @@
 		<view class="goods-list">
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image mode="widthFix" :src="goods.img"></image>
+					<image  mode="aspectFill" :src="'/static/img/pet/'+goods.img"></image>
 					<view class="name">{{goods.breedName}}</view>
 					<view class="info">
 						<view class="slogan">{{goods.name}}</view>
@@ -131,8 +131,10 @@
 		},
 		methods: {
 			//商品跳转
-			toGoods(goods) {
-				
+			toGoods(e) {
+				uni.navigateTo({
+					url: '../../goods/pet?cid='+e.id+'&breed='+e.breedName
+				});
 			},
 			//排序类型
 			select(index) {
