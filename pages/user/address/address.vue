@@ -57,7 +57,7 @@
 		onReady() {
 			getDefaultAddress:{
 				getAddressByDefault({}).then((response) => {
-					console.log(response.data.data)
+					// console.log(response.data.data)
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -124,7 +124,7 @@
 		},
 		methods: {
 			 sortedAddressList() {
-				 console.log('paixu')
+				
 			    // 找到 isDefault 字段值为 1 的地址对象
 			      let defaultAddress = this.addressList.find(address => address.isDefault == 1);
 			    
@@ -132,13 +132,13 @@
 			      if (defaultAddress) {
 			        const defaultAddressIndex = this.addressList.indexOf(defaultAddress);
 			        this.addressList.splice(defaultAddressIndex, 1);
-					
 			        this.addressList.unshift(defaultAddress);
 			      }
 			    
 			     
 			  },
 			edit(row) {
+	
 				uni.setStorage({
 					key: 'address',
 					data: row,
