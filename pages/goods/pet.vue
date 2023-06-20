@@ -171,6 +171,7 @@
 	export default {
 		data() {
 			return {
+				token:'',
 				storeImg:'',
 				breed:'',
 				//控制渐变标题栏的参数
@@ -268,8 +269,8 @@
 				title: '触发上拉加载'
 			});
 		},
-		mounted() {
-
+		onShow() {
+			this.token=uni.getStorageSync('token')
 		},
 		methods: {
 			toStore(){
@@ -284,14 +285,8 @@
 				getPet({
 					id: id
 				}).then((response) => {
-<<<<<<< HEAD
-					this_.goodsData=response.data.data;
-					this.storeImg = response.data.data.etc.store.img
-					this.store = this.goodsData.etc.store
-=======
 					console.log(response.data.data)
 					this.goodsData=response.data.data;
->>>>>>> efcbf7c7bcab455cda38ef3093e0d1f9a354b2b4
 				}).catch((error) => {
 					//console.log(error)
 				})
@@ -328,32 +323,28 @@
 			},
 			//立即购买
 			buy() {
-				console.log(111)
+				if(this.token==''){
+					uni.showToast({
+						title:'请先登录',
+						icon: 'none'
+					})
+					return;
+				}
+				this.goodsData.num=this.num
+				uni.setStorage({
+					key: 'petOrder',
+					data: this.goodsData,
+					success: function() {
+						uni.navigateTo({
+							url: '/pages/order/confirmation?type=0'
+						})
+					}
+				})
 			},
 			//商品评论
 			toRatings() {
 				uni.navigateTo({
 					url: 'ratings/ratings'
-				})
-			},
-			//跳转确认订单页面
-			toConfirmation() {
-				let tmpList = [];
-				let goods = {
-					id: this.goodsData.id,
-					img: '../../static/img/goods/p1.jpg',
-					name: this.goodsData.name,
-					spec: '规格:' + this.goodsData.spec[this.selectSpec],
-					price: this.goodsData.price,
-					num: this.goodsData.num
-				};
-				tmpList.push(goods);
-				uni.setStorage({
-					key: 'buylist',
-					data: tmpList,
-					success: () => {
-						
-					}
 				})
 			},
 			//跳转评论列表

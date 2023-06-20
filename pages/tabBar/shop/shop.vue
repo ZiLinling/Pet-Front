@@ -42,7 +42,7 @@
 		<view class="goods-list">
 
 			<view class="product-list">
-				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods,goods.etc.storeName)">
 					<image mode="widthFix" :src="getUrl(goods.img)"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
@@ -188,7 +188,6 @@
 		},
 		methods: {
 			getUrl(url) {
-				console.log(url)
 				if (url) {
 					return this.base_url + url
 				} else {
@@ -235,7 +234,8 @@
 			},
 
 			//商品跳转
-			toGoods(e) {
+			toGoods(e,storeName) {
+				console.log('e',e)
 				uni.navigateTo({
 					url: '../../goods/goods?cid=' + e.id
 				});

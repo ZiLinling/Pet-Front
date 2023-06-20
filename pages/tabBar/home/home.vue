@@ -88,7 +88,6 @@
 </template>
 
 <script>
-	<< << << < HEAD
 	var ttt = 0;
 	//高德SDK
 	import amap from '@/common/SDK/amap-wx.js';
