@@ -173,6 +173,11 @@
 	import {
 		base_url
 	} from '@/api/axios'
+	import {
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '../../api/favor';
 	export default {
 		data() {
 			return {
@@ -180,6 +185,9 @@
 				changeTime: 1000,
 				storeImg: '',
 				breed: '',
+				favorId: '',
+				id: "",
+				token: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -247,6 +255,20 @@
 			};
 		},
 		onLoad(option) {
+			this.id = option.cid
+
+			console.log(option.cid)
+			checkFavor(option.cid, 1).then((response) => {
+				console.log(777)
+				console.log(response.data.data)
+				this.favorId = response.data.data.id
+				this.isKeep = true
+
+			}).catch((error) => {
+				this.isKeep = false
+				this.favorId = ''
+
+			})
 			uni.setNavigationBarTitle({
 				title: option.breed
 			});
@@ -278,8 +300,8 @@
 				title: '触发上拉加载'
 			});
 		},
-		mounted() {
-
+		onShow() {
+			this.token = uni.getStorageSync('token')
 		},
 		methods: {
 			getUrl(url) {
@@ -346,36 +368,46 @@
 			},
 			//收藏
 			keep() {
-				this.isKeep = this.isKeep ? false : true;
+				console.log(this.isKeep)
+				console.log(this.id)
+				console.log(this.favorId)
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+
+						console.log('quxiaochenggong')
+						this.isKeep = false
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 1).then((response) => {
+						console.log('jiaruchenggong')
+						this.isKeep = true
+					})
+				}
 			},
 			//立即购买
 			buy() {
-				console.log(111)
+				if (this.token == '') {
+					uni.showToast({
+						title: '请先登录',
+						icon: 'none'
+					})
+					return;
+				}
+				this.goodsData.num = this.num
+				uni.setStorage({
+					key: 'petOrder',
+					data: this.goodsData,
+					success: function() {
+						uni.navigateTo({
+							url: '/pages/order/confirmation?type=0'
+						})
+					}
+				})
 			},
 			//商品评论
 			toRatings() {
 				uni.navigateTo({
 					url: 'ratings/ratings'
-				})
-			},
-			//跳转确认订单页面
-			toConfirmation() {
-				let tmpList = [];
-				let goods = {
-					id: this.goodsData.id,
-					img: '../../static/img/goods/p1.jpg',
-					name: this.goodsData.name,
-					spec: '规格:' + this.goodsData.spec[this.selectSpec],
-					price: this.goodsData.price,
-					num: this.goodsData.num
-				};
-				tmpList.push(goods);
-				uni.setStorage({
-					key: 'buylist',
-					data: tmpList,
-					success: () => {
-
-					}
 				})
 			},
 			//跳转评论列表

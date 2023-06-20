@@ -2,22 +2,24 @@
 	<view>
 		<!-- 状态栏 -->
 		<view class="status" :style="{position:headerPosition}"></view>
-        <view class="header" :style="{position:headerPosition}">
+		<view class="header" :style="{position:headerPosition}">
 		</view>
 		<view class="category-list">
 			<!-- 左侧分类导航 -->
-			<scroll-view  scroll-y="true" class="left" >
-                <view class="row" v-for="(category,index) in categoryList" :key="category.id" :class="[index==showCategoryIndex?'on':'']" @tap="showCategory(index)">
+			<scroll-view scroll-y="true" class="left">
+				<view class="row" v-for="(category,index) in categoryList" :key="category.id"
+					:class="[index==showCategoryIndex?'on':'']" @tap="showCategory(index)">
 					<view class="text">
 						<view class="block"></view>
 						{{category.title}}
 					</view>
 				</view>
-				
-            </scroll-view>
+
+			</scroll-view>
 			<!-- 右侧子导航 -->
-			<scroll-view  scroll-y="true" class="right" >
-			    <view class="category" v-for="(category,index) in categoryList" :key="category.id" v-show="index==showCategoryIndex" >
+			<scroll-view scroll-y="true" class="right">
+				<view class="category" v-for="(category,index) in categoryList" :key="category.id"
+					v-show="index==showCategoryIndex">
 					<view class="banner">
 						<image :src="category.banner"></image>
 					</view>
@@ -33,70 +35,83 @@
 	</view>
 </template>
 <script>
-	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
-import { getBreed } from '../../api/category_pet';
+	import {
+		getBreed
+	} from '../../api/category_pet';
 	export default {
 		created() {
 			let this_ = this;
-			for(let i = 1;i<=3;i++)
-			{
-				getBreed(i).then(res=>{
-					this.categoryList[i-1].list = res.data.data;
+			for (let i = 1; i <= 3; i++) {
+				getBreed(i).then(res => {
+					this.categoryList[i - 1].list = res.data.data;
 				})
 			}
 		},
 		data() {
 			return {
-				showCategoryIndex:0,
-				headerPosition:"fixed",
-				city:"北京",
-				specie:1,
+				showCategoryIndex: 0,
+				headerPosition: "fixed",
+				city: "北京",
+				specie: 1,
 				//分类列表
-				categoryList:[
-					{id:1,title:'猫猫',banner:'/static/img/category/banner.jpg',list:[]},
-					{id:2,title:'狗狗',banner:'/static/img/category/banner.jpg',list:[]},
-					{id:3,title:'其他',banner:'/static/img/category/banner.jpg',list:[]},
+				categoryList: [{
+						id: 1,
+						title: '猫猫',
+						banner: '/static/img/category/banner.jpg',
+						list: []
+					},
+					{
+						id: 2,
+						title: '狗狗',
+						banner: '/static/img/category/banner.jpg',
+						list: []
+					},
+					{
+						id: 3,
+						title: '其他',
+						banner: '/static/img/category/banner.jpg',
+						list: []
+					},
 				]
 			}
 		},
-		onPageScroll(e){
+		onPageScroll(e) {
 			//兼容iOS端下拉时顶部漂移
-			if(e.scrollTop>=0){
+			if (e.scrollTop >= 0) {
 				this.headerPosition = "fixed";
-			}else{
+			} else {
 				this.headerPosition = "absolute";
 			}
 		},
-		onLoad() {
-		},
+		onLoad() {},
 		methods: {
 			//消息列表
-			toMsg(){
+			toMsg() {
 				uni.navigateTo({
-					url:'/pages/msg/msg'
+					url: '/pages/msg/msg'
 				})
 			},
 			//分类切换显示
-			showCategory(index){
+			showCategory(index) {
 				this.showCategoryIndex = index;
 				this.specie = index;
 			},
-			toCategory(e){
-				uni.setStorageSync('catName',e.name);
+			toCategory(e) {
+				uni.setStorageSync('catName', e.name);
 				uni.navigateTo({
-					url: '/pages/goods/goods-list/goods-list?cid='+e.id+'&name='+e.name+'&specie='+'0'
+					url: '/pages/goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name + '&specie=' + '0'
 				});
 			},
 			//搜索跳转
-			toSearch(){
-				uni.showToast({title: "建议跳转到新页面做搜索功能"});
+			toSearch() {
+				uni.showToast({
+					title: "建议跳转到新页面做搜索功能"
+				});
 			}
 		}
 	}
 </script>
 <style lang="scss">
-
 	.status {
 		width: 100%;
 		height: 0;
@@ -105,12 +120,12 @@ import { getBreed } from '../../api/category_pet';
 		background-color: #fff;
 		top: 0;
 		/*  #ifdef  APP-PLUS  */
-		height: var(--status-bar-height);//覆盖样式
+		height: var(--status-bar-height); //覆盖样式
 		/*  #endif  */
-		
+
 	}
 
-	.header{
+	.header {
 		width: 92%;
 		padding: 0 4%;
 		height: 100upx;
@@ -123,16 +138,17 @@ import { getBreed } from '../../api/category_pet';
 		/*  #ifdef  APP-PLUS  */
 		top: var(--status-bar-height);
 		/*  #endif  */
-		
-		.addr{
+
+		.addr {
 			width: 120upx;
 			height: 60upx;
 			flex-shrink: 0;
 			display: flex;
 			align-items: center;
 			font-size: 28upx;
-			.icon{
-				height: 60upx; 
+
+			.icon {
+				height: 60upx;
 				margin-right: 5upx;
 				display: flex;
 				align-items: center;
@@ -140,7 +156,8 @@ import { getBreed } from '../../api/category_pet';
 				color: #ffc50a;
 			}
 		}
-		.input-box{
+
+		.input-box {
 			width: 100%;
 			height: 60upx;
 			background-color: #f5f5f5;
@@ -148,29 +165,33 @@ import { getBreed } from '../../api/category_pet';
 			position: relative;
 			display: flex;
 			align-items: center;
-			.icon{
+
+			.icon {
 				display: flex;
 				align-items: center;
 				position: absolute;
-				top:0;
+				top: 0;
 				right: 0;
 				width: 60upx;
 				height: 60upx;
 				font-size: 34upx;
 				color: #c0c0c0;
 			}
-			input{
+
+			input {
 				padding-left: 28upx;
 				height: 28upx;
 				font-size: 28upx;
 			}
 		}
-		.icon-btn{
+
+		.icon-btn {
 			width: 60upx;
 			height: 60upx;
 			flex-shrink: 0;
 			display: flex;
-			.icon{
+
+			.icon {
 				width: 60upx;
 				height: 60upx;
 				display: flex;
@@ -180,57 +201,68 @@ import { getBreed } from '../../api/category_pet';
 			}
 		}
 	}
-	.place{
-		
+
+	.place {
+
 		background-color: #ffffff;
 		height: 100upx;
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
 	}
-	.category-list{
+
+	.category-list {
 		width: 100%;
 		background-color: #fff;
 		display: flex;
-		.left,.right{
+
+		.left,
+		.right {
 			position: absolute;
-			
+
 			top: 0upx;
 			/*  #ifdef  APP-PLUS  */
 			top: calc(0upx + var(--status-bar-height));
 			/*  #endif  */
 			bottom: 0upx;
 		}
-		.left{
+
+		.left {
 			width: 24%;
 			left: 0upx;
 			background-color: #f2f2f2;
-			.row{
+
+			.row {
 				width: 100%;
 				height: 90upx;
 				display: flex;
 				align-items: center;
-				.text{
+
+				.text {
 					width: 100%;
 					position: relative;
 					font-size: 28upx;
 					display: flex;
 					justify-content: center;
 					color: #3c3c3c;
-					.block{
+
+					.block {
 						position: absolute;
 						width: 0upx;
 						left: 0;
 					}
 				}
-				&.on{
+
+				&.on {
 					height: 100upx;
 					background-color: #fff;
-					.text{
+
+					.text {
 						font-size: 30upx;
 						font-weight: 600;
 						color: #2d2d2d;
-						.block{
+
+						.block {
 							width: 10upx;
 							height: 80%;
 							top: 10%;
@@ -240,40 +272,48 @@ import { getBreed } from '../../api/category_pet';
 				}
 			}
 		}
-		.right{
-		   width: 76%;
+
+		.right {
+			width: 76%;
 			left: 24%;
-			.category{
+
+			.category {
 				width: 94%;
 				padding: 20upx 3%;
-				.banner{
+
+				.banner {
 					width: 100%;
 					height: 24.262vw;
 					border-radius: 10upx;
 					overflow: hidden;
-					box-shadow: 0upx 5upx 20upx rgba(0,0,0,0.3);
-					image{
+					box-shadow: 0upx 5upx 20upx rgba(0, 0, 0, 0.3);
+
+					image {
 						width: 100%;
 						height: 24.262vw;
 					}
 				}
-				.list{
+
+				.list {
 					margin-top: 40upx;
 					width: 100%;
 					display: flex;
 					flex-wrap: wrap;
-					.box{
+
+					.box {
 						width: calc(71.44vw / 3);
 						margin-bottom: 30upx;
 						display: flex;
 						justify-content: center;
 						align-items: center;
 						flex-wrap: wrap;
-						image{
+
+						image {
 							width: 60%;
 							height: calc(71.44vw / 3 * 0.6);
 						}
-						.text{
+
+						.text {
 							margin-top: 5upx;
 							width: 100%;
 							display: flex;
@@ -285,5 +325,4 @@ import { getBreed } from '../../api/category_pet';
 			}
 		}
 	}
-
 </style>

@@ -40,11 +40,19 @@
 		</view>
 		<!-- 宠物分类 -->
 		<view class="category-list">
-			<view class="category" v-for="(row, index) in petCategory" :key="index" @tap="toCategory(row)">
-				<view class="img">
-					<image :src="row.img"></image>
+			<view class="category" v-for="(row, index) in petCategory" :key="index">
+				<view v-if="index" @tap="toCategory(row)">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
 				</view>
-				<view class="text">{{ row.name }}</view>
+				<view v-else @tap="toMap()">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
+				</view>
 			</view>
 		</view>
 		<!-- 热门宠物 -->
@@ -251,7 +259,13 @@
 			this.pagenum++;
 
 		},
-		onLoad() {},
+		onLoad() {
+
+			// #ifdef APP-PLUS
+			this.showHeader = true;
+			this.statusHeight = plus.navigator.getStatusbarHeight();
+			// #endif
+		},
 		methods: {
 			getUrl(url) {
 				if (url) {
@@ -282,6 +296,11 @@
 				});
 				uni.navigateTo({
 					url: '/pages/search/search_pet'
+				});
+			},
+			toMap() {
+				uni.navigateTo({
+					url: '/pages/map/map'
 				});
 			},
 			//轮播图跳转

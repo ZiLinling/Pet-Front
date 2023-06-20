@@ -35,6 +35,7 @@
 			let this_ = this;
 			console.log(this.specie)
 			pageByStoreId(1, 6, this.storeId, 0).then((response) => {
+				console.log(this.storeId)
 				this.count1 = response.data.etc.total
 				this.pageNum++
 				let p = response.data.data.records
@@ -74,6 +75,8 @@
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
+			console.log(666)
+			console.log(option.cid)
 			this.storeId = option.cid
 			uni.setNavigationBarTitle({
 				title: option.storeName
