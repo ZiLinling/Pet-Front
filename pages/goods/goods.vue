@@ -213,9 +213,9 @@
 		<!-- 详情 -->
 		<view class="description">
 			<view class="title">———— 商品详情 ————</view>
-			<view class="">
+			<view class="goods-description">
 				<!-- 商品详情在这，看后面怎么用？ -->
-				<!-- 	{{goodsData.description}} -->
+				{{goodsData.description}}
 			</view>
 			<view class="content"><rich-text :nodes="descriptionStr"></rich-text></view>
 		</view>
@@ -799,6 +799,7 @@
 		}
 
 		.title {
+			text-align: right;
 			font-size: 30upx;
 		}
 	}
@@ -919,6 +920,7 @@
 		}
 	}
 
+
 	.description {
 		.title {
 			width: 100%;
@@ -929,6 +931,17 @@
 			font-size: 26upx;
 			color: #999;
 		}
+
+		.goods-description {
+			display: flex;
+			flex-direction: row;
+			width: 100%;
+			align-items: center; //垂直居中
+			text-align: center;
+			background-color: (248, 248, 248);
+		}
+
+		margin-bottom: 1000upx;
 	}
 
 	.footer {

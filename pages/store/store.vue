@@ -27,12 +27,15 @@
 </template>
 
 <script>
-import { pageByStoreId } from '../../api/store';
+	import {
+		pageByStoreId
+	} from '../../api/store';
 	export default {
 		created() {
 			let this_ = this;
 			console.log(this.specie)
 			pageByStoreId(1, 6, this.storeId, 0).then((response) => {
+				console.log(this.storeId)
 				this.count1 = response.data.etc.total
 				this.pageNum++
 				let p = response.data.data.records
@@ -50,11 +53,11 @@ import { pageByStoreId } from '../../api/store';
 				loadingText: "正在加载...",
 				headerTop: "0px",
 				headerPosition: "fixed",
-				storeId:0,
-				type:0,
+				storeId: 0,
+				type: 0,
 				count1: 0, //数量
 				pageNum: 1, //当前页号
-				pageSize:6,
+				pageSize: 6,
 				orderbyList: [{
 						text: "宠物",
 						selected: true,
@@ -72,6 +75,8 @@ import { pageByStoreId } from '../../api/store';
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
+			console.log(666)
+			console.log(option.cid)
 			this.storeId = option.cid
 			uni.setNavigationBarTitle({
 				title: option.storeName
@@ -110,13 +115,14 @@ import { pageByStoreId } from '../../api/store';
 		},
 		methods: {
 			//商品跳转
-			toGoods(goods) {
-				
+			toGoods(e) {
+				uni.navigateTo({
+					url: '/pages/goods/pet?cid=' + e.id + '&breed=' + e.breedName
+				});
 			},
 			//排序类型
 			select(index) {
-				if(this.type!=index)
-				{
+				if (this.type != index) {
 					this.type = index
 					this.goodsList = []
 					this.pageNum = 1
@@ -146,12 +152,9 @@ import { pageByStoreId } from '../../api/store';
 					}
 				}
 				console.log(this.orderbyList[index].orderby)
-				if(this.orderbyList[index].orderby==0)
-				{
+				if (this.orderbyList[index].orderby == 0) {
 					this.goodsList.sort((a, b) => a.price - b.price);
-				}
-				else
-				{
+				} else {
 					this.goodsList.sort((a, b) => b.price - a.price);
 				}
 			}
@@ -187,6 +190,7 @@ import { pageByStoreId } from '../../api/store';
 			font-size: 28upx;
 			margin-bottom: -2upx;
 			color: #aaa;
+
 			&.on {
 				color: #555;
 				border-bottom: 4upx solid #f06c7a;
@@ -222,7 +226,7 @@ import { pageByStoreId } from '../../api/store';
 			display: flex;
 			justify-content: space-between;
 			flex-wrap: wrap;
-			
+
 			.product {
 				width: 48%;
 				border-radius: 20upx;

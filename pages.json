@@ -133,14 +133,6 @@
 				"backgroundColorBottom": "#f3f3f3"
 			}
 		}, {
-			"path": "pages/user/myQR/myQR",
-			"style": {
-				"navigationBarTitleText": "我的二维码",
-				"app-plus": {
-					"bounce": "none"
-				}
-			}
-		}, {
 			"path": "pages/msg/msg",
 			"style": {
 				"enablePullDownRefresh": true,
@@ -255,9 +247,23 @@
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom"
 			}
-
+		}, {
+			"path": "pages/user/setting/personal_detail/personal_detail",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
 		}
-	],
+	    ,{
+            "path" : "pages/map/map",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "",

@@ -40,11 +40,19 @@
 		</view>
 		<!-- 宠物分类 -->
 		<view class="category-list">
-			<view class="category" v-for="(row, index) in petCategory" :key="index" @tap="toCategory(row)">
-				<view class="img">
-					<image :src="row.img"></image>
+			<view class="category" v-for="(row, index) in petCategory" :key="index">
+				<view v-if="index" @tap="toCategory(row)">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
 				</view>
-				<view class="text">{{ row.name }}</view>
+				<view v-else @tap="toMap()">
+					<view class="img">
+						<image :src="row.img"></image>
+					</view>
+					<view class="text">{{ row.name }}</view>
+				</view>
 			</view>
 		</view>
 		<!-- 热门宠物 -->
@@ -74,7 +82,8 @@
 			</view>
 			<view class="product-list">
 				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="'/static/img/pet/'+product.img"></image>
+					<image mode="aspectFill" :src="getUrl(product.img)">
+					</image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
@@ -88,15 +97,15 @@
 </template>
 
 <script>
-	var ttt = 0;
-	//高德SDK
-	import amap from '@/common/SDK/amap-wx.js';
 	import {
 		getCount,
 		page
 	} from '../../../api/home';
+	import {
+		base_url
+	} from '@/api/axios'
 	export default {
-		created() {
+		mounted() {
 			getCount(-1).then((response) => {
 				this.count1 = response.data.data
 			})
@@ -106,10 +115,10 @@
 					this.productList.push(p[i])
 				}
 			})
-
 		},
 		data() {
 			return {
+				base_url: base_url,
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
@@ -118,7 +127,7 @@
 				pagenum: 2,
 				count1: 0,
 				type: 0, //0为宠物，1为商品
-				city: '北京',
+				city: '厦门',
 				currentSwiper: 0,
 				petCategory: [{
 						id: 0,
@@ -246,8 +255,6 @@
 				for (let i = 0; i < p.length; i++) {
 					this.productList.push(p[i])
 				}
-				//console.log(p);
-
 			})
 			this.pagenum++;
 
@@ -258,29 +265,15 @@
 			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-			this.amapPlugin = new amap.AMapWX({
-				//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
-				key: '821553eebd87b7396dd5e7aa6b3350e5'
-			});
-			//定位地址
-			this.amapPlugin.getRegeo({
-				success: data => {
-					console.log(data)
-					this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
-					// #ifdef APP-PLUS
-					this.nVueTitle.postMessage({
-						type: 'location',
-						city: this.city
-					});
-					// #endif
-				},
-				fail: function(err) { //就是这个
-					console.log('err', err)
-				}
-			});
-
 		},
 		methods: {
+			getUrl(url) {
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			//消息列表
 			toMsg() {
 				uni.navigateTo({
@@ -303,6 +296,11 @@
 				});
 				uni.navigateTo({
 					url: '/pages/search/search_pet'
+				});
+			},
+			toMap() {
+				uni.navigateTo({
+					url: '/pages/map/map'
 				});
 			},
 			//轮播图跳转
@@ -330,7 +328,6 @@
 			},
 			//商品跳转
 			toGoods(e) {
-
 				uni.navigateTo({
 					url: '../../goods/pet?cid=' + e.id + '&breed=' + e.breedName
 				});

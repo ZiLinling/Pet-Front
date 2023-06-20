@@ -101,7 +101,6 @@
 				uni.showModal({
 					title: '删除提示',
 					content: '你将删除这个收货地址',
-
 					success: (res) => {
 						if (res.confirm) {
 							deleteAddress({
