@@ -228,6 +228,7 @@
 
 			//商品跳转
 			toGoods(e) {
+				console.log('e',e)
 				uni.navigateTo({
 					url: '../../goods/goods?cid=' + e.id
 				});

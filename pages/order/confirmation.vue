@@ -28,6 +28,7 @@
 					<view class="goods-info">
 						<view class="img">
 							<image :src="row.img"></image>
+							<!-- 这边有问题 -->
 						</view>
 						<view class="info">
 							<view class="title">{{row.name}}</view>
@@ -104,6 +105,9 @@
 
 <script>
 	import {
+		deleteById
+	} from '../../api/cart'
+	import {
 		generateOrder
 	} from '../../api/order'
 	import {
@@ -115,6 +119,8 @@
 	export default {
 		data() {
 			return {
+
+				type: null,
 				buylist: [], //订单列表
 				goodsPrice: 0.0, //商品合计价格
 				sumPrice: 0.0, //用户付款价格
@@ -123,40 +129,122 @@
 				int: 1200, //抵扣积分
 				deduction: 0, //抵扣价格
 				recinfo: {
-					name: "大黑哥",
-					head: "大",
-					telephone: "18816881688",
-					region: '福建省-厦门市-集美区',
-					address: '理工学院',
+					// name: "大黑哥",
+					// head: "大",
+					// telephone: "18816881688",
+					// region: '福建省-厦门市-集美区',
+					// address: '理工学院',
 				}
 
 			};
 		},
-		onShow() {
-			//页面显示时，加载订单信息
-			uni.getStorage({
-				key: 'buylist',
-				success: (res) => {
-					this.buylist = res.data
-					for (let i = 0; i < this.buylist.length; i++) {
-						for (let j = 0; j < this.buylist[i].goods.length; j++) {
-							this.goodsPrice = this.goodsPrice + (this.buylist[i].goods[j].num * this.buylist[i]
-								.goods[j].price);
-						}
-					}
-					//合计
-					this.deduction = this.int / 100;
-					this.sumPrice = this.goodsPrice - this.deduction + this.freight;
-				}
-			});
-			//页面显示的时候加载地址信息
+		created() {
 			this.getAddressByDefault();
+		},
+		onLoad(option) {
+			//页面显示时，加载订单信息
+			//购物车界面的购买
+			
+			if (option.type == null) {
+				uni.getStorage({
+					key: 'buylist',
+					success: (res) => {
+						this.buylist = res.data
+						for (let i = 0; i < this.buylist.length; i++) {
+							for (let j = 0; j < this.buylist[i].goods.length; j++) {
+								this.goodsPrice = this.goodsPrice + (this.buylist[i].goods[j].num * this
+									.buylist[i]
+									.goods[j].price);
+							}
+						}
+						//合计
+						this.deduction = this.int / 100;
+						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+					}
+				});
+			}
+
+			//页面显示的时候加载地址信息
+			uni.getStorage({
+				key: 'selectAddress',
+				success: (res) => {
+					
+					this.recinfo = res.data
+				},
+			});
+
+			//商品界面的立即购买
+			if (option.type == 1) {
+				uni.getStorage({
+					key: 'goodsOrder',
+					success: (res) => {
+					
+						let store = {
+							name: res.data.storeName,
+							storeId: res.data.storeId,
+							goods: [{
+								id: res.data.id,
+								name: res.data.name,
+								img: res.data.img,
+								num: res.data.num,
+								price: res.data.price
+							}],
+						}
+
+						let buylist = [];
+						this.type = 1;
+						buylist.push(store)
+						this.buylist = buylist;
+						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
+						this.deduction = this.int / 100;
+						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+					},
+				});
+			}
 
 
+			//宠物界面的立即购买
+			if (option.type == 0) {
+				uni.getStorage({
+					key: 'petOrder',
+					success: (res) => {
+			
+						let store = {
+							name: res.data.etc.store.name,
+							storeId: res.data.etc.store.id,
+							goods: [{
+								id: res.data.id,
+								name: res.data.name,
+								img: res.data.img,
+								num: 1,
+								price: res.data.price
+							}],
+						}
+						let buylist = [];
+						this.type = 0;
+						buylist.push(store)
+						this.buylist = buylist;
+						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
+						this.deduction = this.int / 100;
+						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+					},
+				});
+			}
 		},
 		onHide() {
 
 		},
+
+		onReady() {
+
+		},
+		// watch(){
+		// 	 this.recinfo: function (newVal, oldVal) {
+		// 	    if(newVal==null){
+		// 			uni.showToast("快去填写地址")
+		// 		}
+		// 	  },
+		// },
 		onBackPress() {
 			//页面后退时候，清除订单信息
 			this.clearOrder();
@@ -171,7 +259,7 @@
 
 				getAddressByDefault({}).then((response) => {
 					this.recinfo = response.data.data;
-					this.recinfo.id=null;
+					this.recinfo.id = null;
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -205,15 +293,34 @@
 					price: this.sumPrice,
 					postscript: this.note
 				}).then((response) => {
-
-					let orderId = response.data.data
-					for (let i = 0; i < this.buylist.length; i++) {
-						generateOrderItem({
-							...this.buylist[i],
-							orderId: orderId
-						}).then((response) => {
+					if(this.type==null){						
+						let ids='';
+						console.log("buylist",this.buylist)
+						for (let i = 0; i < this.buylist.length; i++) {
+							for (let j = 0; j < this.buylist[i].goods.length; j++) {
+								 ids += this.buylist[i].goods[j].cartId + ',';
+							}
+						}
+						deleteById({ids:ids}).then((response)=>{
 							console.log(response)
 						})
+					}
+					let orderId = response.data.data
+					for (let i = 0; i < this.buylist.length; i++) {
+						for (let j = 0; j < this.buylist[i].goods.length; j++) {
+
+			
+							generateOrderItem({
+								itemId: this.buylist[i].goods[j].id,
+								num: this.buylist[i].goods[j].num,
+								type: this.type,
+								price: this.buylist[i].goods[j].price,
+								orderId: orderId
+							}).then((response) => {
+								console.log(response)
+							})
+						}
+
 					}
 				}).catch((error) => {
 					console.log(error)

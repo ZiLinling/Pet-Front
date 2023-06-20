@@ -45,7 +45,7 @@
 				</view>
 			</view>
 			<view class="btn">
-				<view class="joinCart" @tap="join">加入购物车</view>
+				<view class="joinCart" @tap="join()">加入购物车</view>
 				<view class="buy" @tap="buy">立即购买</view>
 			</view>
 		</view>
@@ -197,6 +197,19 @@
 				</view>
 			</view>
 		</view>
+
+		<view class="info-box comments" id="comments">
+			<view class="row">
+				<view class="text">{{store.name}}</view>
+				<view class="arrow">
+					<view class="show" @tap="toStore">
+						查看商店
+						<view class="icon xiangyou"></view>
+					</view>
+				</view>
+			</view>
+			<image :src="goodsData.img" @tap="toStore"></image>
+		</view>
 		<!-- 详情 -->
 		<view class="description">
 			<view class="title">———— 商品详情 ————</view>
@@ -221,12 +234,17 @@
 		addFavor,
 		deleteFavor
 	} from '../../api/favor';
+	import {
+		getById
+	}
+	from '../../api/store';
 	export default {
 		data() {
 			return {
 				id: '',
 				favorId: '',
 				num: null,
+				token: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -271,9 +289,10 @@
 					stock: 1,
 					category: '',
 					description: '',
-
+					storeName: ''
 
 				},
+				store: [],
 				comment: {
 					num: 102,
 					userface: '../../static/img/face.jpg',
@@ -317,9 +336,12 @@
 			}).catch((error) => {
 				this.isKeep = false
 				this.favorId = ''
-
 			})
+			this.getgoods(option.cid, option.name);
 
+		},
+		onShow() {
+			this.token = uni.getStorageSync('token')
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -338,23 +360,39 @@
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
-			uni.showToast({
-				title: '触发上拉加载'
-			});
+			//滑动函数？
 		},
 		mounted() {
 
 		},
 		methods: {
-			getgoods(goodsId) {
+			// getStore(){
+			// 	console.log("storeId",this.goodsData)
+			// 	getById({id:this.goodsData.storeId}).then((response)=>{
+			// 		console.log(response.data.data)
+			// 	})
+			// },
+			toStore() {
+				uni.navigateTo({
+					url: '../store/store?cid=' + this.goodsData.storeId + '&storeName=' + this.goodsData.storeName
+				})
+				console.log('商店跳转')
+			},
+			getgoods(goodsId, storeName) {
 				//先设置好id为1把数据弄好
 				getGoods({
 					id: goodsId
 				}).then((response) => {
-					console.log(response.data)
 					this.goodsData = response.data.data;
 					this.num = 1;
-					console.log(this.num)
+					console.log("this.goodsData", this.goodsData)
+					getById({
+						id: this.goodsData.storeId
+					}).then((response) => {
+						console.log("store", response.data.data)
+						this.goodsData.storeName = storeName;
+						this.store = response.data.data
+					})
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -405,18 +443,14 @@
 			},
 			// 加入购物车
 			joinCart() {
-				console.log(this.goodsData)
+
 				save({
 					goodsId: this.goodsData.id,
 					num: this.num
-				}).then((response) => {
-					console.log(response)
-				}).catch((error) => {
-					console.log(error)
-				})
+				}).then((response) => {}).catch((error) => {})
 			},
 			join() {
-				this.choose = 0;
+				this.choose = 0
 				return this.showSpec(() => {
 					uni.showToast({
 						title: "已加入购物车"
@@ -429,12 +463,16 @@
 			},
 			//立即购买
 			buy() {
-				this.choose = 1;
+				this.choose = 1
 				return this.showSpec(() => {
-					this.toConfirmation();
+					uni.showToast({
+						title: "已购买"
+					});
+				});
+				uni.showToast({
+					title: "已购买"
 				});
 
-				this.toConfirmation();
 			},
 			//商品评论
 			toRatings() {
@@ -444,31 +482,16 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				// let tmpList = [];
-				// let goods = {
-				// 	id: this.goodsData.id,
-				// 	img: '../../static/img/goods/p1.jpg',
-				// 	name: this.goodsData.name,
-				// 	spec: '规格:' + this.goodsData.spec[this.selectSpec],
-				// 	price: this.goodsData.price,
-				// 	num: this.num
-				// };
-				// tmpList.push(goods);
-				console.log('进入跳转')
+
+				this.goodsData.num = this.num
 				uni.setStorage({
-					key: 'buylist',
+					key: 'petOrder',
 					data: this.goodsData,
 					success: function() {
 						uni.navigateTo({
-							url: '/pages/order/confirmation'
+							url: '/pages/order/confirmation?type=1'
 						})
 					}
-					// success: () => {
-					// 	console.log('跳转成功')
-					// 	uni.navigateTo({
-					// 		url: '/pages/order/confirmation'
-					// 	})
-					// }
 				})
 			},
 			//跳转评论列表
@@ -477,7 +500,7 @@
 			},
 			//减少数量
 			sub() {
-				console.log('---')
+
 				if (this.num <= 1) {
 					return;
 				}
@@ -485,7 +508,7 @@
 			},
 			//增加数量
 			add() {
-				console.log('+++')
+
 				this.num++;
 			},
 			//跳转锚点
@@ -530,7 +553,7 @@
 			},
 			//服务弹窗
 			showService() {
-				console.log('show');
+
 				this.serviceClass = 'show';
 			},
 			//关闭服务弹窗
@@ -543,15 +566,23 @@
 			},
 			//规格弹窗
 			showSpec(fun) {
-				console.log('show');
 				this.specClass = 'show';
 			},
 			//关闭规格弹窗
 			hideSpec() {
 				this.specClass = 'hide';
 				//回调
-				//跳转到订单页面
-				console.log(this.choose)
+
+				if (this.token == '') {
+					console.log("token为空")
+					uni.showToast({
+						title: '请先登录',
+						icon: 'none'
+					})
+					this.specClass = null;
+					return;
+				}
+				console.log("token", this.token)
 				if (this.choose == 0) {
 					this.joinCart();
 				} else {

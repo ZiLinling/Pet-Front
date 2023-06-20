@@ -103,9 +103,12 @@
 		</view>
 		<!-- 商品主图轮播 -->
 		<view class="swiper-box">
-			<swiper circular="true" autoplay="true" @change="swiperChange">
-				<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-					<image :src="swiper.img"></image>
+			<swiper circular="true" :autoplay="autoplay" @change="swiperChange" :interval="changeTime">
+				<swiper-item v-for="(swiper,index) in swiperList" :key="index">
+					<video v-if="index==0" :src="getUrl(swiperVideo)" controls="false"
+						style="height: 100%; width: 100%;" @ended="videoEnded" :autoplay="autoplayVideo" muted="true"
+						object-fit="fill"></video>
+					<image v-if="index!=0" :src="getUrl(goodsData.img)"></image>
 				</swiper-item>
 			</swiper>
 			<view class="indicator">{{currentSwiper+1}}/{{swiperList.length}}</view>
@@ -168,6 +171,9 @@
 		getPet
 	} from '../../api/pet';
 	import {
+		base_url
+	} from '@/api/axios'
+	import {
 		checkFavor,
 		addFavor,
 		deleteFavor
@@ -175,10 +181,13 @@
 	export default {
 		data() {
 			return {
-				id: '',
-				favorId: '',
+				base_url: base_url,
+				changeTime: 1000,
 				storeImg: '',
 				breed: '',
+				favorId: '',
+				id: "",
+				token: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -191,7 +200,7 @@
 				//轮播主图数据
 				swiperList: [{
 						id: 1,
-						img: 'https://ae01.alicdn.com/kf/HTB1Mj7iTmzqK1RjSZFjq6zlCFXaP.jpg'
+						img: '/static/vedio.mp4'
 					},
 					{
 						id: 2,
@@ -208,6 +217,9 @@
 				],
 				//轮播图下标
 				currentSwiper: 0,
+				autoplay: false,
+				autoplayVideo: true,
+				swiperVideo: '',
 				anchorlist: [], //导航条锚点
 				selectAnchor: 0, //选中锚点
 				serviceClass: '', //服务弹窗css类，控制开关动画
@@ -288,16 +300,26 @@
 				title: '触发上拉加载'
 			});
 		},
-		mounted() {
-
+		onShow() {
+			this.token = uni.getStorageSync('token')
 		},
 		methods: {
+			getUrl(url) {
+				if (url) {
+					return this.base_url + url
+				} else {
+					return "/"
+				}
+			},
 			toStore() {
 				uni.navigateTo({
 					url: '../store/store?cid=' + this.store.id
 				})
 			},
-
+			videoEnded() {
+				this.autoplay = true;
+				this.changeTime = 100
+			},
 			getpet(id) {
 				let this_ = this;
 				getPet({
@@ -306,8 +328,7 @@
 					this_.goodsData = response.data.data;
 					this.storeImg = response.data.data.etc.store.img
 					this.store = this.goodsData.etc.store
-					console.log(response.data.data)
-					this.goodsData = response.data.data;
+					this.swiperVideo = response.data.data.video
 				}).catch((error) => {
 					//console.log(error)
 				})
@@ -315,6 +336,13 @@
 			//轮播图指示器
 			swiperChange(event) {
 				this.currentSwiper = event.detail.current;
+				if (event.detail.current == 0) {
+					this.autoplay = false;
+				} else {
+					this.autoplay = true;
+					this.autoplayVideo = false
+					this.changeTime = 2000
+				}
 			},
 			//消息列表
 			toMsg() {
@@ -358,32 +386,28 @@
 			},
 			//立即购买
 			buy() {
-				console.log(111)
+				if (this.token == '') {
+					uni.showToast({
+						title: '请先登录',
+						icon: 'none'
+					})
+					return;
+				}
+				this.goodsData.num = this.num
+				uni.setStorage({
+					key: 'petOrder',
+					data: this.goodsData,
+					success: function() {
+						uni.navigateTo({
+							url: '/pages/order/confirmation?type=0'
+						})
+					}
+				})
 			},
 			//商品评论
 			toRatings() {
 				uni.navigateTo({
 					url: 'ratings/ratings'
-				})
-			},
-			//跳转确认订单页面
-			toConfirmation() {
-				let tmpList = [];
-				let goods = {
-					id: this.goodsData.id,
-					img: '../../static/img/goods/p1.jpg',
-					name: this.goodsData.name,
-					spec: '规格:' + this.goodsData.spec[this.selectSpec],
-					price: this.goodsData.price,
-					num: this.goodsData.num
-				};
-				tmpList.push(goods);
-				uni.setStorage({
-					key: 'buylist',
-					data: tmpList,
-					success: () => {
-
-					}
 				})
 			},
 			//跳转评论列表

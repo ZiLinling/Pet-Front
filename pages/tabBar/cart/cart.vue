@@ -1,57 +1,60 @@
 <template>
 	<view>
+		<view v-if="token">
+			<!-- 占位 -->
+			<view v-if="showHeader" class="place">
+				<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
+				<p>{{address}}</p>
+			</view>
 
-		<!-- 占位 -->
-		<view v-if="showHeader" class="place">
-			<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
-			<p>{{address}}</p>
-		</view>
-		<!-- 商品列表 -->
-		<view class="goods-list">
-			<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
-			<!-- store是商店，cnt是遍历的数字 -->
-			<view v-for="store in storeList" :key="store.id" class="store">
-				<view>
-					<image src="/static/img/store.png" class="store-logo"></image>
-					{{store.name}}
+			<!-- 商品列表 -->
+			<view class="goods-list">
+				<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
+				<!-- store是商店，cnt是遍历的数字 -->
+				<view v-for="store in storeList" :key="store.id" class="store">
+					<view>
+						<image src="/static/img/store.png" class="store-logo"></image>
+						{{store.name}}
 
-				</view>
-
-				<view class="row" v-for="goods in store.goodsVOList" :key="goods.id">
-					<!-- 删除按钮 -->
-
-					<view class="menu" @tap.stop="deleteGood(goods.cartId)">
-
-						<view class="icon shanchu"></view>
 					</view>
-					<!-- 商品 -->
-					<view class="carrier" :class="[theIndex==goods.id?'open':oldIndex==goods.id?'close':'']"
-						@touchstart="touchStart(goods.id,$event)" @touchmove="touchMove(goods.id,$event)"
-						@touchend="touchEnd(goods.id,$event)">
-						<!-- checkbox -->
-						<view class="checkbox-box" @tap="selected(goods.id,store.id)">
-							<view class="checkbox">
-								<view :class="[goods.selected?'on':'']"></view>
-							</view>
+
+					<view class="row" v-for="goods in store.goodsVOList" :key="goods.id">
+						<!-- 删除按钮 -->
+
+						<view class="menu" @tap.stop="deleteGood(goods.cartId)">
+
+							<view class="icon shanchu"></view>
 						</view>
-						<!-- 商品信息 -->
-						<view class="goods-info" @tap="toGoods(goods)">
-							<view class="img">
-								<image :src="goods.img"></image>
+						<!-- 商品 -->
+						<view class="carrier" :class="[theIndex==goods.id?'open':oldIndex==goods.id?'close':'']"
+							@touchstart="touchStart(goods.id,$event)" @touchmove="touchMove(goods.id,$event)"
+							@touchend="touchEnd(goods.id,$event)">
+							<!-- checkbox -->
+							<view class="checkbox-box" @tap="selected(goods.id,store.id)">
+								<view class="checkbox">
+									<view :class="[goods.selected?'on':'']"></view>
+								</view>
 							</view>
-							<view class="info">
-								<view class="title">{{goods.name}}</view>
-								<view class="price-number">
-									<view class="price">￥{{goods.price}}</view>
-									<view class="number">
-										<view class="sub" @tap.stop="sub(goods.id)">
-											<view class="icon jian"></view>
-										</view>
-										<view class="input" @tap.stop="discard">
-											<input type="number" v-model="goods.num" @input="sum($event,goods.id)" />
-										</view>
-										<view class="add" @tap.stop="add(goods.id)">
-											<view class="icon jia"></view>
+							<!-- 商品信息 -->
+							<view class="goods-info" @tap="toGoods(goods)">
+								<view class="img">
+									<image :src="goods.img"></image>
+								</view>
+								<view class="info">
+									<view class="title">{{goods.name}}</view>
+									<view class="price-number">
+										<view class="price">￥{{goods.price}}</view>
+										<view class="number">
+											<view class="sub" @tap.stop="sub(goods.id)">
+												<view class="icon jian"></view>
+											</view>
+											<view class="input" @tap.stop="discard">
+												<input type="number" v-model="goods.num"
+													@input="sum($event,goods.id)" />
+											</view>
+											<view class="add" @tap.stop="add(goods.id)">
+												<view class="icon jia"></view>
+											</view>
 										</view>
 									</view>
 								</view>
@@ -59,28 +62,32 @@
 						</view>
 					</view>
 				</view>
+
+				<!-- 列表v-for从这开始 -->
+
 			</view>
-
-
-			<!-- 列表v-for从这开始 -->
-
+			<!-- 脚部菜单 -->
+			<view class="footer" :style="{bottom:footerbottom}">
+				<view class="checkbox-box" @tap="allSelect">
+					<view class="checkbox">
+						<view :class="[isAllselected?'on':'']"></view>
+					</view>
+					<view class="text">全选</view>
+				</view>
+				<view class="delBtn" @tap="deleteGoods()" v-if="selectedList.length>0">删除</view>
+				<view class="settlement">
+					<view class="sum">合计:<view class="money">￥{{sumPrice}}</view>
+					</view>
+					<view class="btn" @tap="toConfirmation">结算({{selectedList.length}})</view>
+				</view>
+			</view>
 		</view>
-		<!-- 脚部菜单 -->
-		<view class="footer" :style="{bottom:footerbottom}">
-			<view class="checkbox-box" @tap="allSelect">
-				<view class="checkbox">
-					<view :class="[isAllselected?'on':'']"></view>
-				</view>
-				<view class="text">全选</view>
-			</view>
-			<view class="delBtn" @tap="deleteGoods()" v-if="selectedList.length>0">删除</view>
-			<view class="settlement">
-				<view class="sum">合计:<view class="money">￥{{sumPrice}}</view>
-				</view>
-				<view class="btn" @tap="toConfirmation">结算({{selectedList.length}})</view>
-			</view>
+		<view v-if="!this.token">
+			<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
+			</u-empty>
 		</view>
 	</view>
+
 </template>
 
 <script>
@@ -119,6 +126,7 @@
 				oldIndex: null,
 				isStop: false,
 				storeList: [],
+				token: '',
 			}
 		},
 		onPageScroll(e) {
@@ -144,9 +152,8 @@
 			// #endif
 		},
 		activated() {
-			this.address = '福建省厦门市集美区',
-				this.headerPosition = "fixed",
-				this.headerTop = null,
+			this.token = uni.getStorageSync('token')
+			this.headerTop = null,
 				this.statusTop = null,
 				this.showHeader = true,
 				this.isAllselected = false,
@@ -292,7 +299,6 @@
 				for (let i = 0; i < this.selectedList.length; i++) {
 					selected_goods.push(this.goodsList[this.selectedList[i]]);
 				}
-				console.log(selected_goods)
 				//用reduce根据storeId分类给store
 				let i = 0;
 				const store = Object.values(selected_goods.reduce((acc, obj) => {
