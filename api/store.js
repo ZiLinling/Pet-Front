@@ -1,12 +1,24 @@
 const {
-	postJsonRequest,postRequest,getRequest
+	postJsonRequest,
+	postRequest,
+	getRequest
 } = require("./axios");
 
-export function pageByStoreId(pageNum,pageSize,storeId,type) {
-	return postJsonRequest('/store/pageByStoreId', {pageNum,pageSize,storeId,type})
+export function pageByStoreId(pageNum, pageSize, storeId, type) {
+	return postJsonRequest('/store/pageByStoreId', {
+		pageNum,
+		pageSize,
+		storeId,
+		type
+	})
 }
 
-
 export function getById(id) {
-	return getRequest('/store/getById', id)
+	return getRequest("/store/getById", {
+		id
+	})
+}
+
+export function getList(id) {
+	return getRequest("/store/list")
 }

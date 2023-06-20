@@ -32,7 +32,7 @@
 		<view class="category-list">
 			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
 				<view class="img">
-					<image :src="getUrl(row.img)"></image>
+					<image :src="$base_url+row.img"></image>
 				</view>
 				<view class="text">{{ row.name }}</view>
 			</view>
@@ -43,7 +43,7 @@
 
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image mode="aspectFill" :src="getUrl(goods.img)"></image>
+					<image mode="aspectFill" :src="$base_url+goods.img"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
 						<view class="store">{{goods.etc.storeName}}</view>
@@ -187,13 +187,6 @@
 			// #endif
 		},
 		methods: {
-			getUrl(url) {
-				if (url) {
-					return this.base_url + url
-				} else {
-					return "/"
-				}
-			},
 			//搜索跳转
 			toSearch() {
 				uni.navigateTo({

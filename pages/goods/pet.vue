@@ -310,7 +310,7 @@
 			},
 			toStore() {
 				uni.navigateTo({
-					url: '../store/store?cid=' + this.store.id + '&storeName=' + this.store.name
+					url: '../store/store?cid=' + this.store.id
 				})
 			},
 			videoEnded() {

@@ -17,7 +17,7 @@
 			<view class="product-list">
 				<!-- 加载列表 -->
 				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="getUrl(product.etc.item.img)"></image>
+					<image mode="aspectFill" :src="$base_url+product.etc.item.img"></image>
 					<view class="name">
 						<view class="productName" v-if="favNow==1">{{product.etc.item.etc.breed}}</view>
 						<view class="productName" v-if="favNow!=1">{{product.etc.item.name}}</view>
@@ -87,7 +87,7 @@
 			});
 			let len = this.productList.length;
 			if (len >= this.count) {
-				this.loadingText = '到底了';
+				this.loadingText = '没有更多了';
 				return false;
 			}
 			getList(this.pageNum++, this.pageSize, this.favNow).then((response) => {
@@ -103,18 +103,14 @@
 			this.favNow = param.type
 			getList(this.pageNum++, this.pageSize, this.favNow).then((response) => {
 				this.productList = response.data.data
+				if (this.productList.length < this.pageSize) {
+					this.loadingText = "没有更多了"
+				}
 			})
 		},
 		methods: {
 			refresh() {
 				location.reload()
-			},
-			getUrl(url) {
-				if (url) {
-					return this.base_url + url
-				} else {
-					return "/"
-				}
 			},
 			//分类跳转
 			toCategory(e) {
@@ -126,13 +122,20 @@
 			},
 			//商品跳转
 			toGoods(e) {
-				uni.showToast({
-					title: '商品' + e.goods_id,
-					icon: 'none'
-				});
-				uni.navigateTo({
-					url: '../../goods/goods'
-				});
+				if (this.favNow == 1) {
+					uni.navigateTo({
+						url: '../../goods/pet?cid=' + e.etc.item.id + '&breed=' + e.etc.item.etc.breed
+					});
+				} else if (this.favNow == 2) {
+					uni.navigateTo({
+						url: '../../goods/goods?cid=' + e.etc.item.id
+					});
+				} else if (this.favNow == 3) {
+					uni.navigateTo({
+						url: '../store/store?cid=' + this.etc.item.id
+					})
+				}
+
 			},
 			//加载数据
 			showPets() {
@@ -153,12 +156,12 @@
 			},
 			cancelFav(e) { //取消收藏
 				console.log(e)
-				console.log(e.id)
 				uni.showModal({
 					title: '取消收藏提示',
 					content: '你将取消这个收藏',
 
 					success: (res) => {
+						console.log(e.id)
 						if (res.confirm) {
 							deleteFavor({
 								id: e.id

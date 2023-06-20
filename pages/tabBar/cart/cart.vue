@@ -1,12 +1,12 @@
 <template>
 	<view>
 		<view v-if="token">
-		<!-- 占位 -->
-		<view v-if="showHeader" class="place">
-			<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
-			<p>{{address}}</p>
-		</view>
-		
+			<!-- 占位 -->
+			<view v-if="showHeader" class="place">
+				<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
+				<p>{{address}}</p>
+			</view>
+
 			<!-- 商品列表 -->
 			<view class="goods-list">
 				<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
@@ -83,15 +83,11 @@
 			</view>
 		</view>
 		<view v-if="!this.token">
-			<u-empty
-			        mode="car"
-			        icon="http://cdn.uviewui.com/uview/empty/car.png"
-					style="margin-top: 300upx;"
-			>
+			<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
 			</u-empty>
 		</view>
 	</view>
-	
+
 </template>
 
 <script>
@@ -306,7 +302,7 @@
 				//用reduce根据storeId分类给store
 				let i = 0;
 				const store = Object.values(selected_goods.reduce((acc, obj) => {
-					const key = obj.storeId - 1;
+					const key = obj.storeId;
 					if (!acc[key]) {
 						acc[key] = {
 							storeId: key,

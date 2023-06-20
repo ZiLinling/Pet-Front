@@ -46,7 +46,7 @@
 					account: this.account,
 					password: this.password
 				}).then((response) => {
-					uni.setStorageSync("token",response.data.data)
+					uni.setStorageSync("token", response.data.data)
 					uni.switchTab({
 						url: "/pages/tabBar/user/user",
 						success() {
@@ -54,10 +54,9 @@
 						}
 					})
 				}).catch((error) => {
-					console.log(error)
 					uni.showToast({
 						title: error.message,
-						icon:  "none"
+						icon: "none"
 					})
 				})
 			}

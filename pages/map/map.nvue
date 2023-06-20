@@ -1,0 +1,124 @@
+<template>
+	<view>
+		<view class="page-body">
+			<view class="page-section page-section-gap">
+				<map id="map" v-if="show" :style="'width: 100%;height:'+this.windowHeight*2+'upx;'" :latitude="latitude"
+					:longitude="longitude" :markers="markers" :circles="circles" show-location :show-compass="true"
+					:enable-poi="true" show-scale @callouttap="open" @markertap="open">
+				</map>
+			</view>
+		</view>
+		<uni-popup ref="popup" background-color="#fff">
+			<view class="popup-content">
+				<button class="button" type="primary" @tap="gotoStore()">
+					<text class="button-text">进入店铺</text>
+				</button>
+				<button class="button" type="primary" @tap="navigate()">
+					<text class="button-text">导航</text>
+				</button>
+			</view>
+		</uni-popup>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: 'map',
+				latitude: 24.6249200000,
+				longitude: 118.0800640000,
+				markers: [],
+				show: false,
+				windowHeight: 0,
+				circles: [{
+					latitude: 0,
+					longitude: 0,
+					fillColor: "#b2efffaa",
+					color: '#89f6ff',
+					radius: 500,
+					strokeWidth: 1
+				}],
+				address: "",
+				selectStore: null,
+				store: []
+			}
+		},
+		onLoad() {
+			this.windowHeight = uni.getSystemInfoSync().windowHeight;
+			console.log(11111)
+			this.store = this.$store
+			if (this.store) {
+				console.log(this.store)
+				for (let store of this.store) {
+					let marker = {
+						id: store.id,
+						longitude: store.longitude,
+						latitude: store.latitude,
+						title: store.name,
+						iconPath: this.$base_url + "/resource/icon/location.png",
+						width: 25,
+						callout: {
+							content: store.name,
+							display: "ALWAYS", // 一直展示
+							fontSize: 15,
+							borderRadius: 10,
+							padding: 5
+						},
+					}
+					this.markers.push(marker)
+					console.log(this.markers)
+				}
+				this.getMyLocation()
+			}
+		},
+		methods: {
+			open(e) {
+				this.$refs.popup.open()
+				this.selectStore = e.detail.markerId
+			},
+			gotoStore() {
+				uni.navigateTo({
+					url: '../store/store?cid=' + this.selectStore
+				})
+			},
+			navigate() {
+				uni.openLocation({
+					latitude: this.markers[this.selectStore].latitude,
+					longitude: this.markers[this.selectStore].longitude,
+					success: function() {
+						console.log('success');
+					},
+
+				});
+			},
+			getMyLocation() {
+				console.log(111)
+				this.show = true
+				uni.getLocation({
+					// map组件默认为国测局坐标gcj02，调用 uni.getLocation返回结果传递给组件时，需指定 type 为 gcj02 
+					type: 'gcj02',
+					geocode: true,
+					success: ({
+						longitude,
+						latitude,
+						address
+					}) => {
+						console.log('当前位置的经度：' + longitude)
+						console.log('当前位置的纬度：' + latitude)
+						this.address = address
+						this.longitude = this.circles[0].longitude = longitude
+						this.latitude = this.circles[0].latitude = latitude
+						// 画出定位位置
+						this.show = true
+					}
+				})
+
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+
+</style>

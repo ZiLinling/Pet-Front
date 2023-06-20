@@ -1,6 +1,7 @@
 <template>
 	<view>
 		<view class="header" :style="{position:headerPosition,top:headerTop}">
+
 			<view class="target" v-for="(target,index) in orderbyList" @tap="select(index)" :key="index"
 				:class="[target.selected?'on':'']">
 				{{target.text}}
@@ -13,7 +14,7 @@
 		<view class="goods-list">
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
-					<image mode="aspectFill" :src="'/static/img/pet/'+goods.img"></image>
+					<image mode="aspectFill" :src="$base_url+goods.img"></image>
 					<view class="name" v-if="type==0">{{goods.breedName}}</view>
 					<view class="info">
 						<view class="slogan">{{goods.name}}</view>
@@ -28,32 +29,17 @@
 
 <script>
 	import {
+		getById,
 		pageByStoreId
 	} from '../../api/store';
 	export default {
-		created() {
-			let this_ = this;
-			console.log(this.specie)
-			pageByStoreId(1, 6, this.storeId, 0).then((response) => {
-				console.log(this.storeId)
-				this.count1 = response.data.etc.total
-				this.pageNum++
-				let p = response.data.data.records
-				for (let i = 0; i < p.length; i++) {
-					this.goodsList.push(p[i])
-				}
-			})
-			if (this.goodsList.length >= this.count1) {
-				this.loadingText = '没有更多了'
-			}
-		},
 		data() {
 			return {
 				goodsList: [],
 				loadingText: "正在加载...",
 				headerTop: "0px",
 				headerPosition: "fixed",
-				storeId: 0,
+				store: {},
 				type: 0,
 				count1: 0, //数量
 				pageNum: 1, //当前页号
@@ -75,13 +61,24 @@
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
-			console.log(666)
 			console.log(option.cid)
-			this.storeId = option.cid
+			getById(option.cid).then((response) => {
+				this.store = response.data.data
+				pageByStoreId(1, 6, parseInt(this.store.id), 0).then((response) => {
+					this.count1 = response.data.etc.total
+					this.pageNum++
+					let p = response.data.data.records
+					for (let i = 0; i < p.length; i++) {
+						this.goodsList.push(p[i])
+					}
+				})
+				if (this.goodsList.length >= this.count1) {
+					this.loadingText = '没有更多了'
+				}
+			})
 			uni.setNavigationBarTitle({
-				title: option.storeName
+				title: this.store.name
 			});
-
 			//兼容H5下排序栏位置
 			// #ifdef H5
 			//定时器方式循环获取高度为止，这么写的原因是onLoad中head未必已经渲染出来。

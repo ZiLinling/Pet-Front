@@ -230,11 +230,19 @@
 		getGoods
 	} from '../../api/goods';
 	import {
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '../../api/favor';
+	import {
 		getById
-	} from '../../api/store';
+	}
+	from '../../api/store';
 	export default {
 		data() {
 			return {
+				id: '',
+				favorId: '',
 				num: null,
 				token: '',
 				//控制渐变标题栏的参数
@@ -315,6 +323,20 @@
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
+			console.log(option.cid); //打印出上个页面传递的参数。
+			this.getgoods(option.cid);
+
+			this.id = option.cid
+
+			checkFavor(option.cid, 2).then((response) => {
+				console.log(response.data.data)
+				this.favorId = response.data.data.id
+				this.isKeep = true
+
+			}).catch((error) => {
+				this.isKeep = false
+				this.favorId = ''
+			})
 			this.getgoods(option.cid, option.name);
 
 		},
@@ -403,7 +425,21 @@
 			},
 			//收藏
 			keep() {
-				this.isKeep = this.isKeep ? false : true;
+				console.log(this.isKeep)
+				console.log(this.id)
+				console.log(this.favorId)
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+
+						console.log('quxiaochenggong')
+						this.isKeep = false
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 2).then((response) => {
+						console.log('jiaruchenggong')
+						this.isKeep = true
+					})
+				}
 			},
 			// 加入购物车
 			joinCart() {
