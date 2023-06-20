@@ -92,9 +92,7 @@
 				updateUser(this.user).then(res => {})
 
 				setTimeout(function() {
-					uni.navigateTo({
-						url: '/pages/user/setting/setting'
-					})
+					uni.navigateBack()
 				}, 400);
 
 			}

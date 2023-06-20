@@ -1,6 +1,13 @@
 <template>
 	<view>
-		<view class="header" :style="{position:headerPosition,top:headerTop}">
+		<view class="status" :style="{position:headerPosition}"></view>
+		<view class="header" :style="{position:headerPosition}">
+			<view style="font-size: 60upx; text-align: center;width: 100%;">{{store.name}}</view>
+		</view>
+		<!-- 占位 -->
+		<view class="place"></view>
+		<image :src="$base_url+store.img" mode="aspectFill" style="width: 100%;"></image>
+		<view class="order">
 
 			<view class="target" v-for="(target,index) in orderbyList" @tap="select(index)" :key="index"
 				:class="[target.selected?'on':'']">
@@ -8,8 +15,6 @@
 				<view v-if="target.orderbyicon" class="icon" :class="target.orderbyicon[target.orderby]"></view>
 			</view>
 		</view>
-		<!-- 占位 -->
-		<view class="place"></view>
 		<!-- 商品列表 -->
 		<view class="goods-list">
 			<view class="product-list">
@@ -90,12 +95,10 @@
 				}
 			}, 1);
 			// #endif
+
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
-			uni.showToast({
-				title: '触发上拉加载'
-			});
 			let len = this.goodsList.length;
 			if (len >= this.count1) {
 				this.loadingText = '没有更多了';
@@ -123,7 +126,8 @@
 					this.type = index
 					this.goodsList = []
 					this.pageNum = 1
-					pageByStoreId(this.pageNum, this.pageSize, this.storeId, index).then((response) => {
+					pageByStoreId(this.pageNum, this.pageSize, this.store.id, index).then((response) => {
+						console.log(response.data)
 						this.pageNum++;
 						this.count1 = response.data.etc.total
 						let p = response.data.data.records
@@ -161,21 +165,31 @@
 </script>
 
 <style lang="scss">
+	.status {
+		width: 100%;
+		height: 0;
+		position: fixed;
+		z-index: 10;
+		background-color: #fff;
+		top: 0;
+		/*  #ifdef  APP-PLUS  */
+		height: var(--status-bar-height); //覆盖样式
+		/*  #endif  */
+
+	}
+
 	.icon {
 		font-size: 26upx;
 	}
 
-	.header {
+	.order {
 		width: 92%;
 		padding: 0 4%;
 		height: 88upx;
 		display: flex;
+		margin-bottom: 10upx;
 		justify-content: space-around;
 		align-items: flex-end;
-		position: fixed;
-		top: 0px;
-		z-index: 10;
-		background-color: #fff;
 		border-bottom: solid 1upx #eee;
 
 		.target {
@@ -194,16 +208,28 @@
 				font-weight: 600;
 				font-size: 30upx;
 			}
-
-
 		}
 	}
 
-	.place {
+	.header {
+		width: 92%;
+		padding: 0 4%;
+		height: 100upx;
+		display: flex;
+		position: fixed;
+		z-index: 10;
+		background-color: #fff;
+		/*  #ifdef  APP-PLUS  */
+		top: var(--status-bar-height);
+		/*  #endif  */
+	}
 
+	.place {
 		background-color: #ffffff;
 		height: 100upx;
-
+		/*  #ifdef  APP-PLUS  */
+		margin-top: var(--status-bar-height);
+		/*  #endif  */
 	}
 
 	.goods-list {

@@ -10,10 +10,10 @@
 		</view>
 		<uni-popup ref="popup" background-color="#fff">
 			<view class="popup-content">
-				<button class="button" type="primary" @tap="gotoStore()">
+				<button class="button" type="primary" @click="gotoStore()">
 					<text class="button-text">进入店铺</text>
 				</button>
-				<button class="button" type="primary" @tap="navigate()">
+				<button class="button" type="primary" @click="navigate()">
 					<text class="button-text">导航</text>
 				</button>
 			</view>
@@ -46,10 +46,8 @@
 		},
 		onLoad() {
 			this.windowHeight = uni.getSystemInfoSync().windowHeight;
-			console.log(11111)
 			this.store = this.$store
 			if (this.store) {
-				console.log(this.store)
 				for (let store of this.store) {
 					let marker = {
 						id: store.id,
@@ -67,7 +65,6 @@
 						},
 					}
 					this.markers.push(marker)
-					console.log(this.markers)
 				}
 				this.getMyLocation()
 			}
@@ -93,8 +90,6 @@
 				});
 			},
 			getMyLocation() {
-				console.log(111)
-				this.show = true
 				uni.getLocation({
 					// map组件默认为国测局坐标gcj02，调用 uni.getLocation返回结果传递给组件时，需指定 type 为 gcj02 
 					type: 'gcj02',

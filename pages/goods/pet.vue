@@ -105,10 +105,10 @@
 		<view class="swiper-box">
 			<swiper circular="true" :autoplay="autoplay" @change="swiperChange" :interval="changeTime">
 				<swiper-item v-for="(swiper,index) in swiperList" :key="index">
-					<video v-if="index==0" :src="getUrl(swiperVideo)" controls="false"
+					<video v-if="index==0" :src="$base_url+swiperVideo" controls="false"
 						style="height: 100%; width: 100%;" @ended="videoEnded" :autoplay="autoplayVideo" muted="true"
 						object-fit="fill"></video>
-					<image v-if="index!=0" :src="getUrl(goodsData.img)"></image>
+					<image v-if="index!=0" :src="$base_url+goodsData.img"></image>
 				</swiper-item>
 			</swiper>
 			<view class="indicator">{{currentSwiper+1}}/{{swiperList.length}}</view>
@@ -148,7 +148,7 @@
 					</view>
 				</view>
 			</view>
-			<image :src="storeImg" @tap="toStore"></image>
+			<image :src="$base_url+storeImg" @tap="toStore" mode="aspectFill" style="width: 100%;"></image>
 		</view>
 
 		<!-- 详情 -->
@@ -304,13 +304,6 @@
 			this.token = uni.getStorageSync('token')
 		},
 		methods: {
-			getUrl(url) {
-				if (url) {
-					return this.base_url + url
-				} else {
-					return "/"
-				}
-			},
 			toStore() {
 				uni.navigateTo({
 					url: '../store/store?cid=' + this.store.id

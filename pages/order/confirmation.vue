@@ -27,7 +27,7 @@
 				<view class="row" v-for="(row,index) in store.goods" :key="index">
 					<view class="goods-info">
 						<view class="img">
-							<image :src="row.img"></image>
+							<image :src="$base_url+row.img"></image>
 							<!-- 这边有问题 -->
 						</view>
 						<view class="info">
@@ -144,7 +144,7 @@
 		onLoad(option) {
 			//页面显示时，加载订单信息
 			//购物车界面的购买
-			
+
 			if (option.type == null) {
 				uni.getStorage({
 					key: 'buylist',
@@ -168,7 +168,7 @@
 			uni.getStorage({
 				key: 'selectAddress',
 				success: (res) => {
-					
+
 					this.recinfo = res.data
 				},
 			});
@@ -178,7 +178,7 @@
 				uni.getStorage({
 					key: 'goodsOrder',
 					success: (res) => {
-					
+
 						let store = {
 							name: res.data.storeName,
 							storeId: res.data.storeId,
@@ -208,7 +208,7 @@
 				uni.getStorage({
 					key: 'petOrder',
 					success: (res) => {
-			
+
 						let store = {
 							name: res.data.etc.store.name,
 							storeId: res.data.etc.store.id,
@@ -293,15 +293,17 @@
 					price: this.sumPrice,
 					postscript: this.note
 				}).then((response) => {
-					if(this.type==null){						
-						let ids='';
-						console.log("buylist",this.buylist)
+					if (this.type == null) {
+						let ids = '';
+						console.log("buylist", this.buylist)
 						for (let i = 0; i < this.buylist.length; i++) {
 							for (let j = 0; j < this.buylist[i].goods.length; j++) {
-								 ids += this.buylist[i].goods[j].cartId + ',';
+								ids += this.buylist[i].goods[j].cartId + ',';
 							}
 						}
-						deleteById({ids:ids}).then((response)=>{
+						deleteById({
+							ids: ids
+						}).then((response) => {
 							console.log(response)
 						})
 					}
@@ -309,7 +311,7 @@
 					for (let i = 0; i < this.buylist.length; i++) {
 						for (let j = 0; j < this.buylist[i].goods.length; j++) {
 
-			
+
 							generateOrderItem({
 								itemId: this.buylist[i].goods[j].id,
 								num: this.buylist[i].goods[j].num,

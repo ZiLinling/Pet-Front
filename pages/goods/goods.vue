@@ -208,7 +208,7 @@
 					</view>
 				</view>
 			</view>
-			<image :src="goodsData.img" @tap="toStore"></image>
+			<image :src="$base_url+store.img" @tap="toStore" mode="aspectFill" style="width: 100%;"></image>
 		</view>
 		<!-- 详情 -->
 		<view class="description">
@@ -386,9 +386,7 @@
 					this.goodsData = response.data.data;
 					this.num = 1;
 					console.log("this.goodsData", this.goodsData)
-					getById({
-						id: this.goodsData.storeId
-					}).then((response) => {
+					getById(this.goodsData.storeId).then((response) => {
 						console.log("store", response.data.data)
 						this.goodsData.storeName = storeName;
 						this.store = response.data.data
@@ -443,7 +441,6 @@
 			},
 			// 加入购物车
 			joinCart() {
-
 				save({
 					goodsId: this.goodsData.id,
 					num: this.num

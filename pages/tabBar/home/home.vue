@@ -260,7 +260,6 @@
 
 		},
 		onLoad() {
-
 			// #ifdef APP-PLUS
 			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();

@@ -163,9 +163,19 @@
 				this.oldIndex = null,
 				this.isStop = false,
 				this.getCart();
-
-
-
+		},
+		mounted() {
+			this.token = uni.getStorageSync('token')
+			this.headerTop = null,
+				this.statusTop = null,
+				this.showHeader = true,
+				this.isAllselected = false,
+				this.goodsList = [],
+				//控制滑动效果
+				this.theIndex = null,
+				this.oldIndex = null,
+				this.isStop = false,
+				this.getCart();
 		},
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
