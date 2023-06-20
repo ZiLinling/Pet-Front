@@ -716,7 +716,7 @@
 					padding: 10upx 4%;
 					display: -webkit-box;
 					-webkit-box-orient: vertical;
-					-webkit-line-clamp: 2;
+					-webkit-line-clamp: 1;
 					text-align: justify;
 					overflow: hidden;
 					font-size: 30upx;
@@ -736,10 +736,20 @@
 					}
 
 					.slogan {
-						line-height: 5px;
-						height: 30upx;
-						color: #807c87;
-						font-size: 24upx;
+						width: 100%;
+						color: #8b8b8b;
+						display: -webkit-box;
+						/** 对象作为伸缩盒子模型显示 **/
+						overflow: hidden;
+						word-break: break-all;
+						/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
+						text-overflow: ellipsis;
+						/* 超出部分省略号 */
+						-webkit-box-orient: vertical;
+						/** 设置或检索伸缩盒对象的子元素的排列方式 **/
+						-webkit-line-clamp: 1;
+						/** 显示的行数 **/
+
 					}
 				}
 			}

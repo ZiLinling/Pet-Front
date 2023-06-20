@@ -257,10 +257,7 @@
 		onLoad(option) {
 			this.id = option.cid
 
-			console.log(option.cid)
 			checkFavor(option.cid, 1).then((response) => {
-				console.log(777)
-				console.log(response.data.data)
 				this.favorId = response.data.data.id
 				this.isKeep = true
 
@@ -759,6 +756,19 @@
 		.title {
 			font-size: 30upx;
 			text-align: right;
+			color: #807c87;
+			width: 100%;
+			display: -webkit-box;
+			/** 对象作为伸缩盒子模型显示 **/
+			overflow: hidden;
+			word-break: break-all;
+			/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
+			text-overflow: ellipsis;
+			/* 超出部分省略号 */
+			-webkit-box-orient: vertical;
+			/** 设置或检索伸缩盒对象的子元素的排列方式 **/
+			-webkit-line-clamp: 1;
+			/** 显示的行数 **/
 		}
 	}
 

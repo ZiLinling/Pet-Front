@@ -230,13 +230,13 @@
 		getGoods
 	} from '../../api/goods';
 	import {
-			getById
-		} from '../../api/store';
+		getById
+	} from '../../api/store';
 	export default {
 		data() {
 			return {
 				num: null,
-				token:'',
+				token: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -281,10 +281,10 @@
 					stock: 1,
 					category: '',
 					description: '',
-					storeName:''
+					storeName: ''
 
 				},
-				store:[],
+				store: [],
 				comment: {
 					num: 102,
 					userface: '../../static/img/face.jpg',
@@ -316,10 +316,10 @@
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
 			this.getgoods(option.cid, option.name);
-			
+
 		},
 		onShow() {
-			this.token=uni.getStorageSync('token')
+			this.token = uni.getStorageSync('token')
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -363,12 +363,14 @@
 				}).then((response) => {
 					this.goodsData = response.data.data;
 					this.num = 1;
-					console.log("this.goodsData",this.goodsData)
-						getById({id:this.goodsData.storeId}).then((response)=>{
-							console.log("store",response.data.data)
-							this.goodsData.storeName = storeName;
-							this.store=response.data.data
-						})
+					console.log("this.goodsData", this.goodsData)
+					getById({
+						id: this.goodsData.storeId
+					}).then((response) => {
+						console.log("store", response.data.data)
+						this.goodsData.storeName = storeName;
+						this.store = response.data.data
+					})
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -405,14 +407,14 @@
 			},
 			// 加入购物车
 			joinCart() {
-				
+
 				save({
 					goodsId: this.goodsData.id,
 					num: this.num
 				}).then((response) => {}).catch((error) => {})
 			},
 			join() {
-				this.choose=0
+				this.choose = 0
 				return this.showSpec(() => {
 					uni.showToast({
 						title: "已加入购物车"
@@ -425,7 +427,7 @@
 			},
 			//立即购买
 			buy() {
-				this.choose=1
+				this.choose = 1
 				return this.showSpec(() => {
 					uni.showToast({
 						title: "已购买"
@@ -444,8 +446,8 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				
-				this.goodsData.num=this.num
+
+				this.goodsData.num = this.num
 				uni.setStorage({
 					key: 'petOrder',
 					data: this.goodsData,
@@ -535,16 +537,16 @@
 				this.specClass = 'hide';
 				//回调
 
-				if(this.token==''){
+				if (this.token == '') {
 					console.log("token为空")
 					uni.showToast({
-						title:'请先登录',
+						title: '请先登录',
 						icon: 'none'
 					})
 					this.specClass = null;
 					return;
 				}
-				console.log("token",this.token )
+				console.log("token", this.token)
 				if (this.choose == 0) {
 					this.joinCart();
 				} else {
@@ -801,6 +803,19 @@
 		.title {
 			text-align: right;
 			font-size: 30upx;
+			color: #807c87;
+			width: 100%;
+			display: -webkit-box;
+			/** 对象作为伸缩盒子模型显示 **/
+			overflow: hidden;
+			word-break: break-all;
+			/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
+			text-overflow: ellipsis;
+			/* 超出部分省略号 */
+			-webkit-box-orient: vertical;
+			/** 设置或检索伸缩盒对象的子元素的排列方式 **/
+			-webkit-line-clamp: 1;
+			/** 显示的行数 **/
 		}
 	}
 
