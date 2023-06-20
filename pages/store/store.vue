@@ -201,6 +201,7 @@
 			font-size: 28upx;
 			margin-bottom: -2upx;
 			color: #aaa;
+			margin-top: 0upx;
 
 			&.on {
 				color: #555;
