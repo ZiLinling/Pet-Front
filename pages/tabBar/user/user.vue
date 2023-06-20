@@ -24,7 +24,7 @@
 		<view class="user" v-if="user">
 			<!-- 头像 -->
 			<view class="left">
-				<image :src="user.img"></image>
+				<image :src="$base_url+user.img"></image>
 			</view>
 			<!-- 昵称,个性签名 -->
 			<view class="right">
@@ -62,11 +62,15 @@
 </template>
 <script>
 	import {
+		base_url
+	} from '../../../api/axios';
+	import {
 		getUser
 	} from '../../../api/user';
 	export default {
 		data() {
 			return {
+				base_url: base_url,
 				isfirst: true,
 				headerPosition: "fixed",
 				headerTop: null,

@@ -230,13 +230,21 @@
 		getGoods
 	} from '../../api/goods';
 	import {
-			getById
-		} from '../../api/store';
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '../../api/favor';
+	import {
+		getById
+	}
+	from '../../api/store';
 	export default {
 		data() {
 			return {
+				id: '',
+				favorId: '',
 				num: null,
-				token:'',
+				token: '',
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
 				afterHeaderzIndex: 10, //层级
@@ -281,10 +289,10 @@
 					stock: 1,
 					category: '',
 					description: '',
-					storeName:''
+					storeName: ''
 
 				},
-				store:[],
+				store: [],
 				comment: {
 					num: 102,
 					userface: '../../static/img/face.jpg',
@@ -315,11 +323,25 @@
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
+			console.log(option.cid); //打印出上个页面传递的参数。
+			this.getgoods(option.cid);
+
+			this.id = option.cid
+
+			checkFavor(option.cid, 2).then((response) => {
+				console.log(response.data.data)
+				this.favorId = response.data.data.id
+				this.isKeep = true
+
+			}).catch((error) => {
+				this.isKeep = false
+				this.favorId = ''
+			})
 			this.getgoods(option.cid, option.name);
-			
+
 		},
 		onShow() {
-			this.token=uni.getStorageSync('token')
+			this.token = uni.getStorageSync('token')
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -363,12 +385,14 @@
 				}).then((response) => {
 					this.goodsData = response.data.data;
 					this.num = 1;
-					console.log("this.goodsData",this.goodsData)
-						getById({id:this.goodsData.storeId}).then((response)=>{
-							console.log("store",response.data.data)
-							this.goodsData.storeName = storeName;
-							this.store=response.data.data
-						})
+					console.log("this.goodsData", this.goodsData)
+					getById({
+						id: this.goodsData.storeId
+					}).then((response) => {
+						console.log("store", response.data.data)
+						this.goodsData.storeName = storeName;
+						this.store = response.data.data
+					})
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -401,18 +425,32 @@
 			},
 			//收藏
 			keep() {
-				this.isKeep = this.isKeep ? false : true;
+				console.log(this.isKeep)
+				console.log(this.id)
+				console.log(this.favorId)
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+
+						console.log('quxiaochenggong')
+						this.isKeep = false
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 2).then((response) => {
+						console.log('jiaruchenggong')
+						this.isKeep = true
+					})
+				}
 			},
 			// 加入购物车
 			joinCart() {
-				
+
 				save({
 					goodsId: this.goodsData.id,
 					num: this.num
 				}).then((response) => {}).catch((error) => {})
 			},
 			join() {
-				this.choose=0
+				this.choose = 0
 				return this.showSpec(() => {
 					uni.showToast({
 						title: "已加入购物车"
@@ -425,7 +463,7 @@
 			},
 			//立即购买
 			buy() {
-				this.choose=1
+				this.choose = 1
 				return this.showSpec(() => {
 					uni.showToast({
 						title: "已购买"
@@ -444,8 +482,8 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				
-				this.goodsData.num=this.num
+
+				this.goodsData.num = this.num
 				uni.setStorage({
 					key: 'petOrder',
 					data: this.goodsData,
@@ -535,16 +573,16 @@
 				this.specClass = 'hide';
 				//回调
 
-				if(this.token==''){
+				if (this.token == '') {
 					console.log("token为空")
 					uni.showToast({
-						title:'请先登录',
+						title: '请先登录',
 						icon: 'none'
 					})
 					this.specClass = null;
 					return;
 				}
-				console.log("token",this.token )
+				console.log("token", this.token)
 				if (this.choose == 0) {
 					this.joinCart();
 				} else {

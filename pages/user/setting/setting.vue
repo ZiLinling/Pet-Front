@@ -5,9 +5,6 @@
 				<view class="row" @tap="toModify">
 					<view class="title">个人信息</view>
 					<view class="right">
-						<view class="tis">
-							<image src="/static/img/face.jpg" mode="widthFix"></image>
-						</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
@@ -66,7 +63,7 @@
 			},
 			toModify() {
 				uni.navigateTo({
-					url: '/pages/user/setting/setting_personal_detail/setting_personal_detail'
+					url: '/pages/user/setting/personal_detail/personal_detail'
 				})
 			}
 		}

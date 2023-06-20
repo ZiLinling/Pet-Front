@@ -82,7 +82,7 @@
 			</view>
 			<view class="product-list">
 				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="getUrl(product.img)">
+					<image mode="aspectFill" :src="$base_url+product.img">
 					</image>
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
@@ -267,13 +267,6 @@
 			// #endif
 		},
 		methods: {
-			getUrl(url) {
-				if (url) {
-					return this.base_url + url
-				} else {
-					return "/"
-				}
-			},
 			//消息列表
 			toMsg() {
 				uni.navigateTo({
