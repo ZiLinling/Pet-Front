@@ -19,7 +19,7 @@
 			<view class="swiper-box">
 				<swiper circular="true" autoplay="true" @change="swiperChange">
 					<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-						<image :src="swiper.img" @tap="toSwiper(swiper)"></image>
+						<image :src="swiper.img"></image>
 					</swiper-item>
 				</swiper>
 				<view class="indicator">
@@ -40,14 +40,17 @@
 
 		<!-- 周边商品列表 -->
 		<view class="goods-list">
-
+			<view class="title">
+				<image src="/static/img/hua.png"></image>
+				<image src="/static/img/hua.png"></image>
+			</view>
 			<view class="product-list">
 				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
 					<image mode="aspectFill" :src="$base_url+goods.img"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
 						<view class="store">{{goods.etc.storeName}}</view>
-						<view class="price">{{ goods.price }}</view>
+						<view class="price">${{ goods.price }}</view>
 					</view>
 				</view>
 			</view>
@@ -62,7 +65,7 @@
 	// import amap from '@/common/SDK/amap-wx.js';
 	import {
 		getGoodsList
-	} from '../../../api/goods';
+	} from '@/api/goods';
 	import {
 		base_url
 	} from '@/api/axios'
@@ -155,9 +158,6 @@
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
 			let this_ = this
-			uni.showToast({
-				title: '触发上拉加载'
-			});
 			let len = this.goodsList.length;
 			if (len >= this.count1) {
 				this.loadingText = '没有商品了';
@@ -190,21 +190,13 @@
 			//搜索跳转
 			toSearch() {
 				uni.navigateTo({
-					url: '/pages/search/search_goods_detail?name=' + this.searchValue
-				});
-			},
-			//轮播图跳转
-			toSwiper(e) {
-				uni.showToast({
-					title: e.src,
-					icon: 'none'
+					url: '/pages/item/goods/search/searchList?name=' + this.searchValue
 				});
 			},
 			//分类跳转
 			toGoodsCategory(e) {
 				let this_ = this
 				this.category = e.id - 1 //展示类别
-				console.log(this.category)
 				this.pageNum = 1
 				this.goodsList = []
 				if (this_.category == 0) {
@@ -213,7 +205,6 @@
 						for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
 							this_.goodsList.push(res.data.data.records[i])
 						}
-						console.log(this_.goodsList)
 					})
 				} else {
 					getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
@@ -228,9 +219,8 @@
 
 			//商品跳转
 			toGoods(e) {
-				console.log('e',e)
 				uni.navigateTo({
-					url: '../../goods/goods?cid=' + e.id
+					url: '/pages/item/goods/goods?cid=' + e.id
 				});
 			},
 			//轮播图指示器
@@ -574,10 +564,6 @@
 			justify-content: space-between;
 			flex-wrap: wrap;
 
-			.cart {
-				float: right;
-			}
-
 			.product {
 				width: 48%;
 				border-radius: 20upx;
@@ -595,7 +581,7 @@
 					padding: 10upx 4%;
 					display: -webkit-box;
 					-webkit-box-orient: vertical;
-					-webkit-line-clamp: 2;
+					-webkit-line-clamp: 1;
 					text-align: justify;
 					overflow: hidden;
 					font-size: 30upx;
@@ -608,25 +594,28 @@
 					width: 92%;
 					padding: 10upx 4% 10upx 4%;
 
-					.store {
-
-						line-height: 5px;
-						height: 30upx;
-
-						font-size: 10upx;
-						margin-left: 5px;
-					}
-
 					.price {
 						color: #e65339;
-						font-size: 30upx;
+						font-size: 28upx;
 						font-weight: 600;
-						margin-left: 50px;
 					}
 
-					.slogan {
-						color: #807c87;
-						font-size: 24upx;
+					.store {
+						width: 100%;
+						color: #8b8b8b;
+						display: -webkit-box;
+						font-size: 28upx;
+						/** 对象作为伸缩盒子模型显示 **/
+						overflow: hidden;
+						word-break: break-all;
+						/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
+						text-overflow: ellipsis;
+						/* 超出部分省略号 */
+						-webkit-box-orient: vertical;
+						/** 设置或检索伸缩盒对象的子元素的排列方式 **/
+						-webkit-line-clamp: 1;
+						/** 显示的行数 **/
+
 					}
 				}
 			}

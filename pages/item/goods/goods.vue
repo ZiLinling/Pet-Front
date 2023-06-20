@@ -56,25 +56,25 @@
 				<view class="h1">分享</view>
 				<view class="list">
 					<view class="box">
-						<image src="../../static/img/share/wx.png"></image>
+						<image src="/static/img/share/wx.png"></image>
 						<view class="title">
 							微信好友
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/pyq.png"></image>
+						<image src="/static/img/share/pyq.png"></image>
 						<view class="title">
 							朋友圈
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/wb.png"></image>
+						<image src="/static/img/share/wb.png"></image>
 						<view class="title">
 							新浪微博
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/qq.png"></image>
+						<image src="/static/img/share/qq.png"></image>
 						<view class="title">
 							QQ
 						</view>
@@ -115,7 +115,7 @@
 							</view>
 						</view>
 						<view style="margin-top:30upx; margin-left: 20upx;">
-							<img src="../../static/img/goods/p1.jpg" alt="" style="border-radius: 50upx;">
+							<img src="/static/img/goods/p1.jpg" alt="" style="border-radius: 50upx;">
 						</view>
 					</view>
 					<view class="length">
@@ -225,19 +225,19 @@
 <script>
 	import {
 		save
-	} from '../../api/cart';
+	} from '@/api/cart';
 	import {
 		getGoods
-	} from '../../api/goods';
+	} from '@/api/goods';
 	import {
 		checkFavor,
 		addFavor,
 		deleteFavor
-	} from '../../api/favor';
+	} from '@/api/favor';
 	import {
 		getById
 	}
-	from '../../api/store';
+	from '@/api/store';
 	export default {
 		data() {
 			return {
@@ -295,7 +295,7 @@
 				store: [],
 				comment: {
 					num: 102,
-					userface: '../../static/img/face.jpg',
+					userface: '/static/img/face.jpg',
 					username: '大黑哥',
 					content: '很不错，之前买了很多次了，很好看，能放很久，和图片色差不大，值得购买！'
 				},

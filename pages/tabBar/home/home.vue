@@ -29,7 +29,7 @@
 			<view class="swiper-box">
 				<swiper circular="true" autoplay="true" @change="swiperChange">
 					<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-						<image :src="swiper.img" @tap="toSwiper(swiper)"></image>
+						<image :src="swiper.img"></image>
 					</swiper-item>
 				</swiper>
 				<view class="indicator">
@@ -39,15 +39,16 @@
 			</view>
 		</view>
 		<!-- 宠物分类 -->
+
 		<view class="category-list">
 			<view class="category" v-for="(row, index) in petCategory" :key="index">
-				<view v-if="index" @tap="toCategory(row)">
+				<view v-if="index" @tap="toCategory(row)" class="item">
 					<view class="img">
 						<image :src="row.img"></image>
 					</view>
 					<view class="text">{{ row.name }}</view>
 				</view>
-				<view v-else @tap="toMap()">
+				<view v-else @tap="toMap()" class="item">
 					<view class="img">
 						<image :src="row.img"></image>
 					</view>
@@ -77,7 +78,6 @@
 		<view class="goods-list">
 			<view class="title">
 				<image src="/static/img/hua.png"></image>
-				猜你喜欢
 				<image src="/static/img/hua.png"></image>
 			</view>
 			<view class="product-list">
@@ -87,7 +87,7 @@
 					<view class="name">{{ product.breedName }}</view>
 					<view class="info">
 						<view class="slogan">{{product.name}}</view>
-						<view class="price">{{ product.price }}$</view>
+						<view class="price">${{ product.price }}</view>
 					</view>
 				</view>
 			</view>
@@ -100,7 +100,7 @@
 	import {
 		getCount,
 		page
-	} from '../../../api/home';
+	} from '@/api/pet';
 	import {
 		base_url
 	} from '@/api/axios'
@@ -118,7 +118,6 @@
 		},
 		data() {
 			return {
-				base_url: base_url,
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
@@ -241,9 +240,6 @@
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
-			uni.showToast({
-				title: '触发上拉加载'
-			});
 			let len = this.productList.length;
 
 			if (len >= this.count1) {
@@ -274,20 +270,14 @@
 			},
 			//查看全部分类
 			toBreedAll() {
-				uni.showToast({
-					title: '查看全部'
-				});
 				uni.navigateTo({
 					url: '/pages/category/category'
 				});
 			},
 			//搜索跳转
 			toSearch() {
-				uni.showToast({
-					title: '建议跳转到新页面做搜索功能'
-				});
 				uni.navigateTo({
-					url: '/pages/search/search_pet'
+					url: '/pages/item/pet/search/search'
 				});
 			},
 			toMap() {
@@ -295,33 +285,18 @@
 					url: '/pages/map/map'
 				});
 			},
-			//轮播图跳转
-			toSwiper(e) {
-				uni.showToast({
-					title: e.src,
-					icon: 'none'
-				});
-			},
 			//分类跳转
 			toCategory(e) {
-				//uni.showToast({title: e.name,icon:"none"});
 				uni.setStorageSync('catName', e.name);
 				uni.navigateTo({
-					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name + '&specie=' + e
+					url: '/pages/item/list?cid=' + e.id + '&name=' + e.name + '&specie=' + e
 						.specie
-				});
-			},
-			//推荐商品跳转
-			toPromotion(e) {
-				uni.showToast({
-					title: e.title,
-					icon: 'none'
 				});
 			},
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
-					url: '../../goods/pet?cid=' + e.id + '&breed=' + e.breedName
+					url: '/pages/item/pet/pet?cid=' + e.id + '&breed=' + e.breedName
 				});
 			},
 			//轮播图指示器
@@ -511,8 +486,7 @@
 	}
 
 	.category-list {
-		width: 92%;
-		margin: 0 4%;
+		width: 100%;
 		padding: 0 0 30upx 0;
 		border-bottom: solid 2upx #f6f6f6;
 		display: flex;
@@ -522,7 +496,6 @@
 		.category {
 			width: 25%;
 			margin-top: 50upx;
-			display: flex;
 			flex-wrap: wrap;
 
 			.img {
@@ -723,14 +696,14 @@
 
 					.price {
 						color: #e65339;
-						font-size: 30upx;
+						font-size: 28upx;
 						font-weight: 600;
 					}
 
 					.slogan {
 						width: 100%;
 						color: #8b8b8b;
-						display: -webkit-box;
+						font-size: 28upx;
 						/** 对象作为伸缩盒子模型显示 **/
 						overflow: hidden;
 						word-break: break-all;

@@ -31,7 +31,7 @@
 		getCount,
 		getCountBySpecie,
 		page
-	} from '../../../api/home';
+	} from '@/api/pet';
 	import {
 		base_url
 	} from '@/api/axios'
@@ -143,7 +143,7 @@
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
-					url: '../../goods/pet?cid=' + e.id + '&breed=' + e.breedName
+					url: '/pages/item/pet/pet?cid=' + e.id + '&breed=' + e.breedName
 				});
 			},
 			//排序类型

@@ -47,14 +47,11 @@
 			"path": "pages/tabBar/user/user",
 			"style": {
 				"navigationBarTextStyle": "black",
-				"navigationStyle": "custom",
-				"app-plus": {
-					"bounce": "none"
-				}
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path": "pages/goods/goods-list/goods-list",
+			"path": "pages/item/list",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": true,
@@ -64,7 +61,7 @@
 			}
 		},
 		{
-			"path": "pages/goods/goods",
+			"path": "pages/item/goods/goods",
 			"style": {
 				"navigationBarTitleText": "",
 				"navigationBarBackgroundColor": "#f1f1f1",
@@ -76,7 +73,7 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
+			"path": "pages/user/login/login",
 			"style": {
 				"navigationBarTitleText": "登录",
 				"app-plus": {
@@ -85,7 +82,7 @@
 			}
 		},
 		{
-			"path": "pages/login/reg",
+			"path": "pages/user/login/reg",
 			"style": {
 				"navigationBarTitleText": "注册",
 				"app-plus": {
@@ -94,7 +91,7 @@
 			}
 		},
 		{
-			"path": "pages/login/forget",
+			"path": "pages/user/login/forget",
 			"style": {
 				"navigationBarTitleText": "忘记密码",
 				"app-plus": {
@@ -103,7 +100,7 @@
 			}
 		},
 		{
-			"path": "pages/login/agreement",
+			"path": "pages/user/login/agreement",
 			"style": {
 				"navigationBarTitleText": "用户协议",
 				"app-plus": {
@@ -152,7 +149,7 @@
 				}
 			}
 		}, {
-			"path": "pages/user/keep/keep",
+			"path": "pages/user/favor/favor",
 			"style": {
 				"navigationBarTitleText": "我的收藏",
 				// "navigationBarBackgroundColor": "#f06c7a",
@@ -202,7 +199,7 @@
 				"backgroundColorBottom": "#ffffff"
 			}
 		}, {
-			"path": "pages/goods/ratings/ratings",
+			"path": "pages/item/ratings/ratings",
 			"style": {
 				"navigationBarTitleText": "商品评论",
 				"enablePullDownRefresh": true,
@@ -211,7 +208,7 @@
 				"backgroundColorBottom": "#ffffff"
 			}
 		}, {
-			"path": "pages/search/search_pet",
+			"path": "pages/item/pet/search/search",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
@@ -219,7 +216,7 @@
 			}
 
 		}, {
-			"path": "pages/search/search_pet_detail",
+			"path": "pages/item/pet/search/searchList",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
@@ -227,10 +224,11 @@
 			}
 
 		}, {
-			"path": "pages/goods/pet",
+			"path": "pages/item/pet/pet",
 			"style": {
 				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 
 		}, {
@@ -241,7 +239,7 @@
 			}
 
 		}, {
-			"path": "pages/search/search_goods_detail",
+			"path": "pages/item/goods/search/searchList",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,

@@ -1,23 +1,13 @@
 <template>
 	<view>
 		<view v-if="token">
-			<!-- 占位 -->
-			<view v-if="showHeader" class="place">
-				<u-icon name="map-fill" color="#000000" size="28" class="address-icon"></u-icon>
-				<p>{{address}}</p>
-			</view>
-
+			<uni-notice-bar show-icon scrollable text="[我宣布以上小组成绩无效]制作" />
 			<!-- 商品列表 -->
 			<view class="goods-list">
 				<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
 				<!-- store是商店，cnt是遍历的数字 -->
-				<view v-for="store in storeList" :key="store.id" class="store">
-					<view>
-						<image src="/static/img/store.png" class="store-logo"></image>
-						{{store.name}}
-
-					</view>
-
+				<uni-card v-for="store in storeList" :key="store.id" class="store" :title="store.name" sub-title="商品"
+					padding="10upx 0" thumbnail="/static/img/store.png">
 					<view class="row" v-for="goods in store.goodsVOList" :key="goods.id">
 						<!-- 删除按钮 -->
 
@@ -38,7 +28,7 @@
 							<!-- 商品信息 -->
 							<view class="goods-info" @tap="toGoods(goods)">
 								<view class="img">
-									<image :src="goods.img"></image>
+									<image :src="$base_url+goods.img" mode="aspectFill"></image>
 								</view>
 								<view class="info">
 									<view class="title">{{goods.name}}</view>
@@ -61,8 +51,7 @@
 							</view>
 						</view>
 					</view>
-				</view>
-
+				</uni-card>
 				<!-- 列表v-for从这开始 -->
 
 			</view>
@@ -287,12 +276,9 @@
 
 			//商品跳转
 			toGoods(e) {
-				uni.showToast({
-					title: '商品' + e.id,
-					icon: "none"
-				});
+
 				uni.navigateTo({
-					url: '../../goods/goods?cid=' + e.goodsId
+					url: '/pages/item/goods/goods?cid=' + e.goodsId
 				});
 			},
 			//跳转确认订单页面
@@ -324,8 +310,6 @@
 					acc[key].goods.push(obj);
 					return acc;
 				}, {}));
-				console.log("store")
-				console.log(store)
 				//传值为store
 				uni.setStorage({
 					key: 'buylist',
@@ -339,8 +323,6 @@
 			},
 			//删除商品
 			deleteGoods() {
-				console.log("selectedList")
-				console.log(this.selectedList)
 				let ids = '';
 				for (let i = 0; i < this.selectedList.length; i++) {
 					ids += (this.goodsList[this.selectedList[i]].cartId) + ',';
@@ -354,7 +336,6 @@
 				deleteById({
 					ids: ids
 				}).then((response) => {
-					console.log("删除成功")
 					this.sum();
 					this.oldIndex = null;
 					this.theIndex = null;
@@ -376,7 +357,6 @@
 					cartId: this.goodsList[index].cartId,
 					selected: selected
 				}).then((response) => {
-					console.log(response)
 					this.goodsList[index].selected = selected
 					this.sum();
 				}).catch((error) => {
@@ -394,7 +374,6 @@
 				}
 				this.selectedList = this.isAllselected ? [] : arr;
 				this.isAllselected = this.isAllselected || this.goodsList.length == 0 ? false : true;
-				console.log("this.isAllselected   " + this.isAllselected)
 				isAllSelected({
 					isAllSelected: this.isAllselected
 				}).then((response) => {
@@ -542,7 +521,7 @@
 
 	.goods-list {
 		width: 100%;
-		padding: 20upx 0 120upx 0;
+		padding: 0upx 0 120upx 0;
 
 		.tis {
 			width: 100%;
@@ -559,7 +538,7 @@
 			margin: 20upx auto;
 
 			border-radius: 15upx;
-			box-shadow: 0upx 5upx 20upx rgba(0, 0, 0, 0.1);
+			box-shadow: 2upx 2upx 10upx 3upx rgba(0, 0, 0, 0.1);
 			display: flex;
 			align-items: center;
 			position: relative;
@@ -808,12 +787,12 @@
 
 
 	.store {
-		width: 90%;
-		margin-left: 5%;
-		background-color: #f8f8e4;
-		padding-bottom: 20upx;
-		margin-bottom: 30upx;
-		border-radius: 20upx;
+		// width: 90%;
+		// margin-left: 5%;
+		// background-color: #f8f8e4;
+		// padding-bottom: 20upx;
+		// margin-bottom: 30upx;
+		// border-radius: 20upx;
 	}
 
 	.store-logo {

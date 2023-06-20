@@ -55,25 +55,25 @@
 				<view class="h1">分享</view>
 				<view class="list">
 					<view class="box">
-						<image src="../../static/img/share/wx.png"></image>
+						<image src="/static/img/share/wx.png"></image>
 						<view class="title">
 							微信好友
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/pyq.png"></image>
+						<image src="/static/img/share/pyq.png"></image>
 						<view class="title">
 							朋友圈
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/wb.png"></image>
+						<image src="/static/img/share/wb.png"></image>
 						<view class="title">
 							新浪微博
 						</view>
 					</view>
 					<view class="box">
-						<image src="../../static/img/share/qq.png"></image>
+						<image src="/static/img/share/qq.png"></image>
 						<view class="title">
 							QQ
 						</view>
@@ -122,6 +122,12 @@
 		</view>
 		<!-- 服务-规则选择 -->
 		<view class="info-box spec">
+			<view class="row">
+				<view class="text">性别</view>
+				<view class="content">
+					{{goodsData.gender}}
+				</view>
+			</view>
 			<view class="row" @tap="showService">
 				<view class="text">服务</view>
 				<view class="content">
@@ -130,10 +136,6 @@
 				</view>
 				<view class="arrow">
 					<view class="icon xiangyou"></view>
-				</view>
-			</view>
-			<view class="row">
-				<view class="text">运费：8-24 <view class="arrow"> 性别：{{goodsData.gender}}</view>
 				</view>
 			</view>
 		</view>
@@ -152,12 +154,13 @@
 		</view>
 
 		<!-- 详情 -->
-		<view class="description">
+		<view class="info-box description">
 			<view class="title">———— 商品详情 ————</view>
 			<view class="goods-description">
 				<!-- 商品详情在这，看后面怎么用？ -->
 				{{goodsData.description}}
 			</view>
+			<view class="title">————————————</view>
 			<view class="content"><rich-text :nodes="descriptionStr"></rich-text></view>
 		</view>
 	</view>
@@ -166,10 +169,10 @@
 <script>
 	import {
 		save
-	} from '../../api/cart';
+	} from '@/api/cart';
 	import {
 		getPet
-	} from '../../api/pet';
+	} from '@/api/pet';
 	import {
 		base_url
 	} from '@/api/axios'
@@ -177,7 +180,7 @@
 		checkFavor,
 		addFavor,
 		deleteFavor
-	} from '../../api/favor';
+	} from '@/api/favor';
 	export default {
 		data() {
 			return {
@@ -256,15 +259,12 @@
 		},
 		onLoad(option) {
 			this.id = option.cid
-
 			checkFavor(option.cid, 1).then((response) => {
 				this.favorId = response.data.data.id
 				this.isKeep = true
-
 			}).catch((error) => {
 				this.isKeep = false
 				this.favorId = ''
-
 			})
 			uni.setNavigationBarTitle({
 				title: option.breed
@@ -303,7 +303,7 @@
 		methods: {
 			toStore() {
 				uni.navigateTo({
-					url: '../store/store?cid=' + this.store.id
+					url: '/pages/store/store?cid=' + this.store.id
 				})
 			},
 			videoEnded() {
@@ -363,7 +363,6 @@
 				console.log(this.favorId)
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
-
 						console.log('quxiaochenggong')
 						this.isKeep = false
 					})
@@ -547,7 +546,7 @@
 		display: flex;
 		flex-direction: row;
 		width: 100%;
-		height: 80rpx;
+		margin: 10upx 10upx;
 		align-items: center; //垂直居中
 		text-align: center;
 		background-color: (248, 248, 248);

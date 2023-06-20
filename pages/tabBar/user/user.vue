@@ -106,12 +106,10 @@
 				],
 				// 工具栏列表
 				mytoolbarList: [{
-						url: '/pages/user/keep/keep?type=1',
+						url: '/pages/user/favor/favor?type=1',
 						text: '我的收藏',
 						img: '/static/img/user/point.png'
 					},
-
-
 					{
 						url: '../../user/address/address',
 						text: '收货地址',

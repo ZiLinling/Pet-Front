@@ -1,12 +1,20 @@
 <template>
 	<view>
-		<view class="status" :style="{position:headerPosition}"></view>
-		<view class="header" :style="{position:headerPosition}">
-			<view style="font-size: 60upx; text-align: center;width: 100%;">{{store.name}}</view>
-		</view>
-		<!-- 占位 -->
-		<view class="place"></view>
-		<image :src="$base_url+store.img" mode="aspectFill" style="width: 100%;"></image>
+		<uni-card padding="10upx 10upx" :is-full="true" class="store">
+			<template v-slot:title>
+				<uni-list>
+					<uni-section :title="store.name" type="line"></uni-section>
+				</uni-list>
+			</template>
+			<image :src="$base_url+store.img" mode="aspectFill" style="width: 100%;"></image>
+			<uni-list>
+				<uni-list-item :title="'联系电话:'+store.telephone" />
+				<uni-list-item :title="'地址:'+store.address" />
+				<uni-list-item title="简介" :note="store.description" />
+			</uni-list>
+		</uni-card>
+		</uni-section>
+
 		<view class="order">
 
 			<view class="target" v-for="(target,index) in orderbyList" @tap="select(index)" :key="index"
@@ -81,9 +89,6 @@
 					this.loadingText = '没有更多了'
 				}
 			})
-			uni.setNavigationBarTitle({
-				title: this.store.name
-			});
 			//兼容H5下排序栏位置
 			// #ifdef H5
 			//定时器方式循环获取高度为止，这么写的原因是onLoad中head未必已经渲染出来。
@@ -117,7 +122,7 @@
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
-					url: '/pages/goods/pet?cid=' + e.id + '&breed=' + e.breedName
+					url: '/pages/item/pet/pet?cid=' + e.id + '&breed=' + e.breedName
 				});
 			},
 			//排序类型
@@ -182,6 +187,16 @@
 		font-size: 26upx;
 	}
 
+	.store {
+		.description {
+			margin-top: 20upx;
+			padding-top: 20upx;
+			font-size: 30upx;
+			width: 100%;
+			border-top: 1px solid rgba(0, 0, 0, 0.1);
+		}
+	}
+
 	.order {
 		width: 92%;
 		padding: 0 4%;
@@ -212,26 +227,6 @@
 		}
 	}
 
-	.header {
-		width: 92%;
-		padding: 0 4%;
-		height: 100upx;
-		display: flex;
-		position: fixed;
-		z-index: 10;
-		background-color: #fff;
-		/*  #ifdef  APP-PLUS  */
-		top: var(--status-bar-height);
-		/*  #endif  */
-	}
-
-	.place {
-		background-color: #ffffff;
-		height: 100upx;
-		/*  #ifdef  APP-PLUS  */
-		margin-top: var(--status-bar-height);
-		/*  #endif  */
-	}
 
 	.goods-list {
 		.loading-text {

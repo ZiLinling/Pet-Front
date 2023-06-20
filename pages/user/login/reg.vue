@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<view class="header">
-			<image src="../../static/img/login/logo.png"></image>
+			<image src="/static/img/login/logo.png"></image>
 		</view>
 
 		<view class="list">
@@ -55,7 +55,7 @@
 	import md5 from 'js-md5';
 	import {
 		register
-	} from '../../api/user';
+	} from '@/api/user';
 	var _this, js;
 	export default {
 		onLoad() {

@@ -4,7 +4,7 @@
 			<view class="page-section page-section-gap">
 				<map id="map" v-if="show" :style="'width: 100%;height:'+this.windowHeight*2+'upx;'" :latitude="latitude"
 					:longitude="longitude" :markers="markers" :circles="circles" show-location :show-compass="true"
-					:enable-poi="true" show-scale @callouttap="open" @markertap="open">
+					:enable-poi="true" show-scale @callouttap="open" @markertap="open" scale="15">
 				</map>
 			</view>
 		</view>
@@ -49,6 +49,7 @@
 			this.store = this.$store
 			if (this.store) {
 				for (let store of this.store) {
+					console.log(store)
 					let marker = {
 						id: store.id,
 						longitude: store.longitude,
@@ -73,6 +74,7 @@
 			open(e) {
 				this.$refs.popup.open()
 				this.selectStore = e.detail.markerId
+				console.log(this.store[e.detail.markerId])
 			},
 			gotoStore() {
 				uni.navigateTo({

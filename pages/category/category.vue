@@ -37,7 +37,7 @@
 <script>
 	import {
 		getBreed
-	} from '../../api/category_pet';
+	} from '@/api/pet';
 	export default {
 		created() {
 			let this_ = this;

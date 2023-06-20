@@ -2,8 +2,8 @@ import axios from 'axios'
 
 axios.defaults.timeout = 5000;
 
-export const base_url = "http://loaclhost:8090/Pet"
-// export const base_url = "http://192.168.43.250:8090/Pet"
+export const base_url = "http://localhost:8090/Pet"
+// export const base_url = "http://47.120.4.106:8090/Pet"
 
 //添加请求拦截器， 在请求头中加token
 // axios.interceptors.request.use(
@@ -68,7 +68,7 @@ uni.addInterceptor('request', {
 			return config;
 		}
 		if (config.data.statusCode !== "200") {
-			return Promise.reject(config.data);
+			return config.data;
 		}
 	},
 	fail: function(error) {

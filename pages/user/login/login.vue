@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<view class="header">
-			<image src="../../static/img/login/logo.png"></image>
+			<image src="/static/img/login/logo.png"></image>
 		</view>
 
 		<view class="list">
@@ -33,7 +33,7 @@
 	import md5 from 'js-md5';
 	import {
 		login
-	} from '../../api/user';
+	} from '@/api/user.js';
 	export default {
 		data() {
 			return {
