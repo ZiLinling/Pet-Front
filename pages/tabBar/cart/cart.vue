@@ -100,8 +100,8 @@
 				headerTop: null,
 				statusTop: null,
 				showHeader: true,
-				selectedList:[],
-				selected_length:null,
+				selectedList: [],
+				selected_length: null,
 				isAllselected: false,
 				goodsList: [
 					// {
@@ -142,8 +142,6 @@
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-
-			uni.getAccountInfoSync('token');
 		},
 		activated() {
 			this.address = '福建省厦门市集美区',
@@ -282,8 +280,8 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
-				let selected_goods = [];	
-				if(this.selectedList.length==0){
+				let selected_goods = [];
+				if (this.selectedList.length == 0) {
 					uni.showToast({
 						title: '尚未选中商品',
 						icon: 'none'
@@ -296,13 +294,19 @@
 				}
 				console.log(selected_goods)
 				//用reduce根据storeId分类给store
+				let i = 0;
 				const store = Object.values(selected_goods.reduce((acc, obj) => {
-				  const key = obj.storeId;
-				  if (!acc[key]) {
-				    acc[key] = { storeId: key, goods: [] ,name:this.storeList[key].name};
-				  }
-				  acc[key].goods.push(obj);
-				  return acc;
+					const key = obj.storeId;
+					if (!acc[key]) {
+						acc[key] = {
+							storeId: key,
+							goods: [],
+							name: this.storeList[i].name
+						};
+						i++;
+					}
+					acc[key].goods.push(obj);
+					return acc;
 				}, {}));
 				console.log("store")
 				console.log(store)
@@ -346,23 +350,23 @@
 			},
 			// 选中商品
 			selected(index) {
-				let selected=this.goodsList[index].selected;
-				if(selected==true){
-					selected=false
-				}else{
-					selected=true
+				let selected = this.goodsList[index].selected;
+				if (selected == true) {
+					selected = false
+				} else {
+					selected = true
 				}
 				updateSelected({
-					cartId:this.goodsList[index].cartId,
-					selected:selected
-				}).then((response)=>{
+					cartId: this.goodsList[index].cartId,
+					selected: selected
+				}).then((response) => {
 					console.log(response)
-					this.goodsList[index].selected=selected
+					this.goodsList[index].selected = selected
 					this.sum();
-				}).catch((error)=>{
+				}).catch((error) => {
 					console.log(error)
 				})
-				
+
 			},
 			//全选
 			allSelect() {
@@ -374,12 +378,12 @@
 				}
 				this.selectedList = this.isAllselected ? [] : arr;
 				this.isAllselected = this.isAllselected || this.goodsList.length == 0 ? false : true;
-				console.log("this.isAllselected   "+this.isAllselected)
+				console.log("this.isAllselected   " + this.isAllselected)
 				isAllSelected({
-					isAllSelected:this.isAllselected
-				}).then((response)=>{
-					console.log(response)		
-				}).catch((error)=>{
+					isAllSelected: this.isAllselected
+				}).then((response) => {
+					console.log(response)
+				}).catch((error) => {
 					console.log(error)
 				})
 				this.sum();
@@ -391,11 +395,11 @@
 				}
 				this.goodsList[index].num--;
 				updateNum({
-					cartId:this.goodsList[index].cartId,
-					num:this.goodsList[index].num
-				}).then((response)=>{
-					console.log(response)		
-				}).catch((error)=>{
+					cartId: this.goodsList[index].cartId,
+					num: this.goodsList[index].num
+				}).then((response) => {
+					console.log(response)
+				}).catch((error) => {
 					console.log(error)
 				})
 				this.sum();
@@ -404,11 +408,11 @@
 			add(index) {
 				this.goodsList[index].num++;
 				updateNum({
-					cartId:this.goodsList[index].cartId,
-					num:this.goodsList[index].num
-				}).then((response)=>{
-					console.log(response)		
-				}).catch((error)=>{
+					cartId: this.goodsList[index].cartId,
+					num: this.goodsList[index].num
+				}).then((response) => {
+					console.log(response)
+				}).catch((error) => {
 					console.log(error)
 				})
 				this.sum();
@@ -416,12 +420,12 @@
 			// 合计
 			sum() {
 				this.sumPrice = 0;
-				this.selectedList=[];
-				for (let i = 0; i <this.goodsList.length; i++) {
-					if(this.goodsList[i].selected==true){
+				this.selectedList = [];
+				for (let i = 0; i < this.goodsList.length; i++) {
+					if (this.goodsList[i].selected == true) {
 						this.selectedList.push(i)
 						this.sumPrice = this.sumPrice + (this.goodsList[i].num * this.goodsList[i].price);
-					}else{
+					} else {
 						this.selectedList.splice(i, 1);
 					}
 				}

@@ -253,17 +253,14 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
+		}, {
+			"path": "pages/map/map",
+			"style": {
+				"navigationBarTitleText": "附近商店",
+				"enablePullDownRefresh": false
+			}
 		}
-	    ,{
-            "path" : "pages/map/map",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-    ],
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "",

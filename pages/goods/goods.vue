@@ -216,10 +216,16 @@
 	import {
 		getGoods
 	} from '../../api/goods';
-
+	import {
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '../../api/favor';
 	export default {
 		data() {
 			return {
+				id: '',
+				favorId: '',
 				num: null,
 				//控制渐变标题栏的参数
 				beforeHeaderzIndex: 11, //层级
@@ -301,6 +307,19 @@
 			console.log(option.cid); //打印出上个页面传递的参数。
 			this.getgoods(option.cid);
 
+			this.id = option.cid
+
+			checkFavor(option.cid, 2).then((response) => {
+				console.log(response.data.data)
+				this.favorId = response.data.data.id
+				this.isKeep = true
+
+			}).catch((error) => {
+				this.isKeep = false
+				this.favorId = ''
+
+			})
+
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -368,7 +387,21 @@
 			},
 			//收藏
 			keep() {
-				this.isKeep = this.isKeep ? false : true;
+				console.log(this.isKeep)
+				console.log(this.id)
+				console.log(this.favorId)
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+
+						console.log('quxiaochenggong')
+						this.isKeep = false
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 2).then((response) => {
+						console.log('jiaruchenggong')
+						this.isKeep = true
+					})
+				}
 			},
 			// 加入购物车
 			joinCart() {
