@@ -52,6 +52,7 @@
 </template>
 
 <script>
+	import md5 from 'js-md5';
 	import {
 		register
 	} from '../../api/user';
@@ -160,7 +161,7 @@
 				}
 				register({
 					account: this.account,
-					password: this.password,
+					password: md5(md5(this.password)),
 					name: this.nickName,
 					phone: this.phone,
 					email: this.email,

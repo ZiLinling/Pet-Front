@@ -30,6 +30,7 @@
 </template>
 
 <script>
+	import md5 from 'js-md5';
 	import {
 		login
 	} from '../../api/user';
@@ -44,7 +45,7 @@
 			bindLogin() {
 				login({
 					account: this.account,
-					password: this.password
+					password: md5(md5(this.password))
 				}).then((response) => {
 					uni.setStorageSync("token", response.data.data)
 					uni.switchTab({

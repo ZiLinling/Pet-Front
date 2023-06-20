@@ -33,31 +33,34 @@
 			</view>
 		</view>
 
+		<view v-if="user">
+			<view class="order">
+				<!-- 订单类型 -->
+				<view class="list">
+					<view class="title">我的订单</view>
+					<view class="box" v-for="(row,index) in orderList" :key="index" @tap="toOrderList(index)">
+						<view class="img">
+							<view class="icon" :class="row.icon"></view>
+						</view>
+						<view class="text">{{row.text}}</view>
+					</view>
+				</view>
+			</view>
+			<!-- 工具栏 -->
+			<view class="toolbar">
+				<view class="title">我的工具栏</view>
+				<view class="list">
+					<view class="box" v-for="(row,index) in mytoolbarList" :key="index" @tap="toPage(row.url)">
+						<view class="img">
+							<image :src="row.img"></image>
+						</view>
+						<view class="text">{{row.text}}</view>
+					</view>
+				</view>
+			</view>
+		</view>
 		<!-- 订单-余额 -->
-		<view class="order">
-			<!-- 订单类型 -->
-			<view class="list">
-				<view class="title">我的订单</view>
-				<view class="box" v-for="(row,index) in orderList" :key="index" @tap="toOrderList(index)">
-					<view class="img">
-						<view class="icon" :class="row.icon"></view>
-					</view>
-					<view class="text">{{row.text}}</view>
-				</view>
-			</view>
-		</view>
-		<!-- 工具栏 -->
-		<view class="toolbar">
-			<view class="title">我的工具栏</view>
-			<view class="list">
-				<view class="box" v-for="(row,index) in mytoolbarList" :key="index" @tap="toPage(row.url)">
-					<view class="img">
-						<image :src="row.img"></image>
-					</view>
-					<view class="text">{{row.text}}</view>
-				</view>
-			</view>
-		</view>
+
 	</view>
 </template>
 <script>
@@ -137,6 +140,9 @@
 			uni.$on('checkLogin', () => {
 				this.getLogin()
 			});
+		},
+		mounted() {
+			this.getLogin()
 		},
 		activated() {
 			this.getLogin()
