@@ -383,6 +383,12 @@
 						title: '请先登录',
 						icon: 'none'
 					})
+					setTimeout(function(){
+						uni.navigateTo({
+							url: '/pages/user/login/login' 
+						});
+					  // 延时1秒后执行的函数
+					}, 1000);
 					return;
 				}
 				this.goodsData.num = this.num

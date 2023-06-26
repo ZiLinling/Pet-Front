@@ -4,7 +4,9 @@
 			<uni-notice-bar show-icon scrollable text="[我宣布以上小组成绩无效]制作" />
 			<!-- 商品列表 -->
 			<view class="goods-list">
-				<view class="tis" v-if="storeList.length==0">购物车是空的哦~</view>
+				<view class="tis" v-if="storeList.length==0">购物车是空的哦~
+				</view>
+
 				<!-- store是商店，cnt是遍历的数字 -->
 				<uni-card v-for="store in storeList" :key="store.id" class="store" :title="store.name" sub-title="商品"
 					padding="10upx 0" thumbnail="/static/img/store.png">
@@ -73,6 +75,7 @@
 		</view>
 		<view v-if="!this.token">
 			<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
+				<button type="default" @click="toLogin()" class="login_button">快去登录</button>
 			</u-empty>
 		</view>
 	</view>
@@ -86,7 +89,7 @@
 		updateNum,
 		updateSelected,
 		isAllSelected
-	} from '../../../api/cart';
+	} from '@/api/cart';
 	export default {
 		data() {
 			return {
@@ -140,20 +143,7 @@
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
 		},
-		activated() {
-			this.token = uni.getStorageSync('token')
-			this.headerTop = null,
-				this.statusTop = null,
-				this.showHeader = true,
-				this.isAllselected = false,
-				this.goodsList = [],
-				//控制滑动效果
-				this.theIndex = null,
-				this.oldIndex = null,
-				this.isStop = false,
-				this.getCart();
-		},
-		mounted() {
+		onShow() {
 			this.token = uni.getStorageSync('token')
 			this.headerTop = null,
 				this.statusTop = null,
@@ -169,7 +159,11 @@
 		methods: {
 			// 先调用后端接口，然后sql查询返回storelist（在订单列表中查询啥storeid存在），在storeList数组中存下storeId和商店名称
 			// 直接所有需要的参数查询回来，然后我给他分开push到两个数组里面就好了吧
-
+			toLogin(){
+					uni.navigateTo({
+						url:'/pages/user/login/login'
+					})
+			},
 			getCart() {
 				if (!uni.getStorageSync('token')) {
 					this.storeList = [];
@@ -293,6 +287,7 @@
 				}
 				//获得选中了的商品列表
 				for (let i = 0; i < this.selectedList.length; i++) {
+					
 					selected_goods.push(this.goodsList[this.selectedList[i]]);
 				}
 				//用reduce根据storeId分类给store
@@ -316,7 +311,7 @@
 					data: store,
 					success: () => {
 						uni.navigateTo({
-							url: '../../order/confirmation'
+							url: '/pages/order/confirmation?type=2'
 						})
 					}
 				})
@@ -799,5 +794,11 @@
 		width: 40upx;
 		height: 40upx;
 		margin: 15upx 0 0 15upx;
+	}
+	.login_button{
+		height: 90upx;
+		border-radius: 30upx ;
+		margin-top: 20upx;
+		background-color: #d5d5d5;
 	}
 </style>

@@ -106,6 +106,12 @@
 							deleteAddress({
 								id: this.id
 							}).then((response) => {
+								uni.getStorage({
+									key:'selectAddress',
+									success(address) {
+										console.log("获取address成功",address)
+									}
+								})
 								uni.navigateBack({
 									success() {
 										uni.$emit("update")

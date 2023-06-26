@@ -5,20 +5,22 @@
 			<view class="icon">
 				<image src="../../static/img/addricon.png" mode=""></image>
 			</view>
-			<view class="right">
-				<view class="tel-name">
+			<view class="right" v-if="Object.keys(this.recinfo).length > 0">
+				<view class="tel-name" >
 					<view class="name">
 						{{recinfo.name}}
 					</view>
-					<view class="tel">
+					<view class="tel" >
 						{{recinfo.telephone}}
 					</view>
 				</view>
-				<view class="addres">
+				<view class="addres" >
 					{{recinfo.region}}
 					{{recinfo.address}}
 				</view>
 			</view>
+
+			<view class="right" v-if="Object.keys(this.recinfo).length == 0">点击这边去添加地址</view>
 		</view>
 		<!-- 购买商品列表 -->
 		<view class="buy-list">
@@ -36,7 +38,6 @@
 							<view class="price-number">
 								<view class="price">￥{{row.price*row.num}}</view>
 								<view class="number">
-
 								</view>
 							</view>
 						</view>
@@ -59,7 +60,7 @@
 					备注 :
 				</view>
 				<view class="right">
-					<input placeholder="选填,备注内容" v-model="note" />
+					<input placeholder="备注内容" v-model="note" />
 				</view>
 			</view>
 		</view>
@@ -97,7 +98,7 @@
 			<view class="settlement">
 				<view class="sum">合计:<view class="money">￥{{sumPrice|toFixed}}</view>
 				</view>
-				<view class="btn" @tap="toPay">提交订单</view>
+				<view class="btn" @tap="toPay" >提交订单</view>
 			</view>
 		</view>
 	</view>
@@ -119,13 +120,13 @@
 	export default {
 		data() {
 			return {
-
-				type: null,
+				type:null,
+				isDisabled:false,
 				buylist: [], //订单列表
 				goodsPrice: 0.0, //商品合计价格
 				sumPrice: 0.0, //用户付款价格
 				freight: 12.00, //运费
-				note: '备注备注备注', //备注
+				note: '', //备注
 				int: 1200, //抵扣积分
 				deduction: 0, //抵扣价格
 				recinfo: {
@@ -138,14 +139,38 @@
 
 			};
 		},
-		created() {
+		onLoad(){
 			this.getAddressByDefault();
 		},
 		onLoad(option) {
-			//页面显示时，加载订单信息
-			//购物车界面的购买
+			if(option.type!=null){
+				uni.setStorage({
+					key:'orderType',
+					data:option.type
+				})
+				this.type=option.type
+			}else{
+				uni.getStorage({
+					key:'orderType',
+					success: (res) => {
+						this.type=res.data;
+					}
+				})
+			}
+			
+			
+			// 在页面加载时获取数据
+			uni.getStorage({
+				key: 'selectAddress',
+				success: (res) => {
+					this.recinfo = res.data;
+				},
+				fail() {
+					this.recinfo = null;
+				}
+			});
 
-			if (option.type == null) {
+			if (this.type == 2) {
 				uni.getStorage({
 					key: 'buylist',
 					success: (res) => {
@@ -153,8 +178,7 @@
 						for (let i = 0; i < this.buylist.length; i++) {
 							for (let j = 0; j < this.buylist[i].goods.length; j++) {
 								this.goodsPrice = this.goodsPrice + (this.buylist[i].goods[j].num * this
-									.buylist[i]
-									.goods[j].price);
+									.buylist[i].goods[j].price);
 							}
 						}
 						//合计
@@ -164,17 +188,7 @@
 				});
 			}
 
-			//页面显示的时候加载地址信息
-			uni.getStorage({
-				key: 'selectAddress',
-				success: (res) => {
-
-					this.recinfo = res.data
-				},
-			});
-
-			//商品界面的立即购买
-			if (option.type == 1) {
+			if (this.type == 1) {
 				uni.getStorage({
 					key: 'goodsOrder',
 					success: (res) => {
@@ -202,9 +216,7 @@
 				});
 			}
 
-
-			//宠物界面的立即购买
-			if (option.type == 0) {
+			if (this.type == 0) {
 				uni.getStorage({
 					key: 'petOrder',
 					success: (res) => {
@@ -230,24 +242,18 @@
 					},
 				});
 			}
+		
 		},
-		onHide() {
-
+		onShow() {
+			// 在页面显示时更新数据
+			// 这里可以直接赋值，而不需要再次调用 $forceUpdate 方法
+			this.$forceUpdate()
+			this.recinfo = uni.getStorageSync('selectAddress')
+			
 		},
-
-		onReady() {
-
-		},
-		// watch(){
-		// 	 this.recinfo: function (newVal, oldVal) {
-		// 	    if(newVal==null){
-		// 			uni.showToast("快去填写地址")
-		// 		}
-		// 	  },
-		// },
-		onBackPress() {
-			//页面后退时候，清除订单信息
-			this.clearOrder();
+	onBackPress() {
+			//页面后退时候，清除订单信息A
+			// this.clearOrder();
 		},
 		filters: {
 			toFixed: function(x) {
@@ -256,25 +262,49 @@
 		},
 		methods: {
 			getAddressByDefault() {
-
 				getAddressByDefault({}).then((response) => {
-					this.recinfo = response.data.data;
-					this.recinfo.id = null;
+					if (response.data.data == null) {
+						this.recinfo = null;
+					} else {
+						this.recinfo = response.data.data;
+						this.recinfo.id = null;
+					}
 				}).catch((error) => {
-					console.log(error)
 				})
 			},
+			//removebuylist的本地存储，删除了后端数据库的内容，
 			clearOrder() {
 				uni.removeStorage({
 					key: 'buylist',
 					success: (res) => {
+						if (this.type == 2) {
+							let ids = '';
+							for (let i = 0; i < this.buylist.length; i++) {
+								for (let j = 0; j < this.buylist[i].goods.length; j++) {
+									ids += this.buylist[i].goods[j].cartId + ',';
+								}
+							}
+							deleteById({
+								ids: ids
+							}).then((response) => {
+							
+							})
+						};
 						this.buylist = [];
-						console.log('remove buylist success');
-					}
+					},
 				});
 			},
+
 			toPay() {
 				//商品列表
+				
+				if(Object.keys(this.recinfo).length === 0){
+					uni.showToast({
+						title:"请输入地址",
+						icon:'error'
+					})
+					return;
+				}
 				let paymentOrder = [];
 				let len = this.buylist.length;
 				for (let i = 0; i < len; i++) {
@@ -287,31 +317,15 @@
 					});
 					return;
 				}
-
+				this.recinfo.id=null;
 				generateOrder({
 					...this.recinfo,
 					price: this.sumPrice,
 					postscript: this.note
 				}).then((response) => {
-					if (this.type == null) {
-						let ids = '';
-						console.log("buylist", this.buylist)
-						for (let i = 0; i < this.buylist.length; i++) {
-							for (let j = 0; j < this.buylist[i].goods.length; j++) {
-								ids += this.buylist[i].goods[j].cartId + ',';
-							}
-						}
-						deleteById({
-							ids: ids
-						}).then((response) => {
-							console.log(response)
-						})
-					}
 					let orderId = response.data.data
 					for (let i = 0; i < this.buylist.length; i++) {
 						for (let j = 0; j < this.buylist[i].goods.length; j++) {
-
-
 							generateOrderItem({
 								itemId: this.buylist[i].goods[j].id,
 								num: this.buylist[i].goods[j].num,
@@ -322,8 +336,9 @@
 								console.log(response)
 							})
 						}
-
 					}
+					console.log("clean???")
+					this.clearOrder();
 				}).catch((error) => {
 					console.log(error)
 				})

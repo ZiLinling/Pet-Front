@@ -186,7 +186,7 @@
 			toPage(url) {
 				if (!url) {
 					uni.showToast({
-						title: '模板未包含此页面',
+						title: '此功能尚未实现',
 						icon: "none"
 					});
 					return;

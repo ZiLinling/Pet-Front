@@ -115,7 +115,7 @@
 							</view>
 						</view>
 						<view style="margin-top:30upx; margin-left: 20upx;">
-							<img src="/static/img/goods/p1.jpg" alt="" style="border-radius: 50upx;">
+							<img :src="$base_url+goodsData.img" alt="" style="border-radius: 50upx; width: 200upx;">
 						</view>
 					</view>
 					<view class="length">
@@ -450,28 +450,12 @@
 			},
 			join() {
 				this.choose = 0
-				return this.showSpec(() => {
-					uni.showToast({
-						title: "已加入购物车"
-					});
-				});
-
-				uni.showToast({
-					title: "已加入购物车"
-				});
+				this.showSpec() 
 			},
 			//立即购买
 			buy() {
 				this.choose = 1
-				return this.showSpec(() => {
-					uni.showToast({
-						title: "已购买"
-					});
-				});
-				uni.showToast({
-					title: "已购买"
-				});
-
+				this.showSpec()
 			},
 			//商品评论
 			toRatings() {
@@ -568,22 +552,36 @@
 				this.specClass = 'show';
 			},
 			//关闭规格弹窗
-			hideSpec() {
-				this.specClass = 'hide';
+			hideSpec(action) {
+				
 				//回调
-
+				if(action===0){
+					this.specClass =null;
+					    return; // 直接返回
+				}
+				 this.specClass = 'hide';
+				console.log('没有reuturn')
 				if (this.token == '') {
 					console.log("token为空")
 					uni.showToast({
 						title: '请先登录',
 						icon: 'none'
 					})
-					this.specClass = null;
+					// this.specClass = null;
+					setTimeout(function(){
+						uni.navigateTo({
+							url: '/pages/user/login/login' 
+						});
+					  // 延时1秒后执行的函数
+					}, 1000);
+					
 					return;
 				}
-				console.log("token", this.token)
 				if (this.choose == 0) {
 					this.joinCart();
+					uni.showToast({
+						title: "已加入购物车"
+					});
 				} else {
 					this.toConfirmation();
 				}
@@ -1335,10 +1333,5 @@
 				font-size: 34upx;
 			}
 		}
-	}
-
-	.img {
-		border-radius: 10upx;
-		width: 300upx;
 	}
 </style>

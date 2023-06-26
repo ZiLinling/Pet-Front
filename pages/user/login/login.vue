@@ -48,8 +48,8 @@
 					password: md5(md5(this.password))
 				}).then((response) => {
 					uni.setStorageSync("token", response.data.data)
-					uni.switchTab({
-						url: "/pages/tabBar/user/user",
+					uni.navigateBack({
+						// url: "/pages/tabBar/user/user",
 						success() {
 							uni.$emit("checkLogin")
 						}
