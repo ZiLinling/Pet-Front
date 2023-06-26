@@ -51,11 +51,24 @@
 				addressList: []
 			};
 		},
-		mounted() {
+		
+		onBackPress() {
+			console.log(this.addressList)
+			if (this.addressList.length == 0) {
+				uni.removeStorage({
+					key: 'selectAddress',
+					success: (res) => {
+						console.log('没有选中，不返回地址')
+					}
+				})
+			} else {
+				console.log('选中过了，回退还有storeage地址')
+			}
 
 		},
+		
 		onReady() {
-			getDefaultAddress:{
+			getDefaultAddress: {
 				getAddressByDefault({}).then((response) => {
 					// console.log(response.data.data)
 				}).catch((error) => {
@@ -79,6 +92,7 @@
 					uni.removeStorage({
 						key: 'delAddress'
 					})
+					uni.setStorageSync('delAddress', null)
 				}
 			})
 			uni.getStorage({
@@ -109,13 +123,13 @@
 				getListByUserId().then((response) => {
 					this.addressList = response.data.data
 					this.sortedAddressList()
-				
+
 				})
 			})
-			
+
 			getListByUserId().then((response) => {
 				this.addressList = response.data.data
-				 this.sortedAddressList()
+				this.sortedAddressList()
 			})
 
 			if (e.type == 'select') {
@@ -123,22 +137,22 @@
 			}
 		},
 		methods: {
-			 sortedAddressList() {
-				
-			    // 找到 isDefault 字段值为 1 的地址对象
-			      let defaultAddress = this.addressList.find(address => address.isDefault == 1);
-			    
-			      // 如果找到了默认地址，则将其从原数组中删除并添加到数组的首位
-			      if (defaultAddress) {
-			        const defaultAddressIndex = this.addressList.indexOf(defaultAddress);
-			        this.addressList.splice(defaultAddressIndex, 1);
-			        this.addressList.unshift(defaultAddress);
-			      }
-			    
-			     
-			  },
+			sortedAddressList() {
+
+				// 找到 isDefault 字段值为 1 的地址对象
+				let defaultAddress = this.addressList.find(address => address.isDefault == 1);
+
+				// 如果找到了默认地址，则将其从原数组中删除并添加到数组的首位
+				if (defaultAddress) {
+					const defaultAddressIndex = this.addressList.indexOf(defaultAddress);
+					this.addressList.splice(defaultAddressIndex, 1);
+					this.addressList.unshift(defaultAddress);
+				}
+
+
+			},
 			edit(row) {
-	
+
 				uni.setStorage({
 					key: 'address',
 					data: row,
@@ -160,13 +174,27 @@
 				if (!this.isSelect) {
 					return;
 				}
-				uni.setStorage({
-					key: 'selectAddress',
-					data: row,
-					success() {
-						uni.navigateBack();
-					}
-				})
+				if (row == null) {
+					uni.setStorage({
+						key: 'selectAddress',
+						data: row,
+						success() {
+							uni.navigateTo({
+								url: '/pages/order/confirmation'
+							})
+						}
+					})
+				} else {
+					uni.setStorage({
+						key: 'selectAddress',
+						data: row,
+						success() {
+							uni.navigateTo({
+								url: '/pages/order/confirmation'
+							})
+						}
+					})
+				}
 			}
 		}
 	}

@@ -99,5 +99,8 @@
                 }
             }
         }
+    },
+    "uniStatistics" : {
+        "version" : "2"
     }
 }
