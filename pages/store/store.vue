@@ -3,12 +3,21 @@
 		<uni-card padding="10upx 10upx" :is-full="true" class="store">
 			<template v-slot:title>
 				<uni-list>
-					<uni-section :title="store.name" type="line"></uni-section>
+					<uni-section :title="store.name" type="line">
+						<!-- <template v-slot:footer>
+							<image class="slot-image" :src="$base_url+store.img" mode="widthFix"></image>
+						</template> -->
+					</uni-section>
 				</uni-list>
 			</template>
 			<image :src="$base_url+store.img" mode="aspectFill" style="width: 100%;"></image>
+
 			<uni-list>
-				<uni-list-item :title="'联系电话:'+store.telephone" />
+				<view class="box" @tap="keep">
+					<view class="icon" :class="[isKeep?'shoucangsel':'shoucang']"></view>
+					<view class="text">{{isKeep?'已':''}}收藏</view>
+				</view>
+				<uni-list-item :title="'联系电话:'+store.telephone"></uni-list-item>
 				<uni-list-item :title="'地址:'+store.address" />
 				<uni-list-item title="简介" :note="store.description" />
 			</uni-list>
@@ -42,12 +51,20 @@
 
 <script>
 	import {
+		checkFavor,
+		addFavor,
+		deleteFavor
+	} from '@/api/favor';
+	import {
 		getById,
 		pageByStoreId
 	} from '../../api/store';
 	export default {
 		data() {
 			return {
+				isKeep: '',
+				favorId: '',
+				id: '',
 				goodsList: [],
 				loadingText: "正在加载...",
 				headerTop: "0px",
@@ -74,6 +91,9 @@
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
+
+			this.id = option.cid
+			this.checkFavor()
 			console.log(option.cid)
 			getById(option.cid).then((response) => {
 				this.store = response.data.data
@@ -119,6 +139,34 @@
 			})
 		},
 		methods: {
+			checkFavor() {
+				checkFavor(this.id, 3).then((response) => {
+					this.favorId = response.data.data.id
+					this.isKeep = true
+				}).catch((error) => {
+					this.isKeep = false
+
+				})
+			},
+			//收藏
+			keep() {
+
+
+				if (this.isKeep == true) {
+					deleteFavor(this.favorId).then((response) => {
+						this.isKeep = false
+						this.checkFavor()
+					})
+				} else if (this.isKeep == false) {
+					addFavor(this.id, 3).then((response) => {
+
+						this.isKeep = true
+						this.checkFavor()
+
+					})
+				}
+
+			},
 			//商品跳转
 			toGoods(e) {
 				uni.navigateTo({
@@ -194,6 +242,27 @@
 			font-size: 30upx;
 			width: 100%;
 			border-top: 1px solid rgba(0, 0, 0, 0.1);
+		}
+
+		.box {
+			width: 80upx;
+			height: 80upx;
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+
+			.icon {
+				font-size: 40upx;
+				color: #828282;
+			}
+
+			.text {
+				display: flex;
+				justify-content: center;
+				width: 100%;
+				font-size: 22upx;
+				color: #666;
+			}
 		}
 	}
 

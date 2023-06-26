@@ -259,13 +259,7 @@
 		},
 		onLoad(option) {
 			this.id = option.cid
-			checkFavor(option.cid, 1).then((response) => {
-				this.favorId = response.data.data.id
-				this.isKeep = true
-			}).catch((error) => {
-				this.isKeep = false
-				this.favorId = ''
-			})
+			this.checkFavor()
 			uni.setNavigationBarTitle({
 				title: option.breed
 			});
@@ -301,6 +295,15 @@
 			this.token = uni.getStorageSync('token')
 		},
 		methods: {
+			checkFavor() {
+				checkFavor(this.id, 1).then((response) => {
+					this.favorId = response.data.data.id
+					this.isKeep = true
+				}).catch((error) => {
+					this.isKeep = false
+
+				})
+			},
 			toStore() {
 				uni.navigateTo({
 					url: '/pages/store/store?cid=' + this.store.id
@@ -358,18 +361,18 @@
 			},
 			//收藏
 			keep() {
-				console.log(this.isKeep)
-				console.log(this.id)
-				console.log(this.favorId)
+
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
-						console.log('quxiaochenggong')
+
 						this.isKeep = false
+						this.checkFavor()
 					})
 				} else if (this.isKeep == false) {
 					addFavor(this.id, 1).then((response) => {
-						console.log('jiaruchenggong')
+
 						this.isKeep = true
+						this.checkFavor()
 					})
 				}
 			},
