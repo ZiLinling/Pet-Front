@@ -67,9 +67,7 @@ uni.addInterceptor('request', {
 			uni.removeStorageSync('token');
 			return config;
 		}
-		if (config.data.statusCode !== "200") {
-			return config.data;
-		}
+		return config
 	},
 	fail: function(error) {
 		return Promise.reject(error);
@@ -90,6 +88,9 @@ export function getRequest(url, params) {
 				"token": token
 			},
 			success: res => {
+				if (res.data.statusCode !== "200") {
+					reject(res.data);
+				}
 				resolve(res)
 			},
 			fail: err => {
@@ -111,6 +112,9 @@ export function postRequest(url, params) {
 				"token": token
 			},
 			success: res => {
+				if (res.data.statusCode !== "200") {
+					reject(res.data);
+				}
 				resolve(res)
 			},
 			fail: err => {
@@ -133,6 +137,9 @@ export function postJsonRequest(url, params) {
 				"token": token
 			},
 			success: res => {
+				if (res.data.statusCode !== "200") {
+					reject(res.data);
+				}
 				resolve(res)
 			},
 			fail: err => {

@@ -332,7 +332,6 @@
 				console.log(response.data.data)
 				this.favorId = response.data.data.id
 				this.isKeep = true
-
 			}).catch((error) => {
 				this.isKeep = false
 				this.favorId = ''
@@ -423,19 +422,24 @@
 			},
 			//收藏
 			keep() {
-				console.log(this.isKeep)
-				console.log(this.id)
-				console.log(this.favorId)
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
-
 						console.log('quxiaochenggong')
 						this.isKeep = false
+					}).catch((error)=>{
+										console.log(this.favorId)
+						console.log(error)
 					})
 				} else if (this.isKeep == false) {
 					addFavor(this.id, 2).then((response) => {
-						console.log('jiaruchenggong')
-						this.isKeep = true
+						checkFavor(option.cid, 2).then((response) => {
+							console.log(response.data.data)
+							this.favorId = response.data.data.id
+							this.isKeep = true
+						}).catch((error) => {
+							this.isKeep = false
+							this.favorId = ''
+						})
 					})
 				}
 			},
