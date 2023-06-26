@@ -174,7 +174,7 @@
 					icon: "none"
 				});
 				uni.navigateTo({
-					url: '../../login/login'
+					url: '/pages/user/login/login'
 				})
 				this.isfirst = false;
 			},

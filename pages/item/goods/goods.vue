@@ -323,20 +323,12 @@
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
-			console.log(option.cid); //打印出上个页面传递的参数。
+
 			this.getgoods(option.cid);
 
 			this.id = option.cid
 
-			checkFavor(option.cid, 2).then((response) => {
-				console.log(response.data.data)
-				this.favorId = response.data.data.id
-				this.isKeep = true
-
-			}).catch((error) => {
-				this.isKeep = false
-				this.favorId = ''
-			})
+			this.checkFavor()
 			this.getgoods(option.cid, option.name);
 
 		},
@@ -372,9 +364,20 @@
 			// 		console.log(response.data.data)
 			// 	})
 			// },
+			checkFavor() {
+				checkFavor(this.id, 2).then((response) => {
+					console.log(response.data.data)
+					this.favorId = response.data.data.id
+					this.isKeep = true
+
+				}).catch((error) => {
+					this.isKeep = false
+
+				})
+			},
 			toStore() {
 				uni.navigateTo({
-					url: '../store/store?cid=' + this.goodsData.storeId + '&storeName=' + this.goodsData.storeName
+					url: '/pages/store/store?cid=' + this.goodsData.storeId
 				})
 				console.log('商店跳转')
 			},
@@ -423,19 +426,18 @@
 			},
 			//收藏
 			keep() {
-				console.log(this.isKeep)
-				console.log(this.id)
-				console.log(this.favorId)
+
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
 
-						console.log('quxiaochenggong')
 						this.isKeep = false
+						this.checkFavor()
 					})
 				} else if (this.isKeep == false) {
 					addFavor(this.id, 2).then((response) => {
-						console.log('jiaruchenggong')
+
 						this.isKeep = true
+						this.checkFavor()
 					})
 				}
 			},
