@@ -142,7 +142,7 @@
 		<view class="swiper-box">
 			<swiper circular="true" autoplay="true" @change="swiperChange">
 				<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-					<image :src="swiper.img"></image>
+					<image :src="$base_url+swiper.img"></image>
 				</swiper-item>
 			</swiper>
 			<view class="indicator">{{currentSwiper+1}}/{{swiperList.length}}</view>
@@ -208,6 +208,7 @@
 					</view>
 				</view>
 			</view>
+
 			<image :src="$base_url+store.img" @tap="toStore" mode="aspectFill" style="width: 100%;"></image>
 		</view>
 		<!-- 详情 -->
@@ -257,19 +258,19 @@
 				//轮播主图数据
 				swiperList: [{
 						id: 1,
-						img: 'https://ae01.alicdn.com/kf/HTB1Mj7iTmzqK1RjSZFjq6zlCFXaP.jpg'
+						img: '/resource/pet/cat2.jpg'
 					},
 					{
 						id: 2,
-						img: 'https://ae01.alicdn.com/kf/HTB1fbseTmzqK1RjSZFLq6An2XXaL.jpg'
+						img: '/resource/pet/cat3.jpg'
 					},
 					{
 						id: 3,
-						img: 'https://ae01.alicdn.com/kf/HTB1dPUMThnaK1RjSZFtq6zC2VXa0.jpg'
+						img: '/resource/pet/cat6.jpg'
 					},
 					{
 						id: 4,
-						img: 'https://ae01.alicdn.com/kf/HTB1OHZrTXzqK1RjSZFvq6AB7VXaw.jpg'
+						img: '/resource/pet/cat5.jpg'
 					}
 				],
 				//轮播图下标

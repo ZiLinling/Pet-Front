@@ -2,7 +2,7 @@ import axios from 'axios'
 
 axios.defaults.timeout = 5000;
 
-export const base_url = "http://localhost:8090/Pet"
+export const base_url = "http://localhost:8090/Pet/"
 // export const base_url = "http://47.120.4.106:8090/Pet"
 
 //添加请求拦截器， 在请求头中加token
