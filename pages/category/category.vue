@@ -1,9 +1,5 @@
 <template>
 	<view>
-		<!-- 状态栏 -->
-		<view class="status" :style="{position:headerPosition}"></view>
-		<view class="header" :style="{position:headerPosition}">
-		</view>
 		<view class="category-list">
 			<!-- 左侧分类导航 -->
 			<scroll-view scroll-y="true" class="left">
@@ -25,7 +21,7 @@
 					</view>
 					<view class="list">
 						<view class="box" v-for="(box,i) in category.list" :key="i" @tap="toCategory(box)">
-							<image :src="'/static/img/pet/'+box.img"></image>
+							<image :src="$base_url+box.img"></image>
 							<view class="text">{{box.name}}</view>
 						</view>
 					</view>
@@ -99,7 +95,7 @@
 			toCategory(e) {
 				uni.setStorageSync('catName', e.name);
 				uni.navigateTo({
-					url: '/pages/goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name + '&specie=' + '0'
+					url: '/pages/item/list?cid=' + e.id + '&name=' + e.name + '&specie=' + '0'
 				});
 			},
 			//搜索跳转

@@ -1,37 +1,56 @@
 <template>
-	<view class="favor">
-		<view class="header">
-			<uni-row class="category">
-				<uni-col :span="8">
-					<view class="pets" @tap="showPets()">宠物</view>
-				</uni-col>
-				<uni-col :span="8">
-					<view class="pets" @tap="showGoods()">周边</view>
-				</uni-col>
-				<uni-col :span="8">
-					<view class="pets" @tap="showShops()">商店</view>
-				</uni-col>
-			</uni-row>
+	<view>
+		<!-- 状态栏 -->
+		<view v-if="showHeader" class="status"
+			:style="{ position: headerPosition,top:statusTop,opacity: afterHeaderOpacity}"></view>
+		<!-- 顶部导航栏 -->
+		<view v-if="showHeader" class="header"
+			:style="{ position: headerPosition,top:headerTop,opacity: afterHeaderOpacity }">
+			<!-- 搜索框 -->
+			<view class="input-box">
+				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" v-model="searchValue" />
+				<view class="icon search" @tap="toSearch()"></view>
+			</view>
 		</view>
+		<!-- 占位 -->
+		<view v-if="showHeader" class="place"></view>
+		<!-- 轮播图 -->
+		<view class="swiper">
+			<view class="swiper-box">
+				<swiper circular="true" autoplay="true" @change="swiperChange">
+					<swiper-item v-for="swiper in swiperList" :key="swiper.id">
+						<image :src="swiper.img"></image>
+					</swiper-item>
+				</swiper>
+				<view class="indicator">
+					<view class="dots" v-for="(swiper, index) in swiperList"
+						:class="[currentSwiper >= index ? 'on' : '']" :key="index"></view>
+				</view>
+			</view>
+		</view>
+		<!-- 商品分类 -->
+		<view class="category-list">
+			<view class="category" v-for="(row, index) in goodsCategory" :key="index" @tap="toGoodsCategory(row)">
+				<view class="img">
+					<image :src="$base_url+row.img"></image>
+				</view>
+				<view class="text">{{ row.name }}</view>
+			</view>
+		</view>
+
+		<!-- 周边商品列表 -->
 		<view class="goods-list">
+			<view class="title">
+				<image src="/static/img/hua.png"></image>
+				<image src="/static/img/hua.png"></image>
+			</view>
 			<view class="product-list">
-				<!-- 加载列表 -->
-				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
-					<image mode="aspectFill" :src="$base_url+product.etc.item.img"></image>
-					<view class="name">
-						<view class="productName" v-if="favNow==1">{{product.etc.item.etc.breed}}</view>
-						<view class="productName" v-if="favNow!=1">{{product.etc.item.name}}</view>
-					</view>
-					<view class="fav">
-						<uni-icons type="star-filled" size="25" color="red"
-							@tap.native.stop="cancelFav(product)"></uni-icons>
-					</view>
+				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+					<image mode="aspectFill" :src="$base_url+goods.img"></image>
+					<view class="name">{{ goods.name }}</view>
 					<view class="info">
-						<view class="petName" v-if="favNow==1">{{product.etc.item.name}}</view>
-						<view class="storeName" v-if="favNow==2">{{product.etc.item.etc.store}}</view>
-						<view class="price" v-if="favNow!=3">${{ product.etc.item.price }}</view>
-						<!-- 占位符 -->
-						<view class="place" v-if="favNow==3"></view>
+						<view class="store">{{goods.etc.storeName}}</view>
+						<view class="price">${{ goods.price }}</view>
 					</view>
 				</view>
 			</view>
@@ -41,33 +60,89 @@
 </template>
 
 <script>
+	var ttt = 0;
+	//高德SDK
+	// import amap from '@/common/SDK/amap-wx.js';
 	import {
-		getList,
-		deleteFavor,
-		addFavor
-	} from '../../../api/favor';
+		getGoodsList
+	} from '@/api/goods';
 	import {
 		base_url
 	} from '@/api/axios'
 	export default {
+		created() {
+			let this_ = this;
+			getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+				this.count1 = res.data.etc.total
+				for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+					this_.goodsList.push(res.data.data.records[i])
+				}
+			})
+			this.pageNum++;
+		},
 		data() {
 			return {
 				base_url: base_url,
+				bgColor: '#ffffff',
 				showHeader: true,
+				count1: 0,
+				pageNum: 1,
+				pageSize: 6,
+				category: 0,
+				searchValue: '',
+				key: "",
+				status: 1,
+				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
 				headerTop: null,
 				statusTop: null,
+				nVueTitle: null,
 				currentSwiper: 0,
-				check: true,
-				loadingText: '正在加载...',
-				productList: "",
-				favNow: 1, //当前收藏类型
-				pageSize: 6,
-				pageNum: 1,
-				count: 10,
-			}
-		},
+				goodsCategory: [{
+						id: 1,
+						name: '全部',
+						img: '/resource/goods/61.png'
+					},
+					{
+						id: 2,
+						name: '玩具',
+						img: '/resource/goods/62.png'
+					},
+					{
+						id: 3,
+						name: '保健品',
+						img: '/resource/goods/64.png'
+					},
+					{
+						id: 4,
+						name: '主粮',
+						img: '/resource/goods/63.png'
+					}
+				],
+				// 轮播图片
+				swiperList: [{
+						id: 1,
+						src: 'url1',
+						img: '/static/img/1.jpg'
+					},
+					{
+						id: 2,
+						src: 'url2',
+						img: '/static/img/2.jpg'
+					},
+					{
+						id: 3,
+						src: 'url3',
+						img: '/static/img/3.jpg'
+					},
+				],
 
+				Promotion: [],
+				//猜你喜欢列表
+				goodsList: [],
+				loadingText: '正在加载...'
+			};
+		},
 		onPageScroll(e) {
 			//兼容iOS端下拉时顶部漂移
 			this.headerPosition = e.scrollTop >= 0 ? "fixed" : "absolute";
@@ -82,97 +157,75 @@
 		},
 		//上拉加载，需要自己在page.json文件中配置"onReachBottomDistance"
 		onReachBottom() {
-			uni.showToast({
-				title: '触发上拉加载'
-			});
-			let len = this.productList.length;
-			if (len >= this.count) {
-				this.loadingText = '没有更多了';
+			let this_ = this
+			let len = this.goodsList.length;
+			if (len >= this.count1) {
+				this.loadingText = '没有商品了';
 				return false;
 			}
-			getList(this.pageNum++, this.pageSize, this.favNow).then((response) => {
-				console.log(response.data)
-				this.count = response.data.etc.total
-				let p = response.data.data
-				for (let i = 0; i < p.length; i++) {
-					this.productList.push(p[i])
-				}
-			})
+			if (this_.category == 0) {
+				getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+					this_.count1 = res.data.etc.total
+					for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+						this_.goodsList.push(res.data.data.records[i])
+					}
+				})
+			} else {
+				getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
+					this_.count1 = res.data.etc.total
+					for (let i = 0; i < res.data.data.records.length; i++) { //放入选择商品
+						this_.goodsList.push(res.data.data.records[i])
+					}
+				})
+			}
+			this_.pageNum++;
 		},
-		onLoad(param) {
-			this.favNow = param.type
-			getList(this.pageNum++, this.pageSize, this.favNow).then((response) => {
-				this.productList = response.data.data
-				if (this.productList.length < this.pageSize) {
-					this.loadingText = "没有更多了"
-				}
-			})
+		onLoad() {
+			// #ifdef APP-PLUS
+			this.showHeader = true;
+			this.statusHeight = plus.navigator.getStatusbarHeight();
+			// #endif
 		},
 		methods: {
-			refresh() {
-				location.reload()
+			//搜索跳转
+			toSearch() {
+				uni.navigateTo({
+					url: '/pages/item/goods/search/searchList?name=' + this.searchValue
+				});
 			},
 			//分类跳转
-			toCategory(e) {
-				//uni.showToast({title: e.name,icon:"none"});
-				uni.setStorageSync('catName', e.name);
-				uni.navigateTo({
-					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name
-				});
-			},
-			//商品跳转
-			toGoods(e) {
-				if (this.favNow == 1) {
-					uni.navigateTo({
-						url: '/pages/item/pet/pet?cid=' + e.etc.item.id + '&breed=' + e.etc.item.etc.breed
-					});
-				} else if (this.favNow == 2) {
-					uni.navigateTo({
-						url: '/pages/item/goods/goods?cid=' + e.etc.item.id
-					});
-				} else if (this.favNow == 3) {
-					uni.navigateTo({
-						url: '/pages/store/store?cid=' + e.etc.item.id
-
+			toGoodsCategory(e) {
+				let this_ = this
+				this.category = e.id - 1 //展示类别
+				this.pageNum = 1
+				this.goodsList = []
+				if (this_.category == 0) {
+					getGoodsList(this.pageNum, this.pageSize, this.key, this.key, this.status).then(res => {
+						this_.count1 = res.data.etc.total;
+						for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
+							this_.goodsList.push(res.data.data.records[i])
+						}
+					})
+				} else {
+					getGoodsList(this.pageNum, this.pageSize, this.key, this.category, this.status).then(res => {
+						this_.count1 = res.data.etc.total;
+						for (let i = 0; i < res.data.data.records.length; i++) { //放入选择商品
+							this_.goodsList.push(res.data.data.records[i])
+						}
 					})
 				}
+				this.pageNum++;
+			},
 
-			},
-			//加载数据
-			showPets() {
-				uni.redirectTo({
-					url: "/pages/user/favor/favor?type=1"
-				})
-			},
-			showGoods() {
-				uni.redirectTo({
-					url: "/pages/user/favor/favor?type=2"
-				})
-			},
-			showShops() {
-				uni.redirectTo({
-					url: "/pages/user/favor/favor?type=3"
-				})
-			},
-			cancelFav(e) { //取消收藏
-				console.log(e)
-				uni.showModal({
-					title: '取消收藏提示',
-					content: '你将取消这个收藏',
-					success: (res) => {
-						console.log(e.id)
-						if (res.confirm) {
-							deleteFavor(e.id).then((response) => {
-								this.refresh()
-								console.log('取消收藏成功');
-							})
-
-						} else if (res.cancel) {
-							console.log('用户点击取消');
-						}
-					}
+			//商品跳转
+			toGoods(e) {
+				uni.navigateTo({
+					url: '/pages/item/goods/goods?cid=' + e.id
 				});
-
+			},
+			//轮播图指示器
+			swiperChange(event) {
+				this.currentSwiper = event.detail.current;
 			}
 		}
 	};
@@ -180,7 +233,7 @@
 <style lang="scss">
 	page {
 		position: relative;
-		background-color: rgb(245, 245, 245);
+		background-color: #fff;
 	}
 
 	@font-face {
@@ -189,31 +242,6 @@
 	}
 
 
-	.header {
-
-		width: 90%;
-		margin-left: 5%;
-
-		.category {
-			background-color: #e65339;
-
-			height: 95upx;
-
-
-			.pets {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				text-align: center;
-				height: 95upx;
-				background-color: #fff;
-				color: #f06c7a;
-				// border: solid 1upx #dedede;
-			}
-
-
-		}
-	}
 
 	.status {
 		width: 100%;
@@ -227,15 +255,144 @@
 		/*  #endif  */
 	}
 
+	.header {
+		width: 92%;
+		padding: 0 4%;
+		height: 100upx;
+		display: flex;
+		align-items: center;
+		position: fixed;
+		top: 0;
+		z-index: 10;
+		background-color: #fff;
+
+		/*  #ifdef  APP-PLUS  */
+		top: var(--status-bar-height);
+		/*  #endif  */
+
+		.addr {
+			width: 120upx;
+			height: 60upx;
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			font-size: 28upx;
+
+			.icon {
+				height: 60upx;
+				margin-right: 5upx;
+				display: flex;
+				align-items: center;
+				font-size: 42upx;
+				color: #ffc50a;
+			}
+		}
+
+		.input-box {
+			width: 100%;
+			height: 60upx;
+			background-color: #f5f5f5;
+			border-radius: 30upx;
+			position: relative;
+			display: flex;
+			align-items: center;
+
+			.icon {
+				display: flex;
+				align-items: center;
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 60upx;
+				height: 60upx;
+				font-size: 34upx;
+				color: #c0c0c0;
+			}
+
+			input {
+				padding-left: 28upx;
+				height: 28upx;
+				font-size: 28upx;
+			}
+		}
+
+		.icon-btn {
+			width: 120upx;
+			height: 60upx;
+			flex-shrink: 0;
+			display: flex;
+
+			.icon {
+				width: 60upx;
+				height: 60upx;
+				display: flex;
+				justify-content: flex-end;
+				align-items: center;
+				font-size: 42upx;
+			}
+		}
+	}
 
 	.place {
 		background-color: #ffffff;
-		height: 40upx;
+		height: 100upx;
 		/*  #ifdef  APP-PLUS  */
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
 	}
 
+	.swiper {
+		width: 100%;
+		margin-top: 10upx;
+		display: flex;
+		justify-content: center;
+
+		.swiper-box {
+			width: 92%;
+			height: 30.7vw;
+
+			overflow: hidden;
+			border-radius: 15upx;
+			box-shadow: 0upx 8upx 25upx rgba(0, 0, 0, 0.2);
+			//兼容ios，微信小程序
+			position: relative;
+			z-index: 1;
+
+			swiper {
+				width: 100%;
+				height: 30.7vw;
+
+				swiper-item {
+					image {
+						width: 100%;
+						height: 30.7vw;
+					}
+				}
+			}
+
+			.indicator {
+				position: absolute;
+				bottom: 20upx;
+				left: 20upx;
+				background-color: rgba(255, 255, 255, 0.4);
+				width: 150upx;
+				height: 5upx;
+				border-radius: 3upx;
+				overflow: hidden;
+				display: flex;
+
+				.dots {
+					width: 0upx;
+					background-color: rgba(255, 255, 255, 1);
+					transition: all 0.3s ease-out;
+
+					&.on {
+						width: (100%/3);
+					}
+				}
+			}
+		}
+	}
 
 	.category-list {
 		width: 92%;
@@ -276,9 +433,102 @@
 
 
 
+	.promotion {
+		width: 92%;
+		margin: 0 4%;
+
+		.text {
+			width: 100%;
+			height: 60upx;
+			font-size: 34upx;
+			font-weight: 600;
+			margin-top: 15upx;
+		}
+
+		.list {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+
+			.column {
+				width: 43%;
+				padding: 15upx 3%;
+				background-color: #ebf9f9;
+				border-radius: 10upx;
+				overflow: hidden;
+				display: flex;
+				justify-content: space-between;
+				flex-wrap: wrap;
+
+				.top {
+					width: 100%;
+					height: 40upx;
+					display: flex;
+					align-items: center;
+					margin-bottom: 5upx;
+
+					.title {
+						font-size: 30upx;
+					}
+
+					.countdown {
+						margin-left: 20upx;
+						display: flex;
+						height: 40upx;
+						display: flex;
+						align-items: center;
+						font-size: 20upx;
+
+						view {
+							height: 30upx;
+							background-color: #f06c7a;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							color: #fff;
+							border-radius: 4upx;
+							margin: 0 4upx;
+							padding: 0 2upx;
+						}
+					}
+				}
+
+				.left {
+					width: 50%;
+					height: 18.86vw;
+					display: flex;
+					flex-wrap: wrap;
+					align-content: space-between;
+
+					.ad {
+						margin-top: 5upx;
+						width: 100%;
+						font-size: 22upx;
+						color: #acb0b0;
+					}
+
+					.into {
+						width: 100%;
+						font-size: 24upx;
+						color: #aaa;
+						margin-bottom: 5upx;
+					}
+				}
+
+				.right {
+					width: 18.86vw;
+					height: 18.86vw;
+
+					image {
+						width: 18.86vw;
+						height: 18.86vw;
+					}
+				}
+			}
+		}
+	}
 
 	.goods-list {
-		margin-top: 10px;
 
 		// background-color: #f4f4f4;
 		.title {
@@ -314,12 +564,7 @@
 			justify-content: space-between;
 			flex-wrap: wrap;
 
-			.cart {
-				float: right;
-			}
-
 			.product {
-				font-size: 5upx;
 				width: 48%;
 				border-radius: 20upx;
 				background-color: #fff;
@@ -331,34 +576,16 @@
 					border-radius: 20upx 20upx 0 0;
 				}
 
-				.fav {
-
-					float: right;
-				}
-
 				.name {
-					display: flex;
-					float: left;
-
+					width: 92%;
 					padding: 10upx 4%;
+					display: -webkit-box;
 					-webkit-box-orient: vertical;
-					-webkit-line-clamp: 2;
+					-webkit-line-clamp: 1;
 					text-align: justify;
+					overflow: hidden;
 					font-size: 30upx;
-
-					width: 60%;
-					// 限制长度	
-					// .productName {
-					// 	text-overflow: -o-ellipsis-lastline;
-					// 	overflow: hidden;
-					// 	text-overflow: ellipsis;
-					// 	display: -webkit-box;
-					// 	-webkit-line-clamp: 2; //可设置显示的行数
-					// 	line-clamp: 2;
-					// 	-webkit-box-orient: vertical;
-					// }
 				}
-
 
 				.info {
 					display: flex;
@@ -367,42 +594,17 @@
 					width: 92%;
 					padding: 10upx 4% 10upx 4%;
 
-					.store {
-						font-size: 10upx;
-						margin-left: 5px;
-					}
-
 					.price {
 						color: #e65339;
-						font-size: 30upx;
+						font-size: 28upx;
 						font-weight: 600;
-						margin-left: 50px;
 					}
 
-					.petName {
-						color: #807c87;
-						font-size: 30upx;
+					.store {
 						width: 100%;
+						color: #8b8b8b;
 						display: -webkit-box;
-						/** 对象作为伸缩盒子模型显示 **/
-						overflow: hidden;
-						word-break: break-all;
-						/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
-						text-overflow: ellipsis;
-						/* 超出部分省略号 */
-						-webkit-box-orient: vertical;
-						/** 设置或检索伸缩盒对象的子元素的排列方式 **/
-						-webkit-line-clamp: 1;
-						/** 显示的行数 **/
-					}
-
-					.storeName {
-
-						line-height: 10px;
-						color: #807c87;
-						font-size: 30upx;
-						width: 100%;
-						display: -webkit-box;
+						font-size: 28upx;
 						/** 对象作为伸缩盒子模型显示 **/
 						overflow: hidden;
 						word-break: break-all;
@@ -414,23 +616,6 @@
 						-webkit-line-clamp: 1;
 						/** 显示的行数 **/
 
-					}
-
-					.slogan {
-						color: #807c87;
-						font-size: 30upx;
-						width: 100%;
-						display: -webkit-box;
-						/** 对象作为伸缩盒子模型显示 **/
-						overflow: hidden;
-						word-break: break-all;
-						/* break-all(允许在单词内换行。) https://www.w3school.com.cn/cssref/pr_word-break.asp*/
-						text-overflow: ellipsis;
-						/* 超出部分省略号 */
-						-webkit-box-orient: vertical;
-						/** 设置或检索伸缩盒对象的子元素的排列方式 **/
-						-webkit-line-clamp: 1;
-						/** 显示的行数 **/
 					}
 				}
 			}

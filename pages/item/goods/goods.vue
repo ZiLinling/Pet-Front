@@ -142,7 +142,7 @@
 		<view class="swiper-box">
 			<swiper circular="true" autoplay="true" @change="swiperChange">
 				<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-					<image :src="swiper.img"></image>
+					<image :src="$base_url+swiper.img"></image>
 				</swiper-item>
 			</swiper>
 			<view class="indicator">{{currentSwiper+1}}/{{swiperList.length}}</view>
@@ -208,6 +208,7 @@
 					</view>
 				</view>
 			</view>
+
 			<image :src="$base_url+store.img" @tap="toStore" mode="aspectFill" style="width: 100%;"></image>
 		</view>
 		<!-- 详情 -->
@@ -262,19 +263,19 @@
 				//轮播主图数据
 				swiperList: [{
 						id: 1,
-						img: 'https://ae01.alicdn.com/kf/HTB1Mj7iTmzqK1RjSZFjq6zlCFXaP.jpg'
+						img: '/resource/pet/cat2.jpg'
 					},
 					{
 						id: 2,
-						img: 'https://ae01.alicdn.com/kf/HTB1fbseTmzqK1RjSZFLq6An2XXaL.jpg'
+						img: '/resource/pet/cat3.jpg'
 					},
 					{
 						id: 3,
-						img: 'https://ae01.alicdn.com/kf/HTB1dPUMThnaK1RjSZFtq6zC2VXa0.jpg'
+						img: '/resource/pet/cat6.jpg'
 					},
 					{
 						id: 4,
-						img: 'https://ae01.alicdn.com/kf/HTB1OHZrTXzqK1RjSZFvq6AB7VXaw.jpg'
+						img: '/resource/pet/cat5.jpg'
 					}
 				],
 				//轮播图下标
@@ -330,14 +331,7 @@
 			//option为object类型，会序列化上个页面传递的参数
 			this.getgoods(option.cid);
 			this.id = option.cid
-			checkFavor(option.cid, 2).then((response) => {
-				this.favorId = response.data.data.id
-				this.isKeep = true
-
-			}).catch((error) => {
-				this.isKeep = false
-				this.favorId = ''
-			})
+			this.checkFavor()
 			this.getgoods(option.cid, option.name);
 
 		},
@@ -367,9 +361,22 @@
 
 		},
 		methods: {
+
+			checkFavor() {
+				checkFavor(this.id, 2).then((response) => {
+					console.log(response.data.data)
+					this.favorId = response.data.data.id
+					this.isKeep = true
+
+				}).catch((error) => {
+					this.isKeep = false
+
+				})
+			},
+
 			toStore() {
 				uni.navigateTo({
-					url: '../store/store?cid=' + this.goodsData.storeId + '&storeName=' + this.goodsData.storeName
+					url: '/pages/store/store?cid=' + this.goodsData.storeId
 				})
 			
 			},
@@ -424,17 +431,15 @@
 			},
 			//收藏
 			keep() {
-				
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
-
-						
 						this.isKeep = false
+						this.checkFavor()
 					})
 				} else if (this.isKeep == false) {
 					addFavor(this.id, 2).then((response) => {
-						
 						this.isKeep = true
+						this.checkFavor()
 					})
 				}
 			},
