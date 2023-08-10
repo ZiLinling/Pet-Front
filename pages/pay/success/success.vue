@@ -27,8 +27,9 @@
 		},
 		methods: {
 			toUser() {
+				console.log('111')
 				uni.switchTab({
-					url: '/pages/tabBar/user'
+					 url: "/pages/tabBar/user/user",
 				});
 			}
 		},

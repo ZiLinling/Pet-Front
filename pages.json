@@ -257,8 +257,16 @@
 				"navigationBarTitleText": "附近商店",
 				"enablePullDownRefresh": false
 			}
-		}
-	],
+		}, {
+            "path" : "pages/user/bank_card/bank_card",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "银行卡",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "",

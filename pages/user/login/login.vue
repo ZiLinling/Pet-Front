@@ -47,6 +47,7 @@
 					account: this.account,
 					password: md5(md5(this.password))
 				}).then((response) => {
+					console.log(response)
 					uni.setStorageSync("token", response.data.data)
 					uni.navigateBack({
 						// url: "/pages/tabBar/user/user",
@@ -55,6 +56,7 @@
 						}
 					})
 				}).catch((error) => {
+					console.log(error)
 					uni.showToast({
 						title: error.message,
 						icon: "none"

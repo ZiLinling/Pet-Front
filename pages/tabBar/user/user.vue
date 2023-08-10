@@ -121,7 +121,7 @@
 						img: '/static/img/user/security.png'
 					},
 					{
-						url: '',
+						url: '/pages/user/bank_card/bank_card',
 						text: '银行卡',
 						img: '/static/img/user/bank.png'
 					},
@@ -191,6 +191,7 @@
 					});
 					return;
 				}
+				console.log(url)
 				uni.navigateTo({
 					url: url
 				})

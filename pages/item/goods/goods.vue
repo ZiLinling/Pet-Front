@@ -224,6 +224,10 @@
 
 <script>
 	import {
+		saveMsg
+	}
+	from '@/api/msg';
+	import {
 		save
 	} from '@/api/cart';
 	import {
@@ -238,6 +242,7 @@
 		getById
 	}
 	from '@/api/store';
+	
 	export default {
 		data() {
 			return {
@@ -323,13 +328,9 @@
 			this.showBack = false;
 			// #endif
 			//option为object类型，会序列化上个页面传递的参数
-			console.log(option.cid); //打印出上个页面传递的参数。
 			this.getgoods(option.cid);
-
 			this.id = option.cid
-
 			checkFavor(option.cid, 2).then((response) => {
-				console.log(response.data.data)
 				this.favorId = response.data.data.id
 				this.isKeep = true
 
@@ -366,28 +367,19 @@
 
 		},
 		methods: {
-			// getStore(){
-			// 	console.log("storeId",this.goodsData)
-			// 	getById({id:this.goodsData.storeId}).then((response)=>{
-			// 		console.log(response.data.data)
-			// 	})
-			// },
 			toStore() {
 				uni.navigateTo({
 					url: '../store/store?cid=' + this.goodsData.storeId + '&storeName=' + this.goodsData.storeName
 				})
-				console.log('商店跳转')
+			
 			},
 			getgoods(goodsId, storeName) {
-				//先设置好id为1把数据弄好
 				getGoods({
 					id: goodsId
 				}).then((response) => {
 					this.goodsData = response.data.data;
 					this.num = 1;
-					console.log("this.goodsData", this.goodsData)
 					getById(this.goodsData.storeId).then((response) => {
-						console.log("store", response.data.data)
 						this.goodsData.storeName = storeName;
 						this.store = response.data.data
 					})
@@ -407,8 +399,17 @@
 			},
 			// 客服
 			toChat() {
+				//add
+				saveMsg({
+					type:0,
+					recipient:this.store.id
+				}).then((response) => {
+					console.log(response)
+				}).catch((error) => {
+					console.log(error)
+				})
 				uni.navigateTo({
-					url: "../msg/chat/chat?name=客服008"
+					url: "/pages/msg/chat/chat?recipient"+this.store.id
 				})
 			},
 			// 分享
@@ -423,18 +424,16 @@
 			},
 			//收藏
 			keep() {
-				console.log(this.isKeep)
-				console.log(this.id)
-				console.log(this.favorId)
+				
 				if (this.isKeep == true) {
 					deleteFavor(this.favorId).then((response) => {
 
-						console.log('quxiaochenggong')
+						
 						this.isKeep = false
 					})
 				} else if (this.isKeep == false) {
 					addFavor(this.id, 2).then((response) => {
-						console.log('jiaruchenggong')
+						
 						this.isKeep = true
 					})
 				}
@@ -466,7 +465,7 @@
 
 				this.goodsData.num = this.num
 				uni.setStorage({
-					key: 'petOrder',
+					key: 'goodsOrder',
 					data: this.goodsData,
 					success: function() {
 						uni.navigateTo({
@@ -557,10 +556,8 @@
 					this.specClass =null;
 					    return; // 直接返回
 				}
-				 this.specClass = 'hide';
-				console.log('没有reuturn')
+				 this.specClass = 'hide';			
 				if (this.token == '') {
-					console.log("token为空")
 					uni.showToast({
 						title: '请先登录',
 						icon: 'none'

@@ -16,344 +16,545 @@
 					</view>
 				</view>
 				<view class="row" v-for="(row,index) in list" :key="index">
-					<view class="type">{{typeText[row.type]}}</view>
-					<view class="order-info">
-						<view class="left">
-							<image :src="row.img"></image>
-						</view>
-						<view class="right">
-							<view class="name">
-								{{row.name}}
+					<view class="status">{{typeText[2]}}</view>
+					
+					
+					<view class="store">
+						<image :src="$base_url+row.img"></image>
+							{{row.name}}
+						
+					</view>
+					<!-- row是商店，商店下面的商品~ -->
+					<view class="" v-for="(item,no) in row.etc.orderItems" :key="no">
+
+
+						<view class="order-info">
+							<view class="left">
+								<image :src="$base_url+item.etc.img"></image>
 							</view>
-							<view class="spec">{{row.spec}}</view>
-							<view class="price-number">
-								￥<view class="price">{{row.price}}</view>
-								x<view class="number">{{row.numner}}</view>
+							<view class="right">
+								<view class="name">
+									{{item.etc.name}}
+								</view>
+								<view class="price-number">
+									￥<view class="price">{{item.price}}</view>
+									x<view class="number">{{item.num}}</view>
+								</view>
 							</view>
 						</view>
 						
+						<!-- 这边需要一个分割线 -->
 					</view>
+					
+					<view class="time">
+						订单生成时间：{{row.etc.time}}
+					</view>
+					
 					<view class="detail">
-						<view class="number">共{{row.numner}}件商品</view><view class="sum">合计￥<view class="price">{{row.payment}}</view></view><view class="nominal">(含运费 ￥{{row.freight}})</view>
+						<view class="number">共{{row.etc.num}}件商品</view>
+						<view class="sum">合计￥<view class="price">{{row.etc.price}}</view>
+						</view>
+						<!-- <view class="nominal">(含运费 ￥{{item.freight}})</view> -->
 					</view>
+					
 					<view class="btns">
-						<block v-if="row.type=='unpaid'"><view class="default" @tap="cancelOrder(row)">取消订单</view><view class="pay" @tap="toPayment(row)">付款</view></block>
-						<block v-if="row.type=='back'"><view class="default" @tap="remindDeliver(row)">提醒发货</view></block>
-						<block v-if="row.type=='unreceived'"><view class="default" @tap="showLogistics(row)">查看物流</view><view class="pay">确认收货</view><view class="pay">我要退货</view></block>
-						<block v-if="row.type=='received'"><view class="default">评价</view><view class="default">再次购买</view></block>
-						<block v-if="row.type=='completed'"><view class="default">再次购买</view></block>
-						<block v-if="row.type=='refunds'"><view class="default">查看进度</view></block>
-						<block v-if="row.type=='cancelled'"><view class="default">已取消</view></block>
+						<block v-if="row.etc.order_status=='1'">
+							<view class="default" @tap="cancelOrder(row)">取消订单</view>
+							<view class="pay" @tap="toPayment(row)">付款</view>
+						</block>
+						<block v-if="row.etc.order_status=='2'">
+							<view class="default" @tap="remindDeliver(row)">提醒发货</view>
+						</block>
+						<block v-if="row.etc.order_status=='3'">
+							<view class="default" @tap="showLogistics(row)">查看物流</view>
+							<view class="pay" @tap="confirm(row)">确认收货</view>
+							<view class="pay">我要退货</view>
+						</block>
+						<block v-if="row.etc.order_status=='4'">
+							<view class="default">评价</view>
+							<view class="default">再次购买</view>
+						</block>
+						<block v-if="row.etc.order_status=='5'">
+							<view class="default">再次购买</view>
+						</block>
+						<block v-if="row.etc.order_status=='6'">
+							<view class="default">查看进度</view>
+						</block>
+						<block v-if="row.etc.order_status=='7'">
+							<view class="default">已取消</view>
+						</block>
 					</view>
 				</view>
 			</view>
 		</view>
 	</view>
+	</view>
 </template>
 <script>
+	import {
+		listOrderItem,
+		toPay,
+		cancelOrderItem,
+		confirm
+	} from '@/api/orderItem'
 	export default {
 		data() {
 			return {
-				headerPosition:"fixed",
-				headerTop:"0px",
-				typeText:{
-					unpaid:'等待付款',
-					back:'等待商家发货',
-					unreceived:'商家已发货',
-					received:'等待用户评价',
-					completed:'交易已完成',
-					refunds:'商品退货处理中',
-					cancelled:'订单已取消'
+				num: 1,
+				headerPosition: "fixed",
+				headerTop: "0px",
+				typeText: {
+					0: '等待付款',
+					1: '等待商家发货',
+					2: '商家已发货',
+					3: '等待用户评价',
+					4: '交易已完成',
+					5: '商品退货处理中',
+					5: '订单已取消'
 				},
-				orderType: ['全部','待付款','待发货','待收货','待评价','退换货'],
+				orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货'],
+				orders: [],
 				//订单列表 演示数据
-				orderList:[
-					[
-						{ type:"unpaid",ordersn:0,goods_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"unpaid",ordersn:1,goods_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"back",ordersn:2,goods_id: 1, img: '/static/img/goods/p3.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"unreceived",ordersn:3,goods_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"received",ordersn:4,goods_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"completed",ordersn:5,goods_id: 1, img: '/static/img/goods/p6.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"refunds",ordersn:6,goods_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"cancelled",ordersn:7,goods_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 }
+				orderList: [
+					[ //0
+						// { status:"unpaid",id:0,item_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"unpaid",id:1,item_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"back",id:2,item_id: 1, img: '/static/img/goods/p3.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"unreceived",id:3,item_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"received",id:4,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"completed",id:5,item_id: 1, img: '/static/img/goods/p6.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
+						// { status:"refunds",id:6,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 },
+						// { status:"cancelled",id:7,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
 					],
-					[
-						{ type:"unpaid",ordersn:0,goods_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 },
-						{ type:"unpaid",ordersn:1,goods_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 }
+					[ //1
+						// { status:"unpaid",id:0,item_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 },
+						// { status:"unpaid",id:1,item_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
 					],
-					[
-						//无
+					[ //2
+						// { status:"back",id:2,item_id: 1, img: '/static/img/goods/p3.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
 					],
-					[
-						{ type:"unreceived",ordersn:3,goods_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 }
+					[ //3
+						// { status:"unreceived",id:3,item_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
 					],
-					[
-						{ type:"received",ordersn:4,goods_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 }
+					[ //4
+						// { status:"received",id:4,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
 					],
-					[
-						{ type:"refunds",ordersn:6,goods_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,spec:'规格:S码',numner:1 }
+					[ //5
+						// { status:"refunds",id:6,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
+					],
+					[ //6
+
+					],
+					[ //7
+
 					]
-					
+
 				],
-				list:[],
-				tabbarIndex:0
+				list: [],
+				tabbarIndex: 0
 			};
 		},
+
 		onLoad(option) {
-			//option为object类型，会序列化上个页面传递的参数
-			console.log("option: " + JSON.stringify(option));
-			let tbIndex = parseInt(option.tbIndex)+1;
+			this.getList()
+
+			//option为object类型，会序列化上个页面传递的参数		
+			let tbIndex = parseInt(option.tbIndex) + 1;
 			this.list = this.orderList[tbIndex];
 			this.tabbarIndex = tbIndex;
 			//兼容H5下排序栏位置
 			// #ifdef H5
-				let Timer = setInterval(()=>{
-					let uniHead = document.getElementsByTagName('uni-page-head');
-					if(uniHead.length>0){
-						this.headerTop = uniHead[0].offsetHeight+'px';
-						clearInterval(Timer);//清除定时器
-					}
-				},1);
+			let Timer = setInterval(() => {
+				let uniHead = document.getElementsByTagName('uni-page-head');
+				if (uniHead.length > 0) {
+					this.headerTop = uniHead[0].offsetHeight + 'px';
+					clearInterval(Timer); //清除定时器
+				}
+			}, 1);
 			// #endif
 		},
-		onPageScroll(e){
+		onPageScroll(e) {
 			return;
 			//兼容iOS端下拉时顶部漂移
-			this.headerPosition = e.scrollTop>=0?"fixed":"absolute";
+			this.headerPosition = e.scrollTop >= 0 ? "fixed" : "absolute";
 		},
 		methods: {
-			showType(tbIndex){
+			getList() {
+				this.orderList = [
+					[],
+					[],
+					[],
+					[],
+					[],
+					[],
+					[],
+					[]
+				];
+				console.log("更新了 " + this.num + " 次")
+				listOrderItem().then((response) => {
+					this.orders = response.data.data;
+					for (let i = this.orders.length-1; i >=0 ; i--) {
+						let stores = this.orders[i].etc.stores
+						console.log(i, stores)
+						for (let j = stores.length-1; j>=0 ; j--) {
+							let store = stores[j]
+							this.orderList[0].push(store)
+							this.orderList[store.etc.order_status].push(store)
+						}
+					}
+					this.orderList[0].
+					console.log("new", this.orderList)
+					this.num++;
+				}).catch((error) => {
+					console.log(error)
+				})
+			},
+			showType(tbIndex) {
 				this.tabbarIndex = tbIndex;
 				this.list = this.orderList[tbIndex];
 			},
-			showLogistics(row){
-				
+			showLogistics(row) {
+
 			},
-			remindDeliver(row){
+			remindDeliver(row) {
 				uni.showToast({
-					title:'已提醒商家发货'
+					title: '已提醒商家发货'
 				})
 			},
-			cancelOrder(row){
+			cancelOrder(row) {
 				uni.showModal({
 					title: '取消订单',
 					content: '确定取消此订单？',
-					success: (res)=>{
+					success: (res) => {
 						if (res.confirm) {
-							console.log('用户点击确定');
-							this.doCancelOrder(row.ordersn);
+							this.doCancelOrder(row);
 						} else if (res.cancel) {
 							console.log('用户点击取消');
 						}
 					}
 				});
 			},
-			doCancelOrder(ordersn){
+			doCancelOrder(row) {
 				let typeNum = this.orderList.length;
-				for(let i=0;i<typeNum;i++){
-					let list = this.orderList[i];
-					let orderNum = list.length;
-					if(orderNum>0 && list[0].type=='unpaid'){
-						for(let j=0;j<orderNum;j++){
-							if(this.orderList[i][j].ordersn == ordersn){
-								this.orderList[i][j].type = 'cancelled';
-								break;
-							}
-						}
-					}
-					
+				let items=row.etc.orderItems
+				let ids=items[0].id;
+				for(let i=1;i<items.length;i++){
+					ids += ","+items[i].id
 				}
+				cancelOrderItem({
+					ids
+				}).then((response) => {
+					this.getList()
+					
+					this.list = this.orderList[1];
+					this.tabbarIndex = 1;
+				}).catch((error) => {
+					console.log(error)
+				})
+
 			},
-			toPayment(row){
+			toPayment(row) {
 				//本地模拟订单提交UI效果
 				uni.showLoading({
-					title:'正在获取订单...'
+					title: '正在获取订单...'
 				})
-				let paymentOrder = [];
-				paymentOrder.push(row);
-				setTimeout(()=>{
-					uni.setStorage({
-						key:'paymentOrder',
-						data:paymentOrder,
-						success: () => {
-							uni.hideLoading();
-							uni.navigateTo({
-								url:'../../pay/payment/payment?amount='+row.payment
+				let items=row.etc.orderItems
+				console.log("222",items)
+				let ids=items[0].id;
+				for(let i=1;i<items.length;i++){
+					ids += ","+items[i].id
+				}
+				console.log("ids",ids)
+				toPay({
+					ids:ids
+				}).then((response) => {
+					uni.showToast({
+						title: '付款成功'
+					})
+					this.getList()
+					
+					//option为object类型，会序列化上个页面传递的参数		
+					this.list = this.orderList[1];
+					this.tabbarIndex = 1;
+				}).catch((error) => {
+					console.log(error)
+				})
+				
+				
+				// 跳转到付款页面(暂时不要)
+				// let paymentOrder = [];
+				// paymentOrder.push(row);
+				// setTimeout(() => {
+				// 	uni.setStorage({
+				// 		key: 'paymentOrder',
+				// 		data: paymentOrder,
+				// 		success: () => {
+				// 			uni.hideLoading();
+				// 			uni.navigateTo({
+				// 				url: '../../pay/payment/payment?amount=' + row.price * row.num
+				// 			})
+				// 		}
+				// 	})
+				// }, 500)
+			},
+			confirm(row) {
+				console.log(row)
+				let items=row.etc.orderItems
+				let ids=items[0].id;
+				for(let i=1;i<items.length;i++){
+					ids += ","+items[i].id
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否确认订单？',
+					confirmText: '确定',
+					cancelText: '取消',
+					success: (res) => {
+						if (res.confirm) {
+							confirm({
+								ids
+							}).then((response) => {
+								this.getList()
+								this.list = this.orderList[3];
+								this.tabbarIndex = 3;
+							}).catch((error) => {
+								console.log(error)
 							})
 						}
-					})
-				},500)
+					},
+					fail: (error) => {
+						console.log(error)
+					}
+				});
+
+
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
-page{
-	background-color: #f3f3f3;
-}
-.topTabBar{
-	width: 100%;
-	position: fixed;
-	top: 0;
-	z-index: 10;
-	background-color: #f8f8f8;
-	height: 80upx;
-	display: flex;
-	justify-content: space-around;
-	.grid{
-		width: 20%;
+	page {
+		background-color: #f3f3f3;
+	}
+
+	.topTabBar {
+		width: 100%;
+		position: fixed;
+		top: 0;
+		z-index: 10;
+		background-color: #f8f8f8;
 		height: 80upx;
 		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: #444;
-		font-size: 28upx;
-		.text{
-			height: 76upx;
-			display: flex;
-			align-items: center;
-			&.on{
-				color: #f06c7a;
-				border-bottom: solid 4upx #f06c7a;
-			}
-		}
-		
-	}
-}
-.order-list{
-	margin-top: 80upx;
-	padding-top: 20upx;
-	width: 100%;
-	.list{
-		width: 94%;
-		margin: 0 auto;
-		.onorder{
-			width: 100%;
-			height: 50vw;
+		justify-content: space-around;
+
+		.grid {
+			width: 20%;
+			height: 80upx;
 			display: flex;
 			justify-content: center;
-			align-content: center;
-			flex-wrap: wrap;
-			image{
-				width: 20vw;
-				height: 20vw;
-				border-radius: 100%;
+			align-items: center;
+			color: #444;
+			font-size: 28upx;
+
+			.text {
+				height: 76upx;
+				display: flex;
+				align-items: center;
+
+				&.on {
+					color: #f06c7a;
+					border-bottom: solid 4upx #f06c7a;
+				}
 			}
-			.text{
+
+		}
+	}
+
+	.order-list {
+		margin-top: 80upx;
+		padding-top: 20upx;
+		width: 100%;
+
+		.list {
+			width: 94%;
+			margin: 0 auto;
+
+			.onorder {
 				width: 100%;
-				height: 60upx;
-				font-size: 28upx;
-				color: #444;
+				height: 50vw;
 				display: flex;
 				justify-content: center;
-				align-items: center;
-			}
-		}
-		.row{
-			width: calc(100% - 40upx);
-			padding: 10upx 20upx;
-			border-radius: 10upx;
-			background-color: #fff;
-			margin-bottom: 20upx;
-			.type{
-				font-size: 26upx;
-				color: #ec652f;
-				height: 50upx;
-				display: flex;
-				align-items: center;
-			}
-			.order-info{
-				width: 100%;
-				display: flex;
-				.left{
-					flex-shrink: 0;
-					width: 25vw;
-					height: 25vw;
-					image{
-						width: 25vw;
-						height: 25vw;
-						border-radius: 10upx;
-					}
-				}
-				.right{
-					width: 100%;
-					margin-left: 10upx;
-					position: relative;
-					.name{
-						width: 100%;
-						font-size: 28upx;
-						display: -webkit-box;
-						-webkit-box-orient: vertical;
-						-webkit-line-clamp: 2;
-						overflow: hidden;
-					}
-					.spec{
-						color: #a7a7a7;
-						font-size: 22upx;
+				align-content: center;
+				flex-wrap: wrap;
 
-					}
-					.price-number{
-						position: absolute;
-						bottom: 0;
-						width: 100%;
-						display: flex;
-						justify-content: flex-end;
-						font-size: 22upx;
-						color: #333;
-						display: flex;
-						align-items: flex-end;
-						.price{
-							font-size: 24upx;
-							margin-right: 5upx;
-						}
-						
-					}
+				image {
+					width: 20vw;
+					height: 20vw;
+					border-radius: 100%;
 				}
-			}
-			.detail{
-				display: flex;
-				justify-content: flex-end;
-				align-items: flex-end;
-				height: 60upx;
-				font-size: 26upx;
-				.sum{
-					padding: 0 8upx;
-					display: flex;
-					align-items: flex-end;
-					.price{
-						font-size: 30upx;
-					}
-				}
-				
-			}
-			.btns{
-				height: 80upx;
-				display: flex;
-				align-items: center;
-				justify-content: flex-end;
-				view{
-					min-width: 120upx;
-					height: 50upx;
-					padding: 0 20upx;
-					border-radius: 50upx;
+
+				.text {
+					width: 100%;
+					height: 60upx;
+					font-size: 28upx;
+					color: #444;
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					font-size: 28upx;
-					margin-left: 20upx;
 				}
-				.default{
-					border: solid 1upx #ccc;
-					color: #666;
+			}
+
+			.row {
+				width: calc(100% - 40upx);
+				padding: 10upx 20upx;
+				border-radius: 10upx;
+				background-color: #fff;
+				margin-bottom: 20upx;
+
+				.store{
+					margin-bottom: 5upx;
+					image{
+						border-radius: 50%;
+						width: 40upx;
+						height: 40upx;
+					}
+					
+					display: flex;
+					align-items: center; 
 				}
-				.pay{
-					border: solid 1upx #ec652f;
+
+				.status {
+					font-size: 26upx;
 					color: #ec652f;
+					height: 50upx;
+					display: flex;
+					align-items: center;
+				}
+				
+				.time{
+					margin-bottom:10upx ;
+					font-size: 10upx;
+					color:#cac9c9;
+				}
+				
+				.order-info {
+					width: 100%;
+					display: flex;
+
+					.left {
+						flex-shrink: 0;
+						width: 25vw;
+						height: 25vw;
+
+						image {
+							width: 25vw;
+							height: 25vw;
+							border-radius: 10upx;
+						}
+					}
+
+					.right {
+						width: 100%;
+						margin-left: 10upx;
+						position: relative;
+
+						.name {
+							width: 100%;
+							font-size: 28upx;
+							display: -webkit-box;
+							-webkit-box-orient: vertical;
+							-webkit-line-clamp: 2;
+							overflow: hidden;
+						}
+
+						.price-number {
+							position: absolute;
+							bottom: 0;
+							width: 100%;
+							display: flex;
+							justify-content: flex-end;
+							font-size: 22upx;
+							color: #333;
+							display: flex;
+							align-items: flex-end;
+
+							.price {
+								font-size: 24upx;
+								margin-right: 5upx;
+							}
+
+						}
+					}
+				}
+
+				.price-number {
+					position: absolute;
+					bottom: 0;
+					width: 100%;
+					display: flex;
+					justify-content: flex-end;
+					font-size: 22upx;
+					color: #333;
+					display: flex;
+					align-items: flex-end;
+
+					.price {
+						font-size: 24upx;
+						margin-right: 5upx;
+					}
+
+				}
+
+				.detail {
+					padding-bottom: 10upx;
+					display: flex;
+					justify-content: flex-end;
+					align-items: flex-end;
+					height: 40upx;
+					font-size: 26upx;
+
+					.sum {
+						padding: 0 8upx;
+						display: flex;
+						align-items: flex-end;
+
+						.price {
+							font-size: 30upx;
+						}
+					}
+
+				}
+
+				.btns {
+					height: 80upx;
+					display: flex;
+					align-items: center;
+					justify-content: flex-end;
+
+					view {
+						min-width: 120upx;
+						height: 50upx;
+						padding: 0 20upx;
+						border-radius: 50upx;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						font-size: 28upx;
+						margin-left: 20upx;
+					}
+
+					.default {
+						border: solid 1upx #ccc;
+						color: #666;
+					}
+
+					.pay {
+						border: solid 1upx #ec652f;
+						color: #ec652f;
+					}
 				}
 			}
 		}
 	}
-}
 </style>

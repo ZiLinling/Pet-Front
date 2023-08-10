@@ -2,36 +2,41 @@
 	<view>
 		<view class="content" @touchstart="hideEmoji">
 			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView">
-				<view class="row" v-for="(row,index) in msgList" :key="index" :id="'msg'+row.id">
+				<view class="row" v-for="(row,index) in chatList" :key="index" :id="'msg'+row.id">
 					<!-- 自己发出的消息 -->
-					<view class="my" v-if="row.uid==myuid">
-						<view class="left">
-							<view v-if="row.type=='text'" class="bubble">
-								<rich-text :nodes="row.msg.content"></rich-text>
-							</view>
-							<view v-if="row.type=='voice'" class="bubble voice" @tap="playVoice(row)" :class="playMsgid == row.id?'play':''">
-								<view class="length">{{row.msg.length}}</view>
-								<view class="icon my-voice"></view>
-							</view>
-							<view v-if="row.type=='img'" class="bubble img" @tap="showPic(row)">
-								<image :src="row.msg.url" :style="{'width': row.msg.w+'px','height': row.msg.h+'px'}"></image>
-							</view>
-						</view>
+					
+					<view class="my" v-if="row.userId==myuid">
+						
+					  <view class="left">
+					  <view class="username">
+					     <view class="time">{{row.time}}</view> <view class="name">{{row.username}}</view>
+					   </view>
+					    <view v-if="row.type=='text'" class="bubble">
+					      <rich-text :nodes="row.msg"></rich-text>
+					    </view>
+					    <view v-if="row.type=='voice'" class="bubble voice" @tap="playVoice(row)" :class="playMsgid == row.id?'play':''">
+					      <view class="length">{{row.msg.length}}</view>
+					      <view class="icon my-voice"></view>
+					    </view>
+					    <view v-if="row.type=='img'" class="bubble img" @tap="showPic(row)">
+					      <image :src="row.msg.url" :style="{'width': row.msg.w+'px','height': row.msg.h+'px'}"></image>
+					    </view>
+					  </view>
 						<view class="right">
-							<image :src="row.face"></image>
+							<image :src="$base_url+row.face" class="img"></image>
 						</view>
 					</view>
 					<!-- 别人发出的消息 -->
-					<view class="other" v-if="row.uid!=myuid">
+					<view class="other" v-if="row.userId!=myuid">
 						<view class="left">
-							<image :src="row.face"></image>
+							<image :src="$base_url+row.face" class="img"></image>
 						</view>
 						<view class="right">
 							<view class="username">
 								<view class="name">{{row.username}}</view> <view class="time">{{row.time}}</view>
 							</view>
 							<view v-if="row.type=='text'" class="bubble">
-								<rich-text :nodes="row.msg.content"></rich-text>
+								<rich-text :nodes="row.msg"></rich-text>
 							</view>
 							<view v-if="row.type=='voice'" class="bubble voice" @tap="playVoice(row)" :class="playMsgid == row.id?'play':''">
 								<view class="icon other-voice"></view>
@@ -102,17 +107,24 @@
 </template>
 
 <script>
+	import {
+		save,listChat
+	} from '@/api/chat.js'
+	import {
+		getUser
+	} from '@/api/user.js'
 	export default {
+		
 		data() {
 			return {
 				//文字消息
-				
+				recipient:1,
 				textMsg:'',
 				//消息列表
 				scrollAnimation:false,
 				scrollTop:0,
 				scrollToView:'',
-				msgList:[],
+				chatList:[],
 				msgImgList:[],
 				myuid:0,
 				//录音相关参数
@@ -146,10 +158,23 @@
 			};
 		},
 		onLoad(option) {
+			//根据msg页面传来本人id和对方id
+			// this.myuid=option.userId;
+			this.recipient=option.recipient
 			uni.setNavigationBarTitle({
-				title: option.name
+				title: option.username
 			});
-			this.getMsgList();
+			getUser().then((response)=>{	
+				 console.log("res.id",response.data.data)
+				 this.myuid=response.data.data.id
+				 console.log(this.myuid)
+				
+			}).catch((error) => {
+			
+				 console.log(error)
+			})
+			
+			this.getMsgList(option.recipient);
 			//语音自然播放结束
 			this.AUDIO.onEnded((res)=>{
 				this.playMsgid=null;
@@ -166,25 +191,32 @@
 			// #endif
 		},
 		methods:{
-			getMsgList(){
+			getMsgList(recipient){
 				// 消息列表
-				let list = [
-					{id:0,uid:0,username:"大黑哥",face:"/static/img/face.jpg",time:"12:56",type:"text",msg:{content:"为什么温度会相差那么大？"}},
-					{id:1,uid:1,username:"售后客服008",face:"/static/img/im/face/face_2.jpg",time:"12:57",type:"text",msg:{content:"这个是有偏差的，两个温度相差十几二十度是很正常的，如果相差五十度，那即是质量问题了。"}},
-					{id:2,uid:1,username:"售后客服008",face:"/static/img/im/face/face_2.jpg",time:"12:59",type:"voice",msg:{url:"/static/voice/3.aac",length:"00:06"}},
-					{id:3,uid:0,username:"大黑哥",face:"/static/img/face.jpg",time:"13:05",type:"voice",msg:{url:"/static/voice/2.mp3",length:"00:06"}},
-					{id:4,uid:0,username:"大黑哥",face:"/static/img/face.jpg",time:"13:05",type:"img",msg:{url:"/static/img/goods/p10.jpg",w:200,h:200}},
-					{id:5,uid:1,username:"售后客服008",face:"/static/img/im/face/face_2.jpg",time:"12:59",type:"img",msg:{url:"/static/img/q.jpg",w:1920,h:1080}}
-				]
-				// 获取消息中的图片,并处理显示尺寸
-				for(let i=0;i<list.length;i++){
-					if(list[i].type=='img'){
-						list[i] = this.setPicSize(list[i]);
-						console.log("list[i]: " + JSON.stringify(list[i]));
-						this.msgImgList.push(list[i].msg.url);
-					}
-				}
-				this.msgList = list;
+				console.log(111)
+				listChat({recipient:recipient}).then((response)=>{
+						console.log(222)
+					  let list = response.data.data
+					 console.log("list",list)
+					 
+					 // 获取消息中的图片,并处理显示尺寸
+					 // for(let i=0;i<list.length;i++){
+					 // 	if(list[i].type=='img'){
+					 // 		list[i] = this.setPicSize(list[i]);
+					 // 		console.log("list[i]: " + JSON.stringify(list[i]));
+					 // 		this.msgImgList.push(list[i].msg.url);
+					 // 	}
+					 // }
+					 console.log("old",this.chatList)
+					 this.chatList = list;
+					 	console.log(333)
+					 console.log("new",this.chatList)
+				}).catch((error) => {
+					 console.log(error)
+				})
+				
+				
+				console.log("chatList",this.chatList)
 				// 滚动到底部
 				this.$nextTick(function() {
 					this.scrollTop = 9999;
@@ -210,7 +242,7 @@
 			// 接受消息(筛选处理)
 			screenMsg(msg){
 				//从长连接处转发给这个方法，进行筛选处理
-				if(msg.uid!=this.myuid){
+				if(msg.userId!=this.myuid){
 					uni.vibrateLong();
 				}
 				switch (msg.type){
@@ -246,9 +278,10 @@
 				if(!this.textMsg){
 					return;
 				}
-				let content = this.replaceEmoji(this.textMsg);
-				let msg = {content:content}
-				this.sendMsg(msg,'text');
+				let content = this.textMsg
+				// let content = this.replaceEmoji(this.textMsg);
+				// let msg = {content:content}
+				this.sendMsg(content,'text');
 				this.textMsg = '';
 			},
 			//替换表情符号为图片
@@ -295,32 +328,35 @@
 			sendMsg(content,type){
 				//实际应用中，此处应该提交长连接，模板仅做本地处理。
 				var nowDate = new Date();
-				let lastid = this.msgList[this.msgList.length-1].id;
-				lastid++;
-				let msg = {id:lastid,uid:0,username:"大黑哥",face:"/static/img/face.jpg",time:nowDate.getHours()+":"+nowDate.getMinutes(),type:type,msg:content};
+				let msg = {face:"/static/img/face.jpg",type:type,msg:content,recipient:this.recipient};
+			
+				save({...msg}).then((response)=>{
+					
+					 msg=response.data.data
+					  console.log(msg)
+				}).catch((error) => {
+					
+					 console.log(error)
+				})
+				
 				this.screenMsg(msg);
-				// 定时器模拟对方回复,三秒
-				setTimeout(()=>{
-					lastid = this.msgList[this.msgList.length-1].id;
-					lastid++;
-					msg = {id:lastid,uid:1,username:"售后客服008",face:"/static/img/im/face/face_2.jpg",time:nowDate.getHours()+":"+nowDate.getMinutes(),type:type,msg:content};
-					this.screenMsg(msg);
-				},3000)
+				
 			},
 			
 			// 处理文字消息
 			addTextMsg(msg){
-				this.msgList.push(msg);
+				this.chatList.push(msg);
+				console.log("push",this.chatList)
 			},
 			// 处理语音消息
 			addVoiceMsg(msg){
-				this.msgList.push(msg);
+				this.chatList.push(msg);
 			},
 			// 处理图片消息
 			addImgMsg(msg){
 				msg = this.setPicSize(msg);
 				this.msgImgList.push(msg.msg.url);
-				this.msgList.push(msg);
+				this.chatList.push(msg);
 			},
 			// 预览图片
 			showPic(row){
@@ -634,6 +670,7 @@ page{
 				margin-top: 20upx;
 			}
 			padding: 20upx 0;
+			//是字！
 			.my .left,.other .right{
 				width: 100%;
 				display: flex;
@@ -676,56 +713,71 @@ page{
 					}
 				}
 			}
+			//是头像！
 			.my .right,.other .left{
 				flex-shrink: 0;
-				width: 80upx;
-				height: 80upx;
-				image{
+				// width: 80upx;
+				// height: 80upx;
+
+				 display: flex;
+				   align-items: center;
+				.img{
 					width: 80upx;
 					height: 80upx;
 					border-radius: 10upx;
 				}
 			}
-			.my{
-				width: 100%;
-				display: flex;
+			.my {
+			  width: 100%;
+			  display: flex;
+			 
+			  
+			  .left {
+			    flex-wrap: wrap;
 				justify-content: flex-end;
-				.left{
-					min-height: 80upx;
-					
-					align-items: center;
+				 margin-right: 20upx;
+			    .username{
+			    	width: 100%;
+			    	height: 45upx;
+			    	font-size: 24upx;
+			    	color: #999;
+			    	display: flex;
 					justify-content: flex-end;
-					.bubble{
-						background-color: #f06c7a;
-						color: #fff;
-						&.voice{
-							.icon{
-								color: #fff;
-							}
-							.length{
-								margin-right: 20upx;
-							}
-						}
-						&.play{
-							@keyframes my-play {
-								0% {
-									transform: translateX(80%);
-								}
-								100% {
-									transform: translateX(0%);
-								}
-							}
-							.icon:after
-							{
-								border-left: solid 10upx rgba(240,108,122,.5);
-								animation: my-play 1s linear infinite;
-							}
-						}
-					}
-				}
-				.right{
-					margin-left: 15upx;
-				}
+			    	.time{
+			    		margin-right: 30upx;
+			    	}
+			    }
+			    
+			    .bubble {
+			      background-color: #f06c7a;
+			      color: #fff;
+			      margin-top: 10upx;
+			      
+			      &.voice {
+			        .icon {
+			          color: #fff;
+			        }
+			        .length {
+			          margin-right: 20upx;
+			        }
+			      }
+			      &.play {
+			        @keyframes my-play {
+			          0% {
+			            transform: translateX(80%);
+			          }
+			          100% {
+			            transform: translateX(0%);
+			          }
+			        }
+			        .icon:after {
+			          border-left: solid 10upx rgba(240,108,122,.5);
+			          animation: my-play 1s linear infinite;
+			        }
+			      }
+			    }
+			  }
+			  
 			}
 			.other{
 				width: 100%;
@@ -735,6 +787,7 @@ page{
 				}
 				.right{
 					flex-wrap: wrap;
+					
 					.username{
 						width: 100%;
 						height: 45upx;

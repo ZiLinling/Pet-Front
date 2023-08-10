@@ -18,7 +18,7 @@
 			</view>
 			<!-- 右侧图标按钮 -->
 			<view class="icon-btn">
-				<view class="icon yuyin-home"></view>
+				<view class="icon yuyin-home" ></view>
 				<view class="icon tongzhi" @tap="toMsg"></view>
 			</view>
 		</view>
@@ -260,6 +260,7 @@
 			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
+			
 		},
 		methods: {
 			//消息列表

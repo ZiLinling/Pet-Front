@@ -15,6 +15,11 @@
 				<input placeholder="搜宠物" placeholder-style="color:#c0c0c0;" v-model="searchValue" />
 				<view class="icon search" @tap="toSearch"></view>
 			</view>
+			<!-- 右侧图标按钮 -->
+			<view class="icon-btn">
+				<view class="icon yuyin-home" @click="toSpeech"></view>
+				<view class="icon tongzhi" @tap="toMsg"></view>
+			</view>
 		</view>
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place"></view>
@@ -48,6 +53,7 @@
 	export default {
 		data() {
 			return {
+				speechType: 0,
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
@@ -109,8 +115,57 @@
 				],
 			};
 		},
+		onLoad() {
 
+			this.recognition = new webkitSpeechRecognition();
+			this.recognition.continuous = true;
+			this.recognition.interimResults = true;
+			this.recognition.lang = 'zh-CN';
+
+		},
+		watch:{
+			speechType(newValue) {
+				if (newValue == 1) {
+					uni.showToast({
+						icon:none,
+						title: "再按一次结束语音"
+					})
+				}
+			},
+		},
 		methods: {
+			toSpeech() {
+				console.log('11')
+				if (this.speechType == 1) {
+					  this.recognition.stop();
+					this.speechType = 0;
+					return;
+				}
+				this.speechType = 1
+				this.recognition.onresult = (event) => {
+					let interimTranscript = '';
+					let finalTranscript = '';
+
+					for (let i = event.resultIndex; i < event.results.length; i++) {
+						let transcript = event.results[i][0].transcript;
+						if (event.results[i].isFinal) {
+							finalTranscript += transcript + ' ';
+						} else {
+							interimTranscript += transcript;
+						}
+					}
+
+					this.searchValue = finalTranscript || interimTranscript;
+				};
+
+				this.recognition.start();
+			},
+
+			toMsg() {
+				// uni.navigateTo({
+				// 	url: '/pages/msg/msg'
+				// })
+			},
 			//返回上级页面
 			goBack() {
 				uni.navigateBack({

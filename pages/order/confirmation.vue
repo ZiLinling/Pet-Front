@@ -113,13 +113,14 @@
 	} from '../../api/order'
 	import {
 		generateOrderItem
-	} from '../../api/oderItem'
+	} from '../../api/orderItem'
 	import {
 		getAddressByDefault
 	} from '../../api/address'
 	export default {
 		data() {
 			return {
+				type_goods:null,
 				type:null,
 				isDisabled:false,
 				buylist: [], //订单列表
@@ -171,6 +172,7 @@
 			});
 
 			if (this.type == 2) {
+				this.type_goods=1
 				uni.getStorage({
 					key: 'buylist',
 					success: (res) => {
@@ -189,10 +191,10 @@
 			}
 
 			if (this.type == 1) {
+				this.type_goods=1
 				uni.getStorage({
 					key: 'goodsOrder',
 					success: (res) => {
-
 						let store = {
 							name: res.data.storeName,
 							storeId: res.data.storeId,
@@ -212,11 +214,13 @@
 						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
 						this.deduction = this.int / 100;
 						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+						console.log("buylist",this.buylist)
 					},
 				});
 			}
 
 			if (this.type == 0) {
+				this.type_goods=0
 				uni.getStorage({
 					key: 'petOrder',
 					success: (res) => {
@@ -239,9 +243,13 @@
 						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
 						this.deduction = this.int / 100;
 						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+						
 					},
 				});
 			}
+			
+			
+			console.log("buylist",this.buylist)
 		
 		},
 		onShow() {
@@ -324,17 +332,34 @@
 					postscript: this.note
 				}).then((response) => {
 					let orderId = response.data.data
+					// this.buylist
 					for (let i = 0; i < this.buylist.length; i++) {
 						for (let j = 0; j < this.buylist[i].goods.length; j++) {
-							generateOrderItem({
-								itemId: this.buylist[i].goods[j].id,
-								num: this.buylist[i].goods[j].num,
-								type: this.type,
-								price: this.buylist[i].goods[j].price,
-								orderId: orderId
-							}).then((response) => {
-								console.log(response)
-							})
+							if(this.type_goods==0){
+								generateOrderItem({
+									status:1,
+									itemId: this.buylist[i].goods[j].id,
+									num: this.buylist[i].goods[j].num,
+									type: this.type_goods,
+									price: this.buylist[i].goods[j].price,
+									orderId: orderId
+								}).then((response) => {
+								
+								})
+							}else{
+								console.log("goods?",this.buylist[i].goods[j].goodsId)
+								generateOrderItem({
+									status:1,
+									itemId: this.buylist[i].goods[j].goodsId,
+									num: this.buylist[i].goods[j].num,
+									type: this.type_goods,
+									price: this.buylist[i].goods[j].price,
+									orderId: orderId
+								}).then((response) => {
+									
+								})
+							}
+							
 						}
 					}
 					console.log("clean???")
