@@ -37,7 +37,12 @@
 			<view class="order">
 				<!-- 订单类型 -->
 				<view class="list">
-					<view class="title">我的订单</view>
+					<view class="title">我的订单
+						<view style="float: right; display: flex;">
+							全部
+						</view>
+					</view>
+
 					<view class="box" v-for="(row,index) in orderList" :key="index" @tap="toOrderList(index)">
 						<view class="img">
 							<view class="icon" :class="row.icon"></view>

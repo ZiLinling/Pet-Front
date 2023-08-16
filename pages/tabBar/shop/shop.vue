@@ -11,6 +11,12 @@
 				<input placeholder="搜周边商品" placeholder-style="color:#c0c0c0;" v-model="searchValue" />
 				<view class="icon search" @tap="toSearch()"></view>
 			</view>
+			<!-- 右侧图标按钮 -->
+			<view class="icon-btn">
+				<view class="icon yuyin-home" ></view>
+				<view class="icon tongzhi" @tap="toMsg"></view>
+			</view>
+			
 		</view>
 		<!-- 占位 -->
 		<view v-if="showHeader" class="place"></view>
@@ -187,6 +193,11 @@
 			// #endif
 		},
 		methods: {
+			toMsg() {
+				uni.navigateTo({
+					url: '/pages/msg/msg'
+				})
+			},
 			//搜索跳转
 			toSearch() {
 				uni.navigateTo({

@@ -16,13 +16,13 @@
 					</view>
 				</view>
 				<view class="row" v-for="(row,index) in list" :key="index">
-					<view class="status">{{typeText[2]}}</view>
-					
-					
+					<view class="status">{{typeText[row.etc.order_status]}}</view>
+
+
 					<view class="store">
 						<image :src="$base_url+row.img"></image>
-							{{row.name}}
-						
+						{{row.name}}
+
 					</view>
 					<!-- row是商店，商店下面的商品~ -->
 					<view class="" v-for="(item,no) in row.etc.orderItems" :key="no">
@@ -42,21 +42,21 @@
 								</view>
 							</view>
 						</view>
-						
+
 						<!-- 这边需要一个分割线 -->
 					</view>
-					
+
 					<view class="time">
 						订单生成时间：{{row.etc.time}}
 					</view>
-					
+
 					<view class="detail">
 						<view class="number">共{{row.etc.num}}件商品</view>
 						<view class="sum">合计￥<view class="price">{{row.etc.price}}</view>
 						</view>
 						<!-- <view class="nominal">(含运费 ￥{{item.freight}})</view> -->
 					</view>
-					
+
 					<view class="btns">
 						<block v-if="row.etc.order_status=='1'">
 							<view class="default" @tap="cancelOrder(row)">取消订单</view>
@@ -71,14 +71,14 @@
 							<view class="pay">我要退货</view>
 						</block>
 						<block v-if="row.etc.order_status=='4'">
-							<view class="default">评价</view>
+							<view class="pay" @tap="toComment(row)">评价</view>
 							<view class="default">再次购买</view>
 						</block>
 						<block v-if="row.etc.order_status=='5'">
-							<view class="default">再次购买</view>
+							<view class="default">查看进度</view>
 						</block>
 						<block v-if="row.etc.order_status=='6'">
-							<view class="default">查看进度</view>
+							<view class="default">再次购买</view>
 						</block>
 						<block v-if="row.etc.order_status=='7'">
 							<view class="default">已取消</view>
@@ -104,51 +104,26 @@
 				headerPosition: "fixed",
 				headerTop: "0px",
 				typeText: {
-					0: '等待付款',
-					1: '等待商家发货',
-					2: '商家已发货',
-					3: '等待用户评价',
-					4: '交易已完成',
+					1: '等待付款',
+					2: '等待商家发货',
+					3: '商家已发货',
+					4: '等待用户评价',
 					5: '商品退货处理中',
-					5: '订单已取消'
+					6: '交易已完成',
+					7: '订单已取消'
 				},
 				orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货'],
 				orders: [],
 				//订单列表 演示数据
 				orderList: [
-					[ //0
-						// { status:"unpaid",id:0,item_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"unpaid",id:1,item_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"back",id:2,item_id: 1, img: '/static/img/goods/p3.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"unreceived",id:3,item_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"received",id:4,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"completed",id:5,item_id: 1, img: '/static/img/goods/p6.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-						// { status:"refunds",id:6,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 },
-						// { status:"cancelled",id:7,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
-					],
-					[ //1
-						// { status:"unpaid",id:0,item_id: 0, img: '/static/img/goods/p1.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 },
-						// { status:"unpaid",id:1,item_id: 1, img: '/static/img/goods/p2.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
-					],
-					[ //2
-						// { status:"back",id:2,item_id: 1, img: '/static/img/goods/p3.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '168.00',payment:168.00,freight:12.00,number:1 },
-					],
-					[ //3
-						// { status:"unreceived",id:3,item_id: 1, img: '/static/img/goods/p4.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
-					],
-					[ //4
-						// { status:"received",id:4,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
-					],
-					[ //5
-						// { status:"refunds",id:6,item_id: 1, img: '/static/img/goods/p5.jpg', name: '商品名称商品名称商品名称商品名称商品名称', price: '￥168',payment:168.00,freight:12.00,number:1 }
-					],
-					[ //6
-
-					],
-					[ //7
-
-					]
-
+					[],
+					[],
+					[],
+					[],
+					[],
+					[],
+					[],
+					[]
 				],
 				list: [],
 				tabbarIndex: 0
@@ -179,6 +154,17 @@
 			this.headerPosition = e.scrollTop >= 0 ? "fixed" : "absolute";
 		},
 		methods: {
+			toComment(row) {
+				let goodsIds = ''
+				let itemIds=''
+				for (let i = 0; i < row.etc.orderItems.length; i++) {
+					goodsIds += row.etc.orderItems[i].itemId + ','
+					itemIds += row.etc.orderItems[i].id + ','
+				}
+				uni.navigateTo({
+					url: '/pages/comment/comment?goodsIds=' + goodsIds+"&itemIds="+itemIds
+				})
+			},
 			getList() {
 				this.orderList = [
 					[],
@@ -190,20 +176,18 @@
 					[],
 					[]
 				];
-				console.log("更新了 " + this.num + " 次")
 				listOrderItem().then((response) => {
 					this.orders = response.data.data;
-					for (let i = this.orders.length-1; i >=0 ; i--) {
+					for (let i = this.orders.length - 1; i >= 0; i--) {
 						let stores = this.orders[i].etc.stores
-						console.log(i, stores)
-						for (let j = stores.length-1; j>=0 ; j--) {
+						for (let j = stores.length - 1; j >= 0; j--) {
 							let store = stores[j]
 							this.orderList[0].push(store)
 							this.orderList[store.etc.order_status].push(store)
 						}
 					}
-					this.orderList[0].
-					console.log("new", this.orderList)
+					// this.orderList[0].
+					console.log("new",this.orderList)
 					this.num++;
 				}).catch((error) => {
 					console.log(error)
@@ -236,16 +220,16 @@
 			},
 			doCancelOrder(row) {
 				let typeNum = this.orderList.length;
-				let items=row.etc.orderItems
-				let ids=items[0].id;
-				for(let i=1;i<items.length;i++){
-					ids += ","+items[i].id
+				let items = row.etc.orderItems
+				let ids = items[0].id;
+				for (let i = 1; i < items.length; i++) {
+					ids += "," + items[i].id
 				}
 				cancelOrderItem({
 					ids
 				}).then((response) => {
 					this.getList()
-					
+
 					this.list = this.orderList[1];
 					this.tabbarIndex = 1;
 				}).catch((error) => {
@@ -258,29 +242,29 @@
 				uni.showLoading({
 					title: '正在获取订单...'
 				})
-				let items=row.etc.orderItems
-				console.log("222",items)
-				let ids=items[0].id;
-				for(let i=1;i<items.length;i++){
-					ids += ","+items[i].id
+				let items = row.etc.orderItems
+			
+				let ids = items[0].id;
+				for (let i = 1; i < items.length; i++) {
+					ids += "," + items[i].id
 				}
-				console.log("ids",ids)
+				
 				toPay({
-					ids:ids
+					ids: ids
 				}).then((response) => {
 					uni.showToast({
 						title: '付款成功'
 					})
 					this.getList()
-					
+
 					//option为object类型，会序列化上个页面传递的参数		
 					this.list = this.orderList[1];
 					this.tabbarIndex = 1;
 				}).catch((error) => {
 					console.log(error)
 				})
-				
-				
+
+
 				// 跳转到付款页面(暂时不要)
 				// let paymentOrder = [];
 				// paymentOrder.push(row);
@@ -298,11 +282,11 @@
 				// }, 500)
 			},
 			confirm(row) {
-				console.log(row)
-				let items=row.etc.orderItems
-				let ids=items[0].id;
-				for(let i=1;i<items.length;i++){
-					ids += ","+items[i].id
+				
+				let items = row.etc.orderItems
+				let ids = items[0].id;
+				for (let i = 1; i < items.length; i++) {
+					ids += "," + items[i].id
 				}
 				uni.showModal({
 					title: '提示',
@@ -412,32 +396,36 @@
 				background-color: #fff;
 				margin-bottom: 20upx;
 
-				.store{
+				.store {
 					margin-bottom: 5upx;
-					image{
+
+					image {
 						border-radius: 50%;
 						width: 40upx;
 						height: 40upx;
 					}
-					
+
 					display: flex;
-					align-items: center; 
+					align-items: center;
 				}
 
 				.status {
 					font-size: 26upx;
 					color: #ec652f;
 					height: 50upx;
-					display: flex;
+					display:inline-block;
+					font-size: 30upx;
+					font-weight: 800;
+					float: right;
 					align-items: center;
 				}
-				
-				.time{
-					margin-bottom:10upx ;
+
+				.time {
+					margin-bottom: 10upx;
 					font-size: 10upx;
-					color:#cac9c9;
+					color: #cac9c9;
 				}
-				
+
 				.order-info {
 					width: 100%;
 					display: flex;

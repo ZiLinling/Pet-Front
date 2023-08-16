@@ -243,7 +243,9 @@
 		getById
 	}
 	from '@/api/store';
-	
+	import {
+		getListByGoodsId
+	} from '@/api/comment.js'
 	export default {
 		data() {
 			return {
@@ -378,7 +380,7 @@
 				uni.navigateTo({
 					url: '/pages/store/store?cid=' + this.goodsData.storeId
 				})
-			
+
 			},
 			getgoods(goodsId, storeName) {
 				getGoods({
@@ -408,15 +410,15 @@
 			toChat() {
 				//add
 				saveMsg({
-					type:0,
-					recipient:this.store.id
+					type: 0,
+					recipient: this.store.id
 				}).then((response) => {
 					console.log(response)
 				}).catch((error) => {
 					console.log(error)
 				})
 				uni.navigateTo({
-					url: "/pages/msg/chat/chat?recipient"+this.store.id
+					url: "/pages/msg/chat/chat?recipient" + this.store.id
 				})
 			},
 			// 分享
@@ -452,7 +454,7 @@
 			},
 			join() {
 				this.choose = 0
-				this.showSpec() 
+				this.showSpec()
 			},
 			//立即购买
 			buy() {
@@ -481,7 +483,9 @@
 			},
 			//跳转评论列表
 			showComments(goodsid) {
-
+				uni.navigateTo({
+					url:'/pages/item/ratings/ratings?goodsId='+goodsid
+				})
 			},
 			//减少数量
 			sub() {
@@ -555,26 +559,26 @@
 			},
 			//关闭规格弹窗
 			hideSpec(action) {
-				
+
 				//回调
-				if(action===0){
-					this.specClass =null;
-					    return; // 直接返回
+				if (action === 0) {
+					this.specClass = null;
+					return; // 直接返回
 				}
-				 this.specClass = 'hide';			
+				this.specClass = 'hide';
 				if (this.token == '') {
 					uni.showToast({
 						title: '请先登录',
 						icon: 'none'
 					})
 					// this.specClass = null;
-					setTimeout(function(){
+					setTimeout(function() {
 						uni.navigateTo({
-							url: '/pages/user/login/login' 
+							url: '/pages/user/login/login'
 						});
-					  // 延时1秒后执行的函数
+						// 延时1秒后执行的函数
 					}, 1000);
-					
+
 					return;
 				}
 				if (this.choose == 0) {

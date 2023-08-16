@@ -20,3 +20,6 @@ export function cancelOrderItem(id) {
 export function confirm(id) {
 	return postRequest('/orderItem/confirm', id)
 }
+export function toComment(id) {
+	return postRequest('/orderItem/toComment', id)
+}
