@@ -26,7 +26,7 @@
 		<view class="buy-list">
 			<view class="" v-for="(store,id) in buylist" :key="id">
 				{{store.name}}
-				<view class="row" v-for="(row,index) in store.goods" :key="index">
+				<view class="row" v-for="(row,index) in store.etc.goodsList" :key="index">
 					<view class="goods-info">
 						<view class="img">
 							<image :src="$base_url+row.img"></image>
@@ -34,9 +34,9 @@
 						</view>
 						<view class="info">
 							<view class="title">{{row.name}}</view>
-							<view class="spec">数量:{{row.num}}</view>
+							<view class="spec">数量:{{row.etc.num}}</view>
 							<view class="price-number">
-								<view class="price">￥{{row.price*row.num}}</view>
+								<view class="price">￥{{row.price*row.etc.num}}</view>
 								<view class="number">
 								</view>
 							</view>
@@ -177,10 +177,11 @@
 					key: 'buylist',
 					success: (res) => {
 						this.buylist = res.data
+						console.log("buylist_2",this.buylist)
 						for (let i = 0; i < this.buylist.length; i++) {
-							for (let j = 0; j < this.buylist[i].goods.length; j++) {
-								this.goodsPrice = this.goodsPrice + (this.buylist[i].goods[j].num * this
-									.buylist[i].goods[j].price);
+							for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
+								this.goodsPrice += (this.buylist[i].etc.goodsList[j].etc.num * this
+									.buylist[i].etc.goodsList[j].price);
 							}
 						}
 						//合计
@@ -195,23 +196,30 @@
 				uni.getStorage({
 					key: 'goodsOrder',
 					success: (res) => {
+						console.log(res.data)
 						let store = {
 							name: res.data.storeName,
 							storeId: res.data.storeId,
-							goods: [{
-								id: res.data.id,
-								name: res.data.name,
-								img: res.data.img,
-								num: res.data.num,
-								price: res.data.price
-							}],
+							etc:{
+								goodsList: [{
+									id: res.data.id,
+									name: res.data.name,
+									img: res.data.img,
+									price: res.data.price,
+									etc:{
+										num: res.data.num,
+									},
+								}],
+							}
+							
 						}
 
 						let buylist = [];
 						this.type = 1;
 						buylist.push(store)
 						this.buylist = buylist;
-						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
+						console.log("111",buylist)
+						this.goodsPrice = this.buylist[0].etc.goodsList[0].etc.num * this.buylist[0].etc.goodsList[0].price
 						this.deduction = this.int / 100;
 						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
 						console.log("buylist",this.buylist)
@@ -228,19 +236,24 @@
 						let store = {
 							name: res.data.etc.store.name,
 							storeId: res.data.etc.store.id,
-							goods: [{
-								id: res.data.id,
-								name: res.data.name,
-								img: res.data.img,
-								num: 1,
-								price: res.data.price
-							}],
+							etc:{
+								goodsList: [{
+									id: res.data.id,
+									name: res.data.name,
+									img: res.data.img,
+									etc:{
+										num: 1,
+									},
+									price: res.data.price
+								}],
+							},
+							
 						}
 						let buylist = [];
 						this.type = 0;
 						buylist.push(store)
 						this.buylist = buylist;
-						this.goodsPrice = this.buylist[0].goods[0].num * this.buylist[0].goods[0].price
+						this.goodsPrice = this.buylist[0].etc.goodsList[0].etc.num * this.buylist[0].etc.goodsList[0].price
 						this.deduction = this.int / 100;
 						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
 						
@@ -248,8 +261,6 @@
 				});
 			}
 			
-			
-			console.log("buylist",this.buylist)
 		
 		},
 		onShow() {
@@ -288,12 +299,12 @@
 						if (this.type == 2) {
 							let ids = '';
 							for (let i = 0; i < this.buylist.length; i++) {
-								for (let j = 0; j < this.buylist[i].goods.length; j++) {
-									ids += this.buylist[i].goods[j].cartId + ',';
+								for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
+									ids += this.buylist[i].etc.goodsList[j].id + ',';
 								}
 							}
 							deleteById({
-								ids: ids
+								goodsIds: ids
 							}).then((response) => {
 							
 							})
@@ -305,7 +316,8 @@
 
 			toPay() {
 				//商品列表
-				
+				let orderId =null;
+				let paymentList=this.buylist
 				if(Object.keys(this.recinfo).length === 0){
 					uni.showToast({
 						title:"请输入地址",
@@ -325,45 +337,33 @@
 					});
 					return;
 				}
+				console.log("paymentOrder",paymentOrder)
 				this.recinfo.id=null;
 				generateOrder({
 					...this.recinfo,
 					price: this.sumPrice,
 					postscript: this.note
 				}).then((response) => {
-					let orderId = response.data.data
+					orderId = response.data.data
+					console.log("order之后",this.buylist)
 					// this.buylist
 					for (let i = 0; i < this.buylist.length; i++) {
-						for (let j = 0; j < this.buylist[i].goods.length; j++) {
-							if(this.type_goods==0){
+						for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
 								generateOrderItem({
 									status:1,
-									itemId: this.buylist[i].goods[j].id,
-									num: this.buylist[i].goods[j].num,
+									itemId: this.buylist[i].etc.goodsList[j].id,
+									num: this.buylist[i].etc.goodsList[j].etc.num,
 									type: this.type_goods,
-									price: this.buylist[i].goods[j].price,
+									price: this.buylist[i].etc.goodsList[j].price,
 									orderId: orderId
 								}).then((response) => {
-								
+								this.clearOrder();
 								})
-							}else{
-								console.log("goods?",this.buylist[i].goods[j].goodsId)
-								generateOrderItem({
-									status:1,
-									itemId: this.buylist[i].goods[j].goodsId,
-									num: this.buylist[i].goods[j].num,
-									type: this.type_goods,
-									price: this.buylist[i].goods[j].price,
-									orderId: orderId
-								}).then((response) => {
-									
-								})
-							}
+							
 							
 						}
 					}
-					console.log("clean???")
-					this.clearOrder();
+					
 				}).catch((error) => {
 					console.log(error)
 				})
@@ -373,18 +373,19 @@
 					title: '正在提交订单...'
 				})
 				setTimeout(() => {
+					console.log("pay",paymentList)
 					uni.setStorage({
 						key: 'paymentOrder',
-						data: paymentOrder,
+						data: paymentList,
 						success: () => {
 							uni.hideLoading();
 							uni.redirectTo({
-								url: "../pay/payment/payment?amount=" + this.sumPrice
+								url: "../pay/payment/payment?amount=" + this.sumPrice+"&orderId="+orderId
 							})
 						}
 					})
 				}, 1000)
-
+				
 			},
 			//选择收货地址
 			selectAddress() {

@@ -23,3 +23,11 @@ export function confirm(id) {
 export function toComment(id) {
 	return postRequest('/orderItem/toComment', id)
 }
+
+export function directPayment(id) {
+	return postRequest('/orderItem/directPayment', id)
+}
+
+export function rejected(id) {
+	return postRequest('/orderItem/rejected', id)
+}

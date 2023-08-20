@@ -68,7 +68,7 @@
 						<block v-if="row.etc.order_status=='3'">
 							<view class="default" @tap="showLogistics(row)">查看物流</view>
 							<view class="pay" @tap="confirm(row)">确认收货</view>
-							<view class="pay">我要退货</view>
+							<view class="pay" @tap="rejected(row)">我要退货</view>
 						</block>
 						<block v-if="row.etc.order_status=='4'">
 							<view class="pay" @tap="toComment(row)">评价</view>
@@ -95,7 +95,8 @@
 		listOrderItem,
 		toPay,
 		cancelOrderItem,
-		confirm
+		confirm,
+		rejected
 	} from '@/api/orderItem'
 	export default {
 		data() {
@@ -266,20 +267,20 @@
 
 
 				// 跳转到付款页面(暂时不要)
-				// let paymentOrder = [];
-				// paymentOrder.push(row);
-				// setTimeout(() => {
-				// 	uni.setStorage({
-				// 		key: 'paymentOrder',
-				// 		data: paymentOrder,
-				// 		success: () => {
-				// 			uni.hideLoading();
-				// 			uni.navigateTo({
-				// 				url: '../../pay/payment/payment?amount=' + row.price * row.num
-				// 			})
-				// 		}
-				// 	})
-				// }, 500)
+				let paymentOrder = [];
+				paymentOrder.push(row);
+				setTimeout(() => {
+					uni.setStorage({
+						key: 'paymentOrder',
+						data: paymentOrder,
+						success: () => {
+							uni.hideLoading();
+							uni.navigateTo({
+								url: '../../pay/payment/payment?amount=' + row.price * row.num
+							})
+						}
+					})
+				}, 500)
 			},
 			confirm(row) {
 				
@@ -310,9 +311,38 @@
 						console.log(error)
 					}
 				});
-
-
+			},
+			rejected(row) {
+				
+				let items = row.etc.orderItems
+				let ids = items[0].id;
+				for (let i = 1; i < items.length; i++) {
+					ids += "," + items[i].id
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否退货？',
+					confirmText: '确定',
+					cancelText: '取消',
+					success: (res) => {
+						if (res.confirm) {
+							rejected({
+								ids
+							}).then((response) => {
+								this.getList()
+								this.list = this.orderList[3];
+								this.tabbarIndex = 3;
+							}).catch((error) => {
+								console.log(error)
+							})
+						}
+					},
+					fail: (error) => {
+						console.log(error)
+					}
+				});
 			}
+		
 		}
 	}
 </script>
@@ -397,12 +427,15 @@
 				margin-bottom: 20upx;
 
 				.store {
-					margin-bottom: 5upx;
-
+					margin-bottom: 20upx;
+					margin-top: 10upx;
+					font-size: 36upx;
+					font-weight: 540;
 					image {
+						margin-right: 15upx;
 						border-radius: 50%;
-						width: 40upx;
-						height: 40upx;
+						width: 50upx;
+						height: 50upx;
 					}
 
 					display: flex;
@@ -449,7 +482,7 @@
 
 						.name {
 							width: 100%;
-							font-size: 28upx;
+							font-size: 34upx;
 							display: -webkit-box;
 							-webkit-box-orient: vertical;
 							-webkit-line-clamp: 2;

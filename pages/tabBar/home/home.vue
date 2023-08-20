@@ -81,7 +81,7 @@
 				<image src="/static/img/hua.png"></image>
 			</view>
 			<view class="product-list">
-				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)">
+				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)" v-show='product.status'>
 					<image mode="aspectFill" :src="$base_url+product.img">
 					</image>
 					<view class="name">{{ product.breedName }}</view>
@@ -113,6 +113,7 @@
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
 					this.productList.push(p[i])
+					
 				}
 			})
 		},

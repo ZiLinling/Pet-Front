@@ -51,7 +51,7 @@
 				<image src="/static/img/hua.png"></image>
 			</view>
 			<view class="product-list">
-				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)">
+				<view class="product" v-for="(goods,index) in goodsList" :key="index" @tap="toGoods(goods)"  v-show='goods.status'>
 					<image mode="aspectFill" :src="$base_url+goods.img"></image>
 					<view class="name">{{ goods.name }}</view>
 					<view class="info">
@@ -83,6 +83,7 @@
 				for (let i = 0; i < res.data.data.records.length; i++) { //放入全部商品
 					this_.goodsList.push(res.data.data.records[i])
 				}
+				console.log(this_.goodsList)
 			})
 			this.pageNum++;
 		},

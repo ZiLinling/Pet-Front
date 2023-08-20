@@ -298,7 +298,6 @@
 					category: '',
 					description: '',
 					storeName: ''
-
 				},
 				store: [],
 				comment: {
@@ -334,8 +333,7 @@
 			this.getgoods(option.cid);
 			this.id = option.cid
 			this.checkFavor()
-			this.getgoods(option.cid, option.name);
-
+			this.getgoods(option.cid);
 		},
 		onShow() {
 			this.token = uni.getStorageSync('token')
@@ -362,6 +360,9 @@
 		mounted() {
 
 		},
+		// watch:{
+		// 	goods.num	
+		// },
 		methods: {
 
 			checkFavor() {
@@ -382,14 +383,14 @@
 				})
 
 			},
-			getgoods(goodsId, storeName) {
+			getgoods(goodsId) {
 				getGoods({
 					id: goodsId
 				}).then((response) => {
 					this.goodsData = response.data.data;
 					this.num = 1;
 					getById(this.goodsData.storeId).then((response) => {
-						this.goodsData.storeName = storeName;
+						this.goodsData.storeName = response.data.data.name;
 						this.store = response.data.data
 					})
 				}).catch((error) => {
@@ -471,6 +472,7 @@
 			toConfirmation() {
 
 				this.goodsData.num = this.num
+				console.log("goods",this.goodsData)
 				uni.setStorage({
 					key: 'goodsOrder',
 					data: this.goodsData,
@@ -491,13 +493,23 @@
 			sub() {
 
 				if (this.num <= 1) {
+					uni.showToast({
+						title:'不能小于0'
+					})
 					return;
 				}
 				this.num--;
 			},
 			//增加数量
 			add() {
-
+				if(this.num>=this.goodsData.stock){
+					//超出库存
+					uni.showToast({
+						title:'超出库存'
+					})
+					
+					return;
+				}
 				this.num++;
 			},
 			//跳转锚点
