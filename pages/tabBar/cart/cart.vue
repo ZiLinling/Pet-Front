@@ -11,14 +11,15 @@
 				<uni-card v-for="(store,cnt) in storeList" :key="cnt" class="store" :title="store.name" sub-title="商品"
 					padding="10upx 0" thumbnail="/static/img/store.png">
 					<view class="row" v-for="(goods,index) in store.etc.goodsList" :key="index">
-						
+
 						<!-- 删除按钮 -->
 						<view class="menu" @tap.stop="deleteGood(index,cnt)">
 
 							<view class="icon shanchu"></view>
 						</view>
 						<!-- 商品 -->
-						<view class="carrier" :class="[theIndex==index&&theCnt==cnt?'open':oldIndex==index&&oldCnt==cnt?'close':'']"
+						<view class="carrier"
+							:class="[theIndex==index&&theCnt==cnt?'open':oldIndex==index&&oldCnt==cnt?'close':'']"
 							@touchstart="touchStart(index,cnt,$event)" @touchmove="touchMove(index,cnt,$event)"
 							@touchend="touchEnd(index,cnt,$event)">
 							<!-- checkbox -->
@@ -67,18 +68,22 @@
 				</view>
 				<view class="delBtn" @tap="deleteGoods()" v-if="selectedList.length>0">删除</view>
 				<view class="settlement">
-					<view class="sum">合计:<view class="money">￥{{sumPrice}}</view>
+					<view class="sum">合计:
+					<view class="discount_money">￥{{ (sumPrice * privilege[role]).toFixed(2) }}</view>
+					<view class="money">({{sumPrice}})</view>
+							
 					</view>
-					<view class="btn" @tap="toConfirmation">结算({{selectedList.length}})</view>
+						<view class="btn" @tap="toConfirmation">结算({{selectedList.length}})</view>
+					</view>
+
 				</view>
 			</view>
+			<view v-if="!this.token">
+				<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
+					<button type="default" @click="toLogin()" class="login_button">快去登录</button>
+				</u-empty>
+			</view>
 		</view>
-		<view v-if="!this.token">
-			<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
-				<button type="default" @click="toLogin()" class="login_button">快去登录</button>
-			</u-empty>
-		</view>
-	</view>
 
 </template>
 
@@ -90,6 +95,9 @@
 		updateSelected,
 		isAllSelected
 	} from '@/api/cart';
+	import{
+		getRole
+	} from '@/api/user.js'
 	export default {
 		data() {
 			return {
@@ -106,11 +114,13 @@
 				//控制滑动效果
 				theIndex: null,
 				oldIndex: null,
-				theCnt:null,
-				oldCnt:null,
+				theCnt: null,
+				oldCnt: null,
 				isStop: false,
 				storeList: [],
 				token: '',
+				role:null,
+				privilege:[1,0.95,0.9,0.85,0.8,0.75,0.7],
 			}
 		},
 		onPageScroll(e) {
@@ -147,22 +157,27 @@
 				this.oldIndex = null,
 				this.isStop = false,
 				this.getCart();
-		},
-		watch:{
-			selectedList:[
-				function (newVal, oldVal) {
-					this.isAllselected=(newVal.length==this.goodsList.length);
-				}
 				
+				getRole({}).then((res) => {
+					this.role = res.data.data
+				})
+				
+		},
+		watch: {
+			selectedList: [
+				function(newVal, oldVal) {
+					this.isAllselected = (newVal.length == this.goodsList.length);
+				}
+
 			]
 		},
 		methods: {
-			toLogin(){
-					uni.navigateTo({
-						url:'/pages/user/login/login'
-					})
+			toLogin() {
+				uni.navigateTo({
+					url: '/pages/user/login/login'
+				})
 			},
-			getCart() {			
+			getCart() {
 				if (!uni.getStorageSync('token')) {
 					this.storeList = [];
 					this.goodsList = [];
@@ -178,8 +193,8 @@
 						}
 
 					}
-					console.log("stores",this.storeList)
-					console.log("goods",this.goodsList)
+					console.log("stores", this.storeList)
+					console.log("goods", this.goodsList)
 					this.sum();
 				}).catch((error) => {
 					console.log(error)
@@ -188,7 +203,7 @@
 
 
 			//控制左滑删除效果-begin
-			touchStart(index,cnt, event) {
+			touchStart(index, cnt, event) {
 				//多点触控不触发
 				if (event.touches.length > 1) {
 					this.isStop = true;
@@ -200,48 +215,48 @@
 				this.initXY = [event.touches[0].pageX, event.touches[0].pageY];
 			},
 			touchMove(index, cnt, event) {
-			    // let globalIndex = 0;
-			    // for (let i = 0; i < cnt; i++) {
-			    //     globalIndex += this.storeList[i].etc.goodsList.length;
-			    // }
-			    // globalIndex += index;
-			
-			    //多点触控不触发
-			    if (event.touches.length > 1) {
-			        this.isStop = true;
-			        return;
-			    }
-			    let moveX = event.touches[0].pageX - this.initXY[0];
-			    let moveY = event.touches[0].pageY - this.initXY[1];
-			
-			    if (this.isStop || Math.abs(moveX) < 5) {
-			        return;
-			    }
-			    if (Math.abs(moveY) > Math.abs(moveX)) {
-			        // 竖向滑动-不触发左滑效果
-			        this.isStop = true;
-			        return;
-			    }
-			    if (moveX < 0) {
-			        this.theIndex = index;
-					this.theCnt=cnt;
-			        this.isStop = true;
-			    } else if (moveX > 0) {
-			        if (this.theIndex != null && this.oldIndex == this.theIndex) {
-			            this.oldIndex = index;
-						this.oldCnt=cnt;
-						
-			            this.theIndex = null;
-						this.theCnt=null
-			            this.isStop = true;
-			            setTimeout(() => {
-			                this.oldIndex = null;
-							this.oldCnt=null;
-			            }, 150)
-			        }
-			    }
+				// let globalIndex = 0;
+				// for (let i = 0; i < cnt; i++) {
+				//     globalIndex += this.storeList[i].etc.goodsList.length;
+				// }
+				// globalIndex += index;
+
+				//多点触控不触发
+				if (event.touches.length > 1) {
+					this.isStop = true;
+					return;
+				}
+				let moveX = event.touches[0].pageX - this.initXY[0];
+				let moveY = event.touches[0].pageY - this.initXY[1];
+
+				if (this.isStop || Math.abs(moveX) < 5) {
+					return;
+				}
+				if (Math.abs(moveY) > Math.abs(moveX)) {
+					// 竖向滑动-不触发左滑效果
+					this.isStop = true;
+					return;
+				}
+				if (moveX < 0) {
+					this.theIndex = index;
+					this.theCnt = cnt;
+					this.isStop = true;
+				} else if (moveX > 0) {
+					if (this.theIndex != null && this.oldIndex == this.theIndex) {
+						this.oldIndex = index;
+						this.oldCnt = cnt;
+
+						this.theIndex = null;
+						this.theCnt = null
+						this.isStop = true;
+						setTimeout(() => {
+							this.oldIndex = null;
+							this.oldCnt = null;
+						}, 150)
+					}
+				}
 			},
-			touchEnd(index,cnt, $event) {
+			touchEnd(index, cnt, $event) {
 				//结束禁止触发效果
 				this.isStop = false;
 			},
@@ -266,7 +281,7 @@
 				}
 				// //获得选中了的商品列表
 				// for (let i = 0; i < this.selectedList.length; i++) {
-					
+
 				// 	selected_goods.push(this.goodsList[this.selectedList[i]]);
 				// }
 				// //用reduce根据storeId分类给store
@@ -285,26 +300,26 @@
 				// 	return acc;
 				// }, {}));
 				// //传值为store
-				
-				let buylist =this.storeList
+
+				let buylist = this.storeList
 				for (let i = 0; i < buylist.length; i++) {
-				  let goodsList = buylist[i].etc.goodsList;
-				
-				  for (let j = goodsList.length - 1; j >= 0; j--) {
-				    if (!goodsList[j].etc.selected) {
-				      goodsList.splice(j, 1);
-				    }
-				  }
-				  if(goodsList.length==0){
-					  buylist.splice(i,1);
-				  }
+					let goodsList = buylist[i].etc.goodsList;
+
+					for (let j = goodsList.length - 1; j >= 0; j--) {
+						if (!goodsList[j].etc.selected) {
+							goodsList.splice(j, 1);
+						}
+					}
+					if (goodsList.length == 0) {
+						buylist.splice(i, 1);
+					}
 				}
 				uni.setStorage({
 					key: 'buylist',
 					data: buylist,
 					success: () => {
 						uni.navigateTo({
-							url: '/pages/order/confirmation?type=2'
+							url: '/pages/order/confirmation?type=2&role='+this.role
 						})
 					}
 				})
@@ -317,8 +332,8 @@
 				}
 				this.deleteById(ids);
 			},
-			deleteGood(index,cnt) {
-				console.log("要删除了？",cnt,index)
+			deleteGood(index, cnt) {
+				console.log("要删除了？", cnt, index)
 				this.deleteById(this.storeList[cnt].etc.goodsList[index].id);
 			},
 			deleteById(ids) {
@@ -327,8 +342,8 @@
 				}).then((response) => {
 					this.sum();
 					this.oldIndex = null;
-					this.oldCnt=null;
-					this.theCnt=null;
+					this.oldCnt = null;
+					this.theCnt = null;
 					this.theIndex = null;
 					this.getCart();
 				}).catch((error) => {
@@ -337,7 +352,7 @@
 
 			},
 			// 选中商品
-			selected(index,cnt) {
+			selected(index, cnt) {
 				let selected = this.storeList[cnt].etc.goodsList[index].etc.selected;
 				if (selected == true) {
 					selected = false
@@ -375,11 +390,11 @@
 				this.sum();
 			},
 			// 减少数量
-			sub(index,cnt) {
+			sub(index, cnt) {
 				if (this.storeList[cnt].etc.goodsList[index].etc.num <= 1) {
 					uni.showToast({
-						title:'不能再少了！',
-						icon:'fail'
+						title: '不能再少了！',
+						icon: 'fail'
 					})
 					return;
 				}
@@ -388,25 +403,25 @@
 					goodsId: this.storeList[cnt].etc.goodsList[index].id,
 					num: this.storeList[cnt].etc.goodsList[index].etc.num
 				}).then((response) => {
-					
+
 				}).catch((error) => {
-				
+
 				})
 				this.sum();
 			},
 			// 增加数量
-			add(index,cnt) {
+			add(index, cnt) {
 				this.storeList[cnt].etc.goodsList[index].etc.num++;
 				updateNum({
 					goodsId: this.storeList[cnt].etc.goodsList[index].id,
 					num: this.storeList[cnt].etc.goodsList[index].etc.num
-				}).then((response) => {	
-					
+				}).then((response) => {
+
 				}).catch((error) => {
 					this.storeList[cnt].etc.goodsList[index].etc.num--;
 					uni.showToast({
-						title:error.message,
-						icon:'fail'
+						title: error.message,
+						icon: 'fail'
 					})
 				})
 				this.sum();
@@ -748,13 +763,19 @@
 			align-items: center;
 
 			.sum {
-				width: 50%;
-				font-size: 28upx;
+				width: 60%;
+				font-size: 25upx;
 				margin-right: 10upx;
 				display: flex;
 				justify-content: flex-end;
 
 				.money {
+					font-weight: 400;
+					text-decoration: line-through;
+				}
+
+				.discount_money {
+					color: #f06c7a;
 					font-weight: 600;
 				}
 			}
@@ -799,9 +820,10 @@
 		height: 40upx;
 		margin: 15upx 0 0 15upx;
 	}
-	.login_button{
+
+	.login_button {
 		height: 90upx;
-		border-radius: 30upx ;
+		border-radius: 30upx;
 		margin-top: 20upx;
 		background-color: #d5d5d5;
 	}

@@ -1,9 +1,14 @@
 {
-	"dependencies": {
-		"axios": "^1.4.0",
-		"js-md5": "^0.7.3"
-	},
-	"devDependencies": {
-		"bankcardinfo": "^2.0.6"
-	}
+  "dependencies": {
+    "axios": "^1.4.0",
+    "js-md5": "^0.7.3"
+  },
+  "devDependencies": {
+	"standard": "*",
+    "bankcardinfo": "^2.0.6"
+  },
+  "name": "my-cool-package",
+  "scripts": {
+    "test": "standard && node my-tests.js"
+  }
 }

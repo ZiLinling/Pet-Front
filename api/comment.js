@@ -8,6 +8,5 @@ export function save(user) {
 }
 
 export function getListByGoodsId(user) {
-	console.log("传的值",user)
 	return getRequest('/comment/getListByGoodsId', user)
 }

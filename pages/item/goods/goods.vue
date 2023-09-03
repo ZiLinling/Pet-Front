@@ -367,10 +367,8 @@
 
 			checkFavor() {
 				checkFavor(this.id, 2).then((response) => {
-					console.log(response.data.data)
 					this.favorId = response.data.data.id
 					this.isKeep = true
-
 				}).catch((error) => {
 					this.isKeep = false
 
@@ -393,8 +391,6 @@
 						this.goodsData.storeName = response.data.data.name;
 						this.store = response.data.data
 					})
-				}).catch((error) => {
-					console.log(error)
 				})
 			},
 			//轮播图指示器
@@ -472,7 +468,6 @@
 			toConfirmation() {
 
 				this.goodsData.num = this.num
-				console.log("goods",this.goodsData)
 				uni.setStorage({
 					key: 'goodsOrder',
 					data: this.goodsData,

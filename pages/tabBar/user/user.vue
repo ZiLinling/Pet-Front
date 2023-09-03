@@ -63,9 +63,16 @@
 					</view>
 				</view>
 			</view>
-		</view>
-		<!-- 订单-余额 -->
 
+			<view class="member">
+				<view class="">
+					会员等级：{{role}}
+				</view>
+				<view class="">
+					会员权益：{{privilege[role]}}
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 <script>
@@ -73,11 +80,13 @@
 		base_url
 	} from '../../../api/axios';
 	import {
-		getUser
+		getUser,
+		getRole
 	} from '../../../api/user';
 	export default {
 		data() {
 			return {
+				role: null,
 				base_url: base_url,
 				isfirst: true,
 				headerPosition: "fixed",
@@ -87,6 +96,7 @@
 				img: '/static/img/face.jpg',
 				//个人信息,
 				user: null,
+				privilege:['无','9.5折','9折','8.5折','8折','7.5折','7折'],
 				// 订单类型
 				orderList: [{
 						text: '待付款',
@@ -109,6 +119,7 @@
 						icon: "tuihuo"
 					}
 				],
+				
 				// 工具栏列表
 				mytoolbarList: [{
 						url: '/pages/user/favor/favor?type=1',
@@ -143,12 +154,27 @@
 			uni.$on('checkLogin', () => {
 				this.getLogin()
 			});
+			
 		},
 		mounted() {
 			this.getLogin()
+			getRole({}).then((res) => {
+				this.role = res.data.data
+				uni.setStorage({
+					key:'role',
+					data:this.role
+				})
+			})
 		},
 		activated() {
 			this.getLogin()
+			getRole({}).then((res) => {
+				this.role = res.data.data
+				uni.setStorage({
+					key:'role',
+					data:this.role
+				})
+			})
 		},
 		methods: {
 			//消息列表
@@ -196,7 +222,6 @@
 					});
 					return;
 				}
-				console.log(url)
 				uni.navigateTo({
 					url: url
 				})
@@ -300,16 +325,17 @@
 			width: 100%;
 
 			.username {
-				margin-left: 50upx;
+				margin-left: 30upx;
 				font-size: 36upx;
 				color: black;
 			}
 
 			.account {
-				margin-top: 30upx;
-				margin-left: 50upx;
+				margin-top: 10upx;
+				margin-left: 30upx;
 				color: black;
-				font-size: 28upx;
+				font-size: 26upx;
+				color: #9c9c9c;
 			}
 		}
 
@@ -332,6 +358,8 @@
 			align-items: center;
 			width: 100%;
 		}
+
+
 
 		.list {
 			display: flex;
@@ -411,5 +439,15 @@
 				}
 			}
 		}
+	}
+
+	.member {
+		margin-left: 4%;
+		margin-top: 30upx;
+		width: 92%;
+		padding: 0 0 20upx 0;
+		background-color: #fff;
+		box-shadow: 0upx 0upx 25upx rgba(0, 0, 0, 0.1);
+		border-radius: 15upx;
 	}
 </style>

@@ -18,3 +18,6 @@ export function getUser() {
 export function updateUser(user) {
 	return postJsonRequest("/user/update", user)
 }
+export function getRole(user) {
+	return getRequest("/user/getRole", user)
+}

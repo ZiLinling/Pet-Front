@@ -130,17 +130,17 @@
 				swiperList: [{
 						id: 1,
 						src: 'url1',
-						img: '/static/img/1.jpg'
+						img: '/static/img/1.png'
 					},
 					{
 						id: 2,
 						src: 'url2',
-						img: '/static/img/2.jpg'
+						img: '/static/img/2.png'
 					},
 					{
 						id: 3,
 						src: 'url3',
-						img: '/static/img/3.jpg'
+						img: '/static/img/3.gng'
 					},
 				],
 
@@ -416,7 +416,7 @@
 		flex-wrap: wrap;
 
 		.category {
-			width: 25%;
+			width: 24%;
 			margin-top: 50upx;
 			display: flex;
 			flex-wrap: wrap;
@@ -425,10 +425,12 @@
 				width: 100%;
 				display: flex;
 				justify-content: center;
+				border: solid 1upx #dadada;
+				border-radius: 10% ;
 
 				image {
-					width: 9vw;
-					height: 9vw;
+					width: 14vw;
+					height: 14vw;
 				}
 			}
 
@@ -539,7 +541,16 @@
 			}
 		}
 	}
-
+	
+	.category-list{
+		
+		.category{
+			.img{
+				
+			}
+		}
+	}
+	
 	.goods-list {
 
 		// background-color: #f4f4f4;

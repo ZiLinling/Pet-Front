@@ -191,6 +191,8 @@
 			// #endif
 		},
 		methods:{
+			
+			
 			getMsgList(recipient){
 				// 消息列表
 				console.log(111)

@@ -18,7 +18,7 @@
 			</view>
 			<!-- 右侧图标按钮 -->
 			<view class="icon-btn">
-				<view class="icon yuyin-home" ></view>
+				<view class="icon yuyin-home"></view>
 				<view class="icon tongzhi" @tap="toMsg"></view>
 			</view>
 		</view>
@@ -58,9 +58,9 @@
 		</view>
 		<!-- 热门宠物 -->
 		<view class="popular-pet">
-			<uni-section class="mb-10" title="热门宠物">
+			<uni-section class="mb-10" title="热门宠物" titleFontSize='30upx' >
 				<template v-slot:right>
-					<view style="font-size: 5px;" @click="toBreedAll()">查看全部 <uni-icons type="forward" size="10"
+					<view style="font-size: 26upx;" @click="toBreedAll()">查看全部 <uni-icons type="forward" size="10"
 							@click="toBreedAll()"></uni-icons></view>
 				</template>
 			</uni-section>
@@ -81,7 +81,8 @@
 				<image src="/static/img/hua.png"></image>
 			</view>
 			<view class="product-list">
-				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)" v-show='product.status'>
+				<view class="product" v-for="(product,index) in productList" :key="index" @tap="toGoods(product)"
+					v-show='product.status'>
 					<image mode="aspectFill" :src="$base_url+product.img">
 					</image>
 					<view class="name">{{ product.breedName }}</view>
@@ -113,7 +114,7 @@
 				let p = response.data.data.records
 				for (let i = 0; i < p.length; i++) {
 					this.productList.push(p[i])
-					
+
 				}
 			})
 		},
@@ -133,42 +134,47 @@
 						id: 0,
 						specie: 0,
 						name: '附近',
-						img: '/static/img/category/category_0.jpg'
+						img: '/static/img/category/category_0.png'
 					},
 					{
 						id: 1,
 						specie: 1,
 						name: '猫猫',
-						img: '/static/img/category/category_2.jpg'
+						img: '/static/img/category/category_2.png'
 					},
 					{
 						id: 2,
 						specie: 2,
 						name: '狗狗',
-						img: '/static/img/category/category_1.jpg'
+						img: '/static/img/category/category_1.png'
 					},
 					{
 						id: 3,
 						specie: 3,
 						name: '其他',
-						img: '/static/img/category/category_3.jpg'
+						img: '/static/img/category/category_3.png'
 					}
 				],
 				// 轮播图片
 				swiperList: [{
 						id: 1,
 						src: 'url1',
-						img: '/static/img/1.jpg'
+						img: '/static/img/1.png'
 					},
 					{
 						id: 2,
 						src: 'url2',
-						img: '/static/img/2.jpg'
+						img: '/static/img/3.png'
 					},
 					{
 						id: 3,
 						src: 'url3',
-						img: '/static/img/3.jpg'
+						img: '/static/img/2.png'
+					},
+					{
+						id: 4,
+						src: 'url4',
+						img: '/static/img/4.png'
 					},
 				],
 				// 品种菜单
@@ -261,7 +267,7 @@
 			this.showHeader = true;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-			
+
 		},
 		methods: {
 			//消息列表
@@ -399,7 +405,7 @@
 				width: 60upx;
 				height: 60upx;
 				font-size: 34upx;
-				color: #c0c0c0;
+				color: #98938f;
 			}
 
 			input {
@@ -437,6 +443,7 @@
 	.swiper {
 		width: 100%;
 		margin-top: 10upx;
+		margin-bottom: 20upx;
 		display: flex;
 		justify-content: center;
 
@@ -488,27 +495,31 @@
 	}
 
 	.category-list {
-		width: 100%;
-		padding: 0 0 30upx 0;
+		width: 92%;
+		margin: 0 4%;
 		border-bottom: solid 2upx #f6f6f6;
 		display: flex;
 		justify-content: space-between;
 		flex-wrap: wrap;
 
+	
+
 		.category {
-			width: 25%;
-			margin-top: 50upx;
+			width: 24%;
+			margin-top: 30upx;
 			flex-wrap: wrap;
 
 			.img {
 				width: 100%;
 				display: flex;
 				justify-content: center;
+				border: solid 1upx #dadada;
+				border-radius: 10% ;
 
 				image {
 					//分类图片大小
-					width: 18vw;
-					height: 18vw;
+					width: 14vw;
+					height: 14vw;
 				}
 			}
 
@@ -522,6 +533,7 @@
 			}
 		}
 	}
+	
 
 	.banner {
 		width: 92%;
@@ -630,6 +642,14 @@
 		}
 	}
 
+	.popular-pet{
+		border: solid 2upx #f6f6f6;
+		// .mb-10{
+		// 	background-color: #f4b18f;
+		// 	border-radius: 5%;
+		// }
+	}
+	
 	.goods-list {
 
 		// background-color: #f4f4f4;

@@ -63,8 +63,8 @@
 	export default {
 		data() {
 			return {
-				orderId:null,
-				payment:[],
+				orderId: null,
+				payment: [],
 				amount: 0,
 				orderName: '',
 				paytype: 'alipay' //支付类型
@@ -72,11 +72,11 @@
 		},
 		onLoad(e) {
 			this.amount = parseFloat(e.amount).toFixed(2);
-			this.orderId=e.orderId
+			this.orderId = e.orderId
 			uni.getStorage({
 				key: 'paymentOrder',
 				success: (e) => {
-					this.payment=e.data
+					this.payment = e.data
 					if (e.data.length > 1) {
 						this.orderName = '多商品合并支付'
 					} else {
@@ -90,14 +90,9 @@
 		},
 		methods: {
 			doDeposit() {
-				directPayment({orderId:this.orderId}).then((response)=>{
-					console.log(response)
-				})
-				//模板模拟支付，实际应用请调起微信/支付宝
-				uni.showLoading({
-					title: '支付中...'
-				});
-				setTimeout(() => {
+				directPayment({
+					orderId: this.orderId
+				}).then((response) => {
 					uni.hideLoading();
 					uni.showToast({
 						title: '支付成功'
@@ -107,10 +102,18 @@
 							title: 'ok'
 						})
 						uni.redirectTo({
-							url:'../../pay/success/success?amount='+this.amount
+							url: '../../pay/success/success?amount=' + this.amount
 						});
 					}, 300);
-				}, 700)
+				}).catch((error)=>{
+					uni.showToast({
+						title: '支付失败'
+					});
+				})
+				//模板模拟支付，实际应用请调起微信/支付宝
+				uni.showLoading({
+					title: '支付中...'
+				});
 			}
 		}
 	}

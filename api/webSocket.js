@@ -2,12 +2,15 @@
 
 class WebSocketModule {
   constructor(url) {
+	  console.log("websocket已经创建啦")
     this.url = url;
     this.socket = null;
+	this.connect();
   }
 
   connect() {
     this.socket = new WebSocket(this.url);
+	console.log('连接成功')
     // WebSocket连接的事件处理逻辑
     // ...
   }

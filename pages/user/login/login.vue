@@ -26,6 +26,9 @@
 			<text>|</text>
 			<navigator url="reg" open-type="navigate">注册账户</navigator>
 		</view>
+		<view class="other_login">
+			<button @login="github_login()">github登录</button>
+		</view>
 	</view>
 </template>
 
@@ -62,6 +65,19 @@
 						icon: "none"
 					})
 				})
+			},
+			github_login() {
+				console.log("github登录")
+				uni.login({
+						provider: 'weixin',
+						clientId: '4acb01d41ea9dcaa12f6',
+						redirectUri: 'http://localhost:8080/#/pages/tabBar/user/user',
+						success: (res) => {
+							consol.log(res)
+						}
+					})
+					console.log("没反应？")
+
 			}
 		}
 	}

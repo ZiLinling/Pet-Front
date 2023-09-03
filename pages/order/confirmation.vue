@@ -36,9 +36,9 @@
 							<view class="title">{{row.name}}</view>
 							<view class="spec">数量:{{row.etc.num}}</view>
 							<view class="price-number">
-								<view class="price">￥{{row.price*row.etc.num}}</view>
-								<view class="number">
-								</view>
+								
+								<view class="discount_price">￥{{(row.price * row.etc.num * privilege[role]).toFixed(2) }}</view>
+								<view class="price">({{row.price * row.etc.num  }})</view>
 							</view>
 						</view>
 					</view>
@@ -96,7 +96,9 @@
 		</view>
 		<view class="footer">
 			<view class="settlement">
-				<view class="sum">合计:<view class="money">￥{{sumPrice|toFixed}}</view>
+				<view class="sum">合计:
+				<view class="discount_money">￥{{sumPrice*privilege[role]|toFixed}}</view>
+				<view class="money">({{sumPrice|toFixed}})</view>
 				</view>
 				<view class="btn" @tap="toPay" >提交订单</view>
 			</view>
@@ -117,6 +119,9 @@
 	import {
 		getAddressByDefault
 	} from '../../api/address'
+	import{
+		getRole
+	} from '@/api/user.js'
 	export default {
 		data() {
 			return {
@@ -130,20 +135,28 @@
 				note: '', //备注
 				int: 1200, //抵扣积分
 				deduction: 0, //抵扣价格
-				recinfo: {
-					// name: "大黑哥",
-					// head: "大",
-					// telephone: "18816881688",
-					// region: '福建省-厦门市-集美区',
-					// address: '理工学院',
-				}
+				recinfo: {},
+				role:null,
+				privilege:[1,0.95,0.9,0.85,0.8,0.75,0.7],
 
 			};
 		},
 		onLoad(){
 			this.getAddressByDefault();
+			
 		},
 		onLoad(option) {
+			uni.getStorage({
+				key:'role',
+				success: (res) => {
+					this.role=res.data;
+					console.log(res)
+				},
+				fail: (err) => {
+					console.log(err)
+				}
+			})
+			// this.role=option.role
 			if(option.type!=null){
 				uni.setStorage({
 					key:'orderType',
@@ -177,7 +190,6 @@
 					key: 'buylist',
 					success: (res) => {
 						this.buylist = res.data
-						console.log("buylist_2",this.buylist)
 						for (let i = 0; i < this.buylist.length; i++) {
 							for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
 								this.goodsPrice += (this.buylist[i].etc.goodsList[j].etc.num * this
@@ -196,7 +208,7 @@
 				uni.getStorage({
 					key: 'goodsOrder',
 					success: (res) => {
-						console.log(res.data)
+
 						let store = {
 							name: res.data.storeName,
 							storeId: res.data.storeId,
@@ -213,16 +225,13 @@
 							}
 							
 						}
-
 						let buylist = [];
 						this.type = 1;
 						buylist.push(store)
-						this.buylist = buylist;
-						console.log("111",buylist)
+						this.buylist = buylist;				
 						this.goodsPrice = this.buylist[0].etc.goodsList[0].etc.num * this.buylist[0].etc.goodsList[0].price
 						this.deduction = this.int / 100;
 						this.sumPrice = this.goodsPrice - this.deduction + this.freight;
-						console.log("buylist",this.buylist)
 					},
 				});
 			}
@@ -261,7 +270,7 @@
 				});
 			}
 			
-		
+			this.goodsPrice=this.privilege[this.role]*this.goodsPrice;
 		},
 		onShow() {
 			// 在页面显示时更新数据
@@ -337,7 +346,6 @@
 					});
 					return;
 				}
-				console.log("paymentOrder",paymentOrder)
 				this.recinfo.id=null;
 				generateOrder({
 					...this.recinfo,
@@ -345,7 +353,6 @@
 					postscript: this.note
 				}).then((response) => {
 					orderId = response.data.data
-					console.log("order之后",this.buylist)
 					// this.buylist
 					for (let i = 0; i < this.buylist.length; i++) {
 						for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
@@ -364,16 +371,12 @@
 						}
 					}
 					
-				}).catch((error) => {
-					console.log(error)
 				})
-
 				//本地模拟订单提交UI效果
 				uni.showLoading({
 					title: '正在提交订单...'
 				})
 				setTimeout(() => {
-					console.log("pay",paymentList)
 					uni.setStorage({
 						key: 'paymentOrder',
 						data: paymentList,
@@ -499,20 +502,18 @@
 						width: 100%;
 						bottom: 0upx;
 						display: flex;
-						justify-content: space-between;
 						align-items: flex-end;
 						font-size: 28upx;
 						height: 40upx;
 
-						.price {
+						.discount_price {
 							color: #f06c7a;
+							font-weight: 600;
 						}
-
-						.number {
-							display: flex;
-							justify-content: center;
-							align-items: center;
-
+						.price{
+							font-size: 26upx;
+							font-weight: 300;
+							text-decoration: line-through;
 						}
 					}
 				}
@@ -574,14 +575,20 @@
 			align-items: center;
 
 			.sum {
-				width: 50%;
+				width: 60%;
 				font-size: 28upx;
 				margin-right: 10upx;
 				display: flex;
 				justify-content: flex-end;
 
-				.money {
+				.discount_money {
 					font-weight: 600;
+					color:#f06c7a ;
+				}
+				.money {
+					font-size: 26upx;
+					font-weight: 400;
+					text-decoration: line-through;
 				}
 			}
 

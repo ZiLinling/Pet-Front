@@ -1,6 +1,6 @@
 <template>
 	<view>
-        <view class="chat-list">
+		<view class="chat-list">
 			<view class="chat" v-for="(chat,index) in chatList" :key="index">
 				<view class="row" @tap="toChat(chat)">
 					<view class="left">
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+	import WebSocketModule from '@/api/webSocket.js'
 	import {
 		listMsg
 	}
@@ -30,211 +31,170 @@
 	export default {
 		data() {
 			return {
-				chatList:[
-					// {
-					// 	uid:1,
-					// 	username:"鲜果蔬专营店",
-					// 	face:"/static/img/im/face/face_1.jpg",
-					// 	time:"13:08",
-					// 	msg:"亲，20点前下单都是当天送达的",
-					// 	tisNum:1
-					// },
-					// {
-					// 	uid:2,
-					// 	username:"官店大欺客旗舰店",
-					// 	face:"/static/img/im/face/face_2.jpg",
-					// 	time:"13:05",
-					// 	msg:"问那么多干什么？不想买就滚~",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:3,
-					// 	username:"妙不可言",
-					// 	face:"/static/img/im/face/face_3.jpg",
-					// 	time:"12:15",
-					// 	msg:"推荐一个商品呗？",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:4,
-					// 	username:"茶叶专卖",
-					// 	face:"/static/img/im/face/face_4.jpg",
-					// 	time:"12:11",
-					// 	msg:"现在卖的都是未过青的茶哦",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:5,
-					// 	username:"likeKiss客服",
-					// 	face:"/static/img/im/face/face_5.jpg",
-					// 	time:"12:10",
-					// 	msg:"你好，发福建快递多久送到的？",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:6,
-					// 	username:"白开水",
-					// 	face:"/static/img/im/face/face_6.jpg",
-					// 	time:"12:10",
-					// 	msg:"在吗？",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:7,
-					// 	username:"衣帽间的叹息",
-					// 	face:"/static/img/im/face/face_7.jpg",
-					// 	time:"11:56",
-					// 	msg:"新品上市，欢迎选购",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:8,
-					// 	username:"景萧疏",
-					// 	face:"/static/img/im/face/face_8.jpg",
-					// 	time:"11:56",
-					// 	msg:"商品七天无理由退换的",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:9,
-					// 	username:"文宁先生",
-					// 	face:"/static/img/im/face/face_9.jpg",
-					// 	time:"12:15",
-					// 	msg:"星期天再发货的",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:10,
-					// 	username:"高端Chieh",
-					// 	face:"/static/img/im/face/face_10.jpg",
-					// 	time:"12:36",
-					// 	msg:"建议你直接先测量好尺码在选购的。",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:11,
-					// 	username:"mode旗舰店",
-					// 	face:"/static/img/im/face/face_11.jpg",
-					// 	time:"12:40",
-					// 	msg:"新品5折，还有大量优惠券。",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:12,
-					// 	username:"敏萘客服",
-					// 	face:"/static/img/im/face/face_12.jpg",
-					// 	time:"12:36",
-					// 	msg:"还没有用，等我明天早上试一下",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:13,
-					// 	username:"春天里的花",
-					// 	face:"/static/img/im/face/face_13.jpg",
-					// 	time:"12:36",
-					// 	msg:"适用于成年人的，小孩不适用的",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:14,
-					// 	username:"电脑外设专业户",
-					// 	face:"/static/img/im/face/face_13.jpg",
-					// 	time:"12:36",
-					// 	msg:"把上面的螺丝拆下来，把铁片撬开就能看见了",
-					// 	tisNum:0
-					// },
-					// {
-					// 	uid:15,
-					// 	username:"至善汽车用品",
-					// 	face:"/static/img/im/face/face_15.jpg",
-					// 	time:"12:36",
-					// 	msg:"这个产品是原车配件，完美装上的",
-					// 	tisNum:0
-					// }
-
-				]
+				chatList: []
 			}
 		},
 		//下拉刷新，需要自己在page.json文件中配置开启页面下拉刷新 "enablePullDownRefresh": true
 		onPullDownRefresh() {
-		    setTimeout(function () {
-		        uni.stopPullDownRefresh();
-		    }, 1000);
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1000);
 		},
 		onLoad() {
 			console.log("list")
 			listMsg({}).then((response) => {
 				console.log(response)
-				this.chatList=response.data.data;
-				console.log("msgLsit",this.chatList)
+				this.chatList = response.data.data;
+				console.log("msgLsit", this.chatList)
 			}).catch((error) => {
 				console.log(error)
 			})
 		},
 		methods: {
-			toChat(chat){
-				console.log("chat",chat)
-				uni.navigateTo({
-					url:"chat/chat?recipient="+chat.recipient+"&username="+chat.userName
-				})
+			// init(username) {
+			// 	//username直接传进来，不用初始化
+			// 	// this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {}
+			// 	// let username = this.user.username;
+			// 	let _this = this;
+			// 	if (typeof(WebSocket) == "undefined") {
+			// 		console.log("您的浏览器不支持WebSocket");
+			// 	} else {
+			// 		console.log("您的浏览器支持WebSocket");
+			// 		let socketUrl = "ws://localhost:9090/imserver/" + username;
+			// 		if (socket != null) {
+			// 			socket.close();
+			// 			socket = null;
+			// 		}
+			// 		// 开启一个websocket服务
+			// 		socket = new WebSocket(socketUrl);
+			// 		//打开事件
+			// 		socket.onopen = function() {
+			// 			console.log("websocket已打开");
+			// 		};
+			// 		//  浏览器端收消息，获得从服务端发送过来的文本消息
+			// 		socket.onmessage = function(msg) {
+			// 			console.log("收到数据====" + msg.data)
+			// 			let data = JSON.parse(msg
+			// 				.data) // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
+			// 			if (data.users) { // 获取在线人员信息
+			// 				_this.users = data.users.filter(user => user.username !==
+			// 					username) // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
+			// 			} else {
+			// 				// 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
+			// 				//  // {"from": "zhang", "text": "hello"}
+			// 				if (data.from === _this.chatUser) {
+			// 					_this.messages.push(data)
+			// 					// 构建消息内容
+			// 					_this.createContent(data.from, null, data.text)
+			// 				}
+			// 			}
+			// 		};
+			// 		//关闭事件
+			// 		socket.onclose = function() {
+			// 			console.log("websocket已关闭");
+			// 		};
+			// 		//发生了错误事件
+			// 		socket.onerror = function() {
+			// 			console.log("websocket发生了错误");
+			// 		}
+			// 	}
+			// },
+
+			init(username) {
+				//username直接传进来，不用初始化
+				// this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {}
+				// let username = this.user.username;
+				let _this = this;
+				if (typeof(WebSocket) == "undefined") {
+					console.log("您的浏览器不支持WebSocket");
+				} else {
+					console.log("您的浏览器支持WebSocket");
+					let socketUrl = "ws://localhost:8090/pet/" + username;
+					if (socketModule != null) {
+						console.log("close?")
+						socketModule.close();
+						socketModule = null;
+					}
+					// 开启一个websocket服务
+					const socketModule = new WebSocketModule(socketUrl);
+				}
+			},
+			toChat(chat) {
+				//调到init去打开websocket
+				this.init(chat.userName)
+				// uni.navigateTo({
+				// 	url: "chat/chat?recipient=" + chat.recipient + "&username=" + chat.userName
+				// })
 			}
 		}
 	}
 </script>
 
-<style  lang="scss">
-	page{
-		background-color: rgba(0,0,0,0);
+<style lang="scss">
+	page {
+		background-color: rgba(0, 0, 0, 0);
 	}
-	.chat-list{
+
+	.chat-list {
 		width: 94%;
 		padding: 0 3%;
-		.chat{
+
+		.chat {
 			width: 100%;
 			height: 100upx;
 			padding: 20upx 0;
 			border-bottom: solid 1upx #eaeaea;
-			.row{
+
+			.row {
 				display: flex;
 				justify-content: flex-start;
-				.left{
-					flex-shrink:0;
+
+				.left {
+					flex-shrink: 0;
 					width: 100upx;
 					height: 100upx;
-					image{
+
+					image {
 						width: 100upx;
 						height: 100upx;
 						border-radius: 20upx;
 					}
 				}
-				.right{
-					flex-shrink:1;
+
+				.right {
+					flex-shrink: 1;
 					width: 98%;
 					padding-left: 2%;
-					.top{
+
+					.top {
 						width: 100%;
 						display: flex;
 						justify-content: space-between;
 						align-items: flex-end;
-						.usernam{
+
+						.usernam {
 							font-size: 26upx;
 						}
-						.time{
+
+						.time {
 							font-size: 22upx;
 							color: #bebebe;
 						}
 					}
-					.bottom{
+
+					.bottom {
 						width: 100%;
 						height: 40upx;
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
-						.msg{
+
+						.msg {
 							font-size: 25upx;
 							color: #777;
 						}
-						.tis{
+
+						.tis {
 							width: 35upx;
 							height: 35upx;
 							font-size: 22upx;

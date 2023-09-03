@@ -157,13 +157,13 @@
 		methods: {
 			toComment(row) {
 				let goodsIds = ''
-				let itemIds=''
+				let itemIds = ''
 				for (let i = 0; i < row.etc.orderItems.length; i++) {
 					goodsIds += row.etc.orderItems[i].itemId + ','
 					itemIds += row.etc.orderItems[i].id + ','
 				}
 				uni.navigateTo({
-					url: '/pages/comment/comment?goodsIds=' + goodsIds+"&itemIds="+itemIds
+					url: '/pages/comment/comment?goodsIds=' + goodsIds + "&itemIds=" + itemIds
 				})
 			},
 			getList() {
@@ -188,7 +188,7 @@
 						}
 					}
 					// this.orderList[0].
-					console.log("new",this.orderList)
+					console.log("new", this.orderList)
 					this.num++;
 				}).catch((error) => {
 					console.log(error)
@@ -244,12 +244,12 @@
 					title: '正在获取订单...'
 				})
 				let items = row.etc.orderItems
-			
+
 				let ids = items[0].id;
 				for (let i = 1; i < items.length; i++) {
 					ids += "," + items[i].id
 				}
-				
+
 				toPay({
 					ids: ids
 				}).then((response) => {
@@ -283,7 +283,7 @@
 				}, 500)
 			},
 			confirm(row) {
-				
+
 				let items = row.etc.orderItems
 				let ids = items[0].id;
 				for (let i = 1; i < items.length; i++) {
@@ -313,7 +313,7 @@
 				});
 			},
 			rejected(row) {
-				
+
 				let items = row.etc.orderItems
 				let ids = items[0].id;
 				for (let i = 1; i < items.length; i++) {
@@ -342,7 +342,7 @@
 					}
 				});
 			}
-		
+
 		}
 	}
 </script>
@@ -431,6 +431,7 @@
 					margin-top: 10upx;
 					font-size: 36upx;
 					font-weight: 540;
+
 					image {
 						margin-right: 15upx;
 						border-radius: 50%;
@@ -446,7 +447,7 @@
 					font-size: 26upx;
 					color: #ec652f;
 					height: 50upx;
-					display:inline-block;
+					display: inline-block;
 					font-size: 30upx;
 					font-weight: 800;
 					float: right;
