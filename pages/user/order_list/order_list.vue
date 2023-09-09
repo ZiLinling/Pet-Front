@@ -72,7 +72,7 @@
 						</block>
 						<block v-if="row.etc.order_status=='4'">
 							<view class="pay" @tap="toComment(row)">评价</view>
-							<view class="default">再次购买</view>
+							<view class="default" v-if="row.type==1">再次购买</view>
 						</block>
 						<block v-if="row.etc.order_status=='5'">
 							<view class="default">查看进度</view>
@@ -180,6 +180,7 @@
 				];
 				listOrderItem().then((response) => {
 					this.orders = response.data.data;
+					
 					for (let i = this.orders.length - 1; i >= 0; i--) {
 						let stores = this.orders[i].etc.stores
 						for (let j = stores.length - 1; j >= 0; j--) {
@@ -188,6 +189,7 @@
 							this.orderList[store.etc.order_status].push(store)
 						}
 					}
+					console.log("orders",this.orderList[0])
 					// this.orderList[0].
 					console.log("new", this.orderList)
 					this.num++;
