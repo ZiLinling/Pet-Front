@@ -111,7 +111,8 @@
 					4: '等待用户评价',
 					5: '商品退货处理中',
 					6: '交易已完成',
-					7: '订单已取消'
+					7: '订单已取消',
+					8: '退款成功',
 				},
 				orderType: ['全部', '待付款', '待发货', '待收货', '待评价', '退换货'],
 				orders: [],
@@ -250,25 +251,11 @@
 					ids += "," + items[i].id
 				}
 
-				toPay({
-					ids: ids
-				}).then((response) => {
-					uni.showToast({
-						title: '付款成功'
-					})
-					this.getList()
-
-					//option为object类型，会序列化上个页面传递的参数		
-					this.list = this.orderList[1];
-					this.tabbarIndex = 1;
-				}).catch((error) => {
-					console.log(error)
-				})
-
 
 				// 跳转到付款页面(暂时不要)
 				let paymentOrder = [];
 				paymentOrder.push(row);
+				console.log(row)
 				setTimeout(() => {
 					uni.setStorage({
 						key: 'paymentOrder',
@@ -276,7 +263,7 @@
 						success: () => {
 							uni.hideLoading();
 							uni.navigateTo({
-								url: '../../pay/payment/payment?amount=' + row.price * row.num
+								url: '../../pay/payment/payment?amount=' + row.etc.price * row.etc.num
 							})
 						}
 					})

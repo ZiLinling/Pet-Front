@@ -58,7 +58,7 @@
 
 <script>
 	import {
-		directPayment
+		toPay
 	} from '@/api/orderItem.js'
 	export default {
 		data() {
@@ -72,6 +72,7 @@
 		},
 		onLoad(e) {
 			this.amount = parseFloat(e.amount).toFixed(2);
+			console.log("amount",this.amount)
 			this.orderId = e.orderId
 			uni.getStorage({
 				key: 'paymentOrder',
@@ -82,21 +83,27 @@
 					} else {
 						this.orderName = e.data[0].name;
 					}
-					uni.removeStorage({
-						key: 'paymentOrder'
-					})
 				}
 			})
 		},
 		methods: {
 			doDeposit() {
-				directPayment({
-					orderId: this.orderId
+				console.log(this.payment[0])
+				let store =this.payment[0]
+				let ids=''
+				for(let i=0;i<store.etc.orderItems.length;i++){
+					ids+=store.etc.orderItems[i].id+','
+				}
+				toPay({
+					ids
 				}).then((response) => {
 					uni.hideLoading();
 					uni.showToast({
 						title: '支付成功'
 					});
+					uni.removeStorage({
+						key: 'paymentOrder'
+					})
 					setTimeout(() => {
 						uni.showToast({
 							title: 'ok'
@@ -110,7 +117,9 @@
 						title: '支付失败'
 					});
 				})
+				
 				//模板模拟支付，实际应用请调起微信/支付宝
+				
 				uni.showLoading({
 					title: '支付中...'
 				});
