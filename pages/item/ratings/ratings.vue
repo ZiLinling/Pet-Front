@@ -26,6 +26,9 @@
 								<view class="username">
 									{{row.etc.user.name}}
 								</view>
+								<view class="rate">
+									<uni-rate  class="rating" :value="row.level" :margin="3" :readonly="true"></uni-rate>
+								</view>
 								<view class="date">
 									{{row.createTime}}
 								</view>
@@ -184,6 +187,7 @@
 				goodsId: option.goodsId
 			}).then((response) => {
 				this.ratingsList = response.data.data
+				console.log(this.ratingsList)
 			})
 		},
 		methods: {
@@ -197,6 +201,7 @@
 						goodsId: option.goodsId
 					}).then((response) => {
 						this.ratingsList = response.data.data
+						
 					})
 				})
 
@@ -349,7 +354,15 @@
 						display: flex;
 						width: 100%;
 						flex-wrap: wrap;
-
+						
+						
+						// .rate{
+						// 	width:40upx;
+						// 	.rating{
+						// 		width: 40upx;
+						// 	}
+						// }
+						
 						.name-date {
 							width: 100%;
 							justify-content: space-between;

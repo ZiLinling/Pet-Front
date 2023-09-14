@@ -78,7 +78,7 @@
 
 				</view>
 			</view>
-			<view v-if="!this.token">
+			<view v-if="!token">
 				<u-empty mode="car" icon="http://cdn.uviewui.com/uview/empty/car.png" style="margin-top: 300upx;">
 					<button type="default" @click="toLogin()" class="login_button">快去登录</button>
 				</u-empty>
@@ -90,13 +90,14 @@
 <script>
 	import {
 		getCart,
-		deleteById,
+		deleteByIds,
 		updateNum,
 		updateSelected,
 		isAllSelected
 	} from '@/api/cart';
 	import{
-		getRole
+		getRole,
+		getUser
 	} from '@/api/user.js'
 	export default {
 		data() {
@@ -146,7 +147,16 @@
 			// #endif
 		},
 		onShow() {
-			this.token = uni.getStorageSync('token')
+			getUser({}).then((response)=>{
+				console.log(response.data)
+				this.token='exist'
+			}).catch((err)=>{
+				console.log(err)
+				this.token==null;
+				uni.removeStorage({
+					key:'token',
+				})
+			})
 			this.headerTop = null,
 				this.statusTop = null,
 				this.showHeader = true,
@@ -330,15 +340,15 @@
 				for (let i = 0; i < this.selectedList.length; i++) {
 					ids += (this.goodsList[this.selectedList[i]].id) + ',';
 				}
-				this.deleteById(ids);
+				 this.deleteByIds(ids);
 			},
 			deleteGood(index, cnt) {
 				console.log("要删除了？", cnt, index)
 				this.deleteById(this.storeList[cnt].etc.goodsList[index].id);
 			},
-			deleteById(ids) {
-				deleteById({
-					ids: ids
+			deleteByIds(ids) {
+				deleteByIds({
+					goodsIds: ids
 				}).then((response) => {
 					this.sum();
 					this.oldIndex = null;

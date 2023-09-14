@@ -275,6 +275,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/user/coupon/coupon",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

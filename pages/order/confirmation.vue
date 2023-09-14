@@ -353,9 +353,10 @@
 					postscript: this.note
 				}).then((response) => {
 					orderId = response.data.data
-					// this.buylist
+
 					for (let i = 0; i < this.buylist.length; i++) {
 						for (let j = 0; j < this.buylist[i].etc.goodsList.length; j++) {
+								
 								generateOrderItem({
 									status:1,
 									itemId: this.buylist[i].etc.goodsList[j].id,

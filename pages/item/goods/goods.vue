@@ -188,12 +188,12 @@
 			<view class="comment" @tap="toRatings">
 				<view class="user-info">
 					<view class="face">
-						<image :src="comment.userface"></image>
+						<image :src="$base_url+comment.etc.user.img"></image>
 					</view>
-					<view class="username">{{comment.username}}</view>
+					<view class="username">{{comment.etc.user.name}}</view>
 				</view>
 				<view class="content">
-					{{comment.content}}
+					{{comment.comment}}
 				</view>
 			</view>
 		</view>
@@ -244,7 +244,8 @@
 	}
 	from '@/api/store';
 	import {
-		getListByGoodsId
+		getListByGoodsId,
+		getBestComment
 	} from '@/api/comment.js'
 	export default {
 		data() {
@@ -334,9 +335,17 @@
 			this.id = option.cid
 			this.checkFavor()
 			this.getgoods(option.cid);
+			getBestComment({goodsId:option.cid}).then((response)=>{
+		
+				this.comment=response.data.data
+						console.log(this.comment)
+			}).catch((err)=>{
+				console.log(err)
+			})
 		},
 		onShow() {
 			this.token = uni.getStorageSync('token')
+			
 		},
 		onReady() {
 			this.calcAnchor(); //计算锚点高度，页面数据是ajax加载时，请把此行放在数据渲染完成事件中执行以保证高度计算正确
@@ -358,7 +367,7 @@
 			//滑动函数？
 		},
 		mounted() {
-
+			
 		},
 		// watch:{
 		// 	goods.num	

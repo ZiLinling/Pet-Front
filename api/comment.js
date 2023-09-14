@@ -13,7 +13,11 @@ export function getListByGoodsId(user) {
 
 
 export function addAdditional(user) {
-	console.log(222)
 	return postRequest('/comment/addAdditional', user)
 }
+
+export function getBestComment(user) {
+	return postRequest('/comment/getBestComment', user)
+}
+
 

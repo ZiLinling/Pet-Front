@@ -132,8 +132,8 @@
 						img: '/static/img/user/addr.png'
 					},
 					{
-						url: '',
-						text: '账户安全',
+						url: '../../user/coupon/coupon',
+						text: '优惠券',
 						img: '/static/img/user/security.png'
 					},
 					{
@@ -141,8 +141,6 @@
 						text: '银行卡',
 						img: '/static/img/user/bank.png'
 					},
-
-
 				]
 			}
 		},
@@ -215,6 +213,7 @@
 				})
 			},
 			toPage(url) {
+				console.log(url)
 				if (!url) {
 					uni.showToast({
 						title: '此功能尚未实现',

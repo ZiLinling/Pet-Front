@@ -11,7 +11,7 @@ export function save(goodsId) {
 	return postRequest('/cart/save', goodsId)
 }
 
-export function deleteById(goodsId) {
+export function deleteByIds(goodsId) {
 	return postRequest('/cart/delete', goodsId)
 }
 

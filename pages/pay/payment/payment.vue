@@ -91,7 +91,7 @@
 				console.log(this.payment[0])
 				let store =this.payment[0]
 				let ids=''
-				for(let i=0;i<store.etc.orderItems.length;i++){
+				for(let i=0;i<store.etc.goodsList[0].length;i++){
 					ids+=store.etc.orderItems[i].id+','
 				}
 				toPay({
